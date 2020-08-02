@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.netty.server.handler;
 
 import com.github.liuche51.easyTaskX.cluster.follow.FollowService;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
+import com.github.liuche51.easyTaskX.util.StringConstant;
 
 public class TranTryDelTaskHandler extends BaseHandler {
     @Override
@@ -9,6 +10,6 @@ public class TranTryDelTaskHandler extends BaseHandler {
         String tranAndSchedule = frame.getBody();
         String[] item=tranAndSchedule.split(",");
         FollowService.tryDelTask(item[0],item[1]);
-        return null;
+        return StringConstant.EMPTY;
     }
 }
