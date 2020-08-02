@@ -13,6 +13,13 @@ public abstract class BaseHandler {
         INSTANCES=new HashMap<String,BaseHandler>(){
             {
                 put(NettyInterfaceEnum.CLIENT_SUBMIT_TASK,new ClientSubmitTaskHandler());
+                put(NettyInterfaceEnum.TRAN_TRYSAVETASK,new TranTrySaveTaskHandler());
+                put(NettyInterfaceEnum.TRAN_CONFIRMSAVETASK,new TranConfirmSaveTaskHandler());
+                put(NettyInterfaceEnum.TRAN_CANCELSAVETASK,new TranCancelSaveTaskHandler());
+                put(NettyInterfaceEnum.TRAN_TRYDELTASK,new TranTryDelTaskHandler());
+                put(NettyInterfaceEnum.LEADER_SYNC_DATA_TO_NEW_FOLLOW,new LeaderSyncDataToNewFollowHandler());
+                put(NettyInterfaceEnum.SYNC_LEADER_POSITION,new SyncLeaderPositionHandler());
+                put(NettyInterfaceEnum.GET_DBINFO_BY_TASKID,new GetDBInfoByTaskIdHandler());
             }
         };
     }
