@@ -27,6 +27,7 @@ import java.util.List;
 public class ClusterService {
     private static Logger log = LoggerFactory.getLogger(ClusterService.class);
     private static EasyTaskConfig config = null;
+    private static volatile boolean isStarted = false;//是否已经启动
     /**
      * 当前集群节点的Node对象
      */
@@ -47,11 +48,15 @@ public class ClusterService {
         return config;
     }
 
-    public static void setConfig(EasyTaskConfig config) {
-        ClusterService.config = config;
-    }
 
-    public static void start(EasyTaskConfig config) throws Exception {
+   /* public static void setConfig(EasyTaskConfig config) {
+        ClusterService.config = config;
+    }*/
+
+    public static synchronized void start(EasyTaskConfig config) throws Exception {
+        //避免重复执行
+        if (isStarted)
+            return;
         if (config == null)
             throw new Exception("config is null,please set a EasyTaskConfig!");
         EasyTaskConfig.validateNecessary(config);
@@ -59,6 +64,7 @@ public class ClusterService {
         DbInit.init();
         NettyServer.getInstance().run();//启动组件的Netty服务端口
         initCurrentNode();
+        isStarted=true;
     }
     /**
      * 初始化当前节点的集群。(系统重启或心跳超时重启)
@@ -67,7 +73,7 @@ public class ClusterService {
      *
      * @return
      */
-    public static boolean initCurrentNode() throws Exception {
+    public static void initCurrentNode() throws Exception {
         clearThreadTask();
         deleteAllData();
         CURRENTNODE = new Node(Util.getLocalIP(), ClusterService.getConfig().getServerPort());
@@ -87,16 +93,28 @@ public class ClusterService {
         timerTasks.add(cancelSaveTransactionTask());
         timerTasks.add(retryCancelSaveTransactionTask());
         timerTasks.add(retryDelTransactionTask());
-
-        return true;
     }
-
+    /**
+     * 客户端提交任务。允许线程等待，直到easyTask组件启动完成
+     *
+     * @param schedule
+     * @return
+     * @throws Exception
+     */
+    public void submitTaskAllowWait(Schedule schedule) throws Exception {
+        //集群未启动或正在选举follow中，则继续等待完成
+        while (!isStarted||VoteFollows.isSelecting()) {
+            Thread.sleep(1000l);
+        }
+        this.submitTask(schedule);
+    }
     /**
      * 任务数据持久化。并同步至备份库
      *使用TCC机制实现事务，达到数据最终一致性
      * @throws Exception
      */
     public static void submitTask(Schedule schedule) throws Exception {
+        if (!isStarted) throw new Exception("the easyTask has not started,please wait a moment!");
         if (VoteFollows.isSelecting())
             throw new VotingException("normally exception!save():cluster is voting,please wait a moment.");
         //防止多线程下，follow元素操作竞争问题。确保参与提交的follow不受集群选举影响
