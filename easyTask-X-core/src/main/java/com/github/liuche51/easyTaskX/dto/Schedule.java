@@ -125,6 +125,19 @@ public class Schedule {
         schedule.source=bak.getSource();
         return schedule;
     }
+    public static Schedule valueOf(ScheduleDto.Schedule dto){
+        Schedule schedule=new Schedule();
+        schedule.id=dto.getId();
+        schedule.classPath=dto.getClassPath();
+        schedule.executeTime=dto.getExecuteTime();
+        schedule.taskType=dto.getTaskType();
+        schedule.period=dto.getPeriod();
+        schedule.unit=dto.getUnit();
+        schedule.param=dto.getParam();
+        schedule.source=dto.getSource();
+        schedule.transactionId=dto.getTransactionId();
+        return schedule;
+    }
 
     /**
      * 转换为protocol buffer对象

@@ -21,7 +21,7 @@ public class ClusterTest {
     public void startNode1() {
         EasyTaskConfig config =new EasyTaskConfig();
         try {
-            config.setTaskStorePath("C:/db/node1");
+            config.setTaskStorePath("C:/easyTaskX/node1");
             config.setServerPort(2021);
             initData(config,"Node1");
         } catch (Exception e) {
@@ -31,17 +31,38 @@ public class ClusterTest {
 
     @Test
     public void startNode2() {
-
+        EasyTaskConfig config =new EasyTaskConfig();
+        try {
+            config.setTaskStorePath("C:/easyTaskX/node2");
+            config.setServerPort(2022);
+            initData(config,"Node2");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void startNode3() {
-
+        EasyTaskConfig config =new EasyTaskConfig();
+        try {
+            config.setTaskStorePath("C:/easyTaskX/node3");
+            config.setServerPort(2023);
+            initData(config,"Node3");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void startNode4() {
-
+        EasyTaskConfig config =new EasyTaskConfig();
+        try {
+            config.setTaskStorePath("C:/easyTaskX/node4");
+            config.setServerPort(2024);
+            initData(config,"Node4");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     private void initData(EasyTaskConfig config,String name) throws Exception {
         config.setSQLlitePoolSize(5);

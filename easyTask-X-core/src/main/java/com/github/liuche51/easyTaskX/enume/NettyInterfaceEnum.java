@@ -2,6 +2,10 @@ package com.github.liuche51.easyTaskX.enume;
 
 public class NettyInterfaceEnum {
     /**
+     * 客户端提交任务
+     */
+    public static final String CLIENT_SUBMIT_TASK="Client_Submit_Task";
+    /**
      * 预备提交任务接口。阶段一
      */
     public static final String TRAN_TRYSAVETASK="Tran_TrySaveTask";

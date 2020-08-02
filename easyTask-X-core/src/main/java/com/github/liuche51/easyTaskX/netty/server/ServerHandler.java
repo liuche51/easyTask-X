@@ -9,6 +9,7 @@ import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
+import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -45,45 +46,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
             builder.setSource(ClusterService.getConfig().getAddress());
             Dto.Frame frame = (Dto.Frame) msg;
             builder.setIdentity(frame.getIdentity());
-            switch (frame.getInterfaceName()) {
-                case NettyInterfaceEnum
-                        .TRAN_TRYSAVETASK:
-                    ScheduleDto.Schedule schedule = ScheduleDto.Schedule.parseFrom(frame.getBodyBytes());
-                    FollowService.trySaveTask(schedule);
-                    break;
-                case NettyInterfaceEnum
-                        .TRAN_CONFIRMSAVETASK:
-                    String transactionId = frame.getBody();
-                    FollowService.confirmSaveTask(transactionId);
-                    break;
-                case NettyInterfaceEnum
-                        .TRAN_CANCELSAVETASK:
-                    String transactionId1 = frame.getBody();
-                    FollowService.cancelSaveTask(transactionId1);
-                    break;
-                case NettyInterfaceEnum
-                        .TRAN_TRYDELTASK:
-                    String tranAndSchedule = frame.getBody();
-                    String[] item=tranAndSchedule.split(",");
-                    FollowService.tryDelTask(item[0],item[1]);
-                    break;
-                case NettyInterfaceEnum
-                        .LEADER_SYNC_DATA_TO_NEW_FOLLOW:
-                    ScheduleDto.ScheduleList scheduleList = ScheduleDto.ScheduleList.parseFrom(frame.getBodyBytes());
-                    FollowService.saveScheduleBakBatchByTran(scheduleList);
-                    break;
-                case NettyInterfaceEnum.SYNC_LEADER_POSITION:
-                    String ret = frame.getBody();
-                    FollowService.updateLeaderPosition(ret);
-                    break;
-                case NettyInterfaceEnum.GET_DBINFO_BY_TASKID:
-                    String tranId = frame.getBody();
-                    Map<String, List> map=DBMonitor.getInfoByTaskId(tranId);
-                    result.setBody(JSONObject.toJSONString(map));
-                    break;
-                default:
-                    throw new Exception("unknown interface method");
-            }
+            BaseHandler handler=BaseHandler.INSTANCES.get(frame.getInterfaceName());
+            result.setBody(handler.process(frame));
         } catch (Exception e) {
             log.error("Deal client msg occured error！", e);
             result.setResult(StringConstant.FALSE);
