@@ -21,12 +21,6 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12 -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.26</version>
-        </dependency>
         <!--以下一个配置用于测试同一个项目依赖环境。-->
         <dependency>
             <groupId>com.github.liuche51</groupId>
