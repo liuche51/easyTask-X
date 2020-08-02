@@ -1,7 +1,5 @@
-package com.github.liuche51.easyTaskX.core;
+package com.github.liuche51.easyTaskX.cluster;
 
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.annotation.JSONField;
 import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
@@ -64,23 +62,6 @@ public class EasyTaskConfig {
      * 清理任务备份表中失效的leader备份。默认1小时一次。单位毫秒
      */
     private int clearScheduleBakTime = 36500000;
-
-    /**
-     * 环形队列任务调度线程池
-     */
-    @JSONField(serialize=false)
-    private ExecutorService dispatchs =  null;
-    private String dispatchsPool_corePoolSize;
-    private String dispatchsPool_maximumPoolSize;
-    private String dispatchsPool_keepAliveTime;
-    /**
-     * 环形队列工作任务线程池
-     */
-    @JSONField(serialize=false)
-    private ExecutorService workers =  null;
-    private String workersPool_corePoolSize;
-    private String workersPool_maximumPoolSize;
-    private String workersPool_keepAliveTime;
     /**
      * 集群公用程池
      */
@@ -229,22 +210,6 @@ public class EasyTaskConfig {
         this.clusterPool = clusterPool;
     }
 
-    public ExecutorService getDispatchs() {
-        return dispatchs;
-    }
-
-    public void setDispatchs(ExecutorService dispatchs) {
-        this.dispatchs = dispatchs;
-    }
-
-    public ExecutorService getWorkers() {
-        return workers;
-    }
-
-    public void setWorkers(ExecutorService workers) {
-        this.workers = workers;
-    }
-
     /**
      * 必填项验证
      * @param config
@@ -255,10 +220,6 @@ public class EasyTaskConfig {
             throw new Exception("zkAddress is necessary!");
         if(StringUtils.isNullOrEmpty(config.taskStorePath))
             throw new Exception("taskStorePath is necessary!");
-        if(config.dispatchs==null)
-            config.dispatchs=Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        if(config.workers==null)
-            config.workers=Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
         if(config.clusterPool==null)
             config.clusterPool=Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
     }

@@ -1,8 +1,8 @@
 package com.github.liuche51.easyTaskX;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
-import com.github.liuche51.easyTaskX.core.EasyTaskConfig;
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
 import com.github.liuche51.easyTaskX.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,7 @@ public class EasyTaskXApp {
     public static void main(String[] args) throws Exception {
         EasyTaskConfig config = loadConfig();
         log.info("AnnularQueue start config EasyTaskConfig=" + JSONObject.toJSONString(config));
-        AnnularQueue.getInstance().start(config);
+        ClusterService.start(config);
         log.info("===============================================================================");
         log.info("================== EasyTask-X Started Successfull！=============================");
         log.info("================================================================================");
@@ -53,12 +53,6 @@ public class EasyTaskXApp {
         String heartBeat = properties.getProperty("heartBeat");
         String tryCount = properties.getProperty("tryCount");
         String clearScheduleBakTime = properties.getProperty("clearScheduleBakTime");
-        String dispatchsPool_corePoolSize = properties.getProperty("dispatchsPool.corePoolSize");
-        String dispatchsPool_maximumPoolSize = properties.getProperty("dispatchsPool.maximumPoolSize");
-        String dispatchsPool_keepAliveTime = properties.getProperty("dispatchsPool.keepAliveTime");
-        String workersPool_corePoolSize = properties.getProperty("workersPool.corePoolSize");
-        String workersPool_maximumPoolSize = properties.getProperty("workersPool.maximumPoolSize");
-        String workersPool_keepAliveTime = properties.getProperty("workersPool.keepAliveTime");
         String clusterPool_corePoolSize = properties.getProperty("clusterPool.corePoolSize");
         String clusterPool_maximumPoolSize = properties.getProperty("clusterPool.maximumPoolSize");
         String clusterPool_keepAliveTime = properties.getProperty("clusterPool.keepAliveTime");
@@ -86,20 +80,10 @@ public class EasyTaskXApp {
             config.setTryCount(Integer.parseInt(tryCount));
         if (!StringUtils.isNullOrEmpty(clearScheduleBakTime))
             config.setClearScheduleBakTime(Integer.parseInt(clearScheduleBakTime));
-        if (!StringUtils.isNullOrEmpty(dispatchsPool_corePoolSize) && !StringUtils.isNullOrEmpty(dispatchsPool_maximumPoolSize) && !StringUtils.isNullOrEmpty(dispatchsPool_keepAliveTime)) {
-            ExecutorService dispatchs = new ThreadPoolExecutor(Integer.parseInt(dispatchsPool_corePoolSize), Integer.parseInt(dispatchsPool_maximumPoolSize), Integer.parseInt(dispatchsPool_keepAliveTime), TimeUnit.SECONDS,
-                    new LinkedBlockingQueue<Runnable>());
-            config.setDispatchs(dispatchs);
-        }
-        if (!StringUtils.isNullOrEmpty(workersPool_corePoolSize) && !StringUtils.isNullOrEmpty(workersPool_maximumPoolSize) && !StringUtils.isNullOrEmpty(workersPool_keepAliveTime)) {
-            ExecutorService workers = new ThreadPoolExecutor(Integer.parseInt(workersPool_corePoolSize), Integer.parseInt(workersPool_maximumPoolSize), Integer.parseInt(workersPool_keepAliveTime), TimeUnit.SECONDS,
-                    new LinkedBlockingQueue<Runnable>());
-            config.setWorkers(workers);
-        }
         if (!StringUtils.isNullOrEmpty(clusterPool_corePoolSize) && !StringUtils.isNullOrEmpty(clusterPool_maximumPoolSize) && !StringUtils.isNullOrEmpty(clusterPool_keepAliveTime)) {
-            ExecutorService cluster = new ThreadPoolExecutor(Integer.parseInt(clusterPool_corePoolSize), Integer.parseInt(clusterPool_maximumPoolSize), Integer.parseInt(clusterPool_keepAliveTime), TimeUnit.SECONDS,
+            ThreadPoolExecutor cluster = new ThreadPoolExecutor(Integer.parseInt(clusterPool_corePoolSize), Integer.parseInt(clusterPool_maximumPoolSize), Integer.parseInt(clusterPool_keepAliveTime), TimeUnit.SECONDS,
                     new LinkedBlockingQueue<Runnable>());
-            config.setWorkers(cluster);
+            config.setClusterPool(cluster);
         }
         return config;
     }

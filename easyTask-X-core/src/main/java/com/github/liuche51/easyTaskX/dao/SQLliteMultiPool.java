@@ -1,19 +1,16 @@
 package com.github.liuche51.easyTaskX.dao;
 
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
-import com.github.liuche51.easyTaskX.core.EasyTaskConfig;
+
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.util.StringConstant;
-import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -48,7 +45,7 @@ public class SQLliteMultiPool {
         pools.put(StringConstant.SCHEDULE_BAK, new ConcurrentLinkedQueue<Connection>());
         pools.put(StringConstant.SCHEDULE_SYNC, new ConcurrentLinkedQueue<Connection>());
         pools.put(StringConstant.TRANSACTION_LOG, new ConcurrentLinkedQueue<Connection>());
-        for (int i = 0; i < AnnularQueue.getInstance().getConfig().getsQLlitePoolSize(); i++) {
+        for (int i = 0; i < ClusterService.getConfig().getsQLlitePoolSize(); i++) {
             Connection con1 = createConnection(StringConstant.SCHEDULE);
             Connection con2 = createConnection(StringConstant.SCHEDULE_BAK);
             Connection con3 = createConnection(StringConstant.SCHEDULE_SYNC);
@@ -73,7 +70,7 @@ public class SQLliteMultiPool {
         Connection con = null;
         try {
             //注意“/”符号目前测试兼容Windows和Linux，不要改成“\”符号不兼容Linux
-            con = DriverManager.getConnection("jdbc:sqlite:" + AnnularQueue.getInstance().getConfig().getTaskStorePath() + "/" + dbName + ".db");
+            con = DriverManager.getConnection("jdbc:sqlite:" + ClusterService.getConfig().getTaskStorePath() + "/" + dbName + ".db");
             if (con == null) {
                 throw new Exception("数据库连接创建失败，返回null值");
             }
@@ -106,7 +103,7 @@ public class SQLliteMultiPool {
      */
     public void freeConnection(Connection conn,String dbName) {
         ConcurrentLinkedQueue<Connection> pool = pools.get(dbName);
-        if (pool.size() < AnnularQueue.getInstance().getConfig().getsQLlitePoolSize()) {
+        if (pool.size() < ClusterService.getConfig().getsQLlitePoolSize()) {
             pool.add(conn);
         } else {
             try {

@@ -1,20 +1,12 @@
 package com.github.liuche51.easyTaskX.dao;
-
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
-import com.github.liuche51.easyTaskX.dto.Schedule;
 import com.github.liuche51.easyTaskX.dto.ScheduleSync;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.StringConstant;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sqlite.SQLiteException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 

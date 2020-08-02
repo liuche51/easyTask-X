@@ -1,7 +1,8 @@
 package com.github.liuche51.easyTaskX.zk;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
+
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.dto.zk.ZKNode;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
@@ -21,7 +22,7 @@ public class ZKService {
      */
     public static void register(ZKNode data) {
         try {
-            String path = "/" + AnnularQueue.getInstance().getConfig().getAddress();
+            String path = "/" + ClusterService.getConfig().getAddress();
             //检查是否存在节点。如果连不上zk，这里就会卡主线程，进入循环重试连接。直到连接成功
             Stat stat1 = ZKUtil.getClient().checkExists().forPath(path);
             if (stat1 != null) {
@@ -52,7 +53,7 @@ public class ZKService {
      * @return
      */
     public static List<String> getChildrenByCurrentNode() throws UnknownHostException {
-        String path = "/" + AnnularQueue.getInstance().getConfig().getAddress();
+        String path = "/" + ClusterService.getConfig().getAddress();
         return getChildrenByPath(path);
     }
 
@@ -78,7 +79,7 @@ public class ZKService {
      * @return
      */
     public static ZKNode getDataByCurrentNode() throws UnknownHostException {
-        String path = "/" + AnnularQueue.getInstance().getConfig().getAddress();
+        String path = "/" + ClusterService.getConfig().getAddress();
         return getDataByPath(path);
     }
 
@@ -106,7 +107,7 @@ public class ZKService {
      * @return
      */
     public static boolean setDataByCurrentNode(ZKNode data) throws UnknownHostException {
-        String path = "/" + AnnularQueue.getInstance().getConfig().getAddress();
+        String path = "/" + ClusterService.getConfig().getAddress();
         return setDataByPath(path, data);
     }
 

@@ -1,7 +1,7 @@
 package com.github.liuche51.easyTaskX.dto;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 
 import java.net.UnknownHostException;
@@ -113,16 +113,16 @@ public class Schedule {
         this.source = source;
     }
 
-    public static Schedule valueOf(Task task){
+    public static Schedule valueOf(ScheduleBak bak){
         Schedule schedule=new Schedule();
-        schedule.id=task.getTaskExt().getId();
-        schedule.classPath=task.getTaskExt().getTaskClassPath();
-        schedule.executeTime=task.getEndTimestamp();
-        schedule.taskType=task.getTaskType().name();
-        schedule.period=task.getPeriod();
-        schedule.unit=task.getUnit() == null ? "" : task.getUnit().name();
-        schedule.param= JSONObject.toJSONString(task.getParam());
-        schedule.setSource(task.getTaskExt().getSource());
+        schedule.id=bak.getId();
+        schedule.classPath=bak.getClassPath();
+        schedule.executeTime=bak.getExecuteTime();
+        schedule.taskType=bak.getTaskType();
+        schedule.period=bak.getPeriod();
+        schedule.unit=bak.getUnit();
+        schedule.param=bak.getParam();
+        schedule.source=bak.getSource();
         return schedule;
     }
 
@@ -134,7 +134,7 @@ public class Schedule {
         ScheduleDto.Schedule.Builder builder=ScheduleDto.Schedule.newBuilder();
         builder.setId(this.id).setClassPath(this.classPath).setExecuteTime(this.executeTime)
                 .setTaskType(this.taskType).setPeriod(this.period).setUnit(this.unit)
-                .setParam(this.param).setSource(AnnularQueue.getInstance().getConfig().getAddress())
+                .setParam(this.param).setSource(ClusterService.getConfig().getAddress())
                 .setTransactionId(this.transactionId);
         return builder.build();
     }

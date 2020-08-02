@@ -1,16 +1,15 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.ClusterUtil;
 import com.github.liuche51.easyTaskX.cluster.Node;
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
-import com.github.liuche51.easyTaskX.core.EasyTaskConfig;
+
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
 import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
 import com.github.liuche51.easyTaskX.dto.Schedule;
 import com.github.liuche51.easyTaskX.dto.ScheduleSync;
-import com.github.liuche51.easyTaskX.dto.Task;
 import com.github.liuche51.easyTaskX.dto.TransactionLog;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
@@ -26,13 +25,12 @@ public class SaveTaskTCC {
     /**
      * 提交任务事务第一阶段。
      * 先记入事务表，等到第二阶段提交确认
-     * @param task
+     * @param schedule
      * @param follows
      * @throws Exception
      */
-    public static void trySave(String transactionId,Task task, List<Node> follows) throws Exception {
+    public static void trySave(String transactionId,Schedule schedule, List<Node> follows) throws Exception {
         List<String> cancelHost=follows.stream().map(Node::getAddress).collect(Collectors.toList());
-        Schedule schedule = Schedule.valueOf(task);
         schedule.setTransactionId(transactionId);
         schedule.setSource(Util.getSource(schedule.getSource()));
         TransactionLog transactionLog = new TransactionLog();
@@ -54,7 +52,7 @@ public class SaveTaskTCC {
             ScheduleSyncDao.save(scheduleSync);//记录同步状态表
             ScheduleDto.Schedule s = schedule.toScheduleDto();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_TRYSAVETASK).setSource(AnnularQueue.getInstance().getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_TRYSAVETASK).setSource(ClusterService.getConfig().getAddress())
                     .setBodyBytes(s.toByteString());
             NettyClient client = follow.getClientWithCount(1);
             boolean ret = ClusterUtil.sendSyncMsgWithCount(client, builder.build(), 1);
@@ -77,7 +75,7 @@ public class SaveTaskTCC {
         while (items.hasNext()) {
             Node follow = items.next();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_CONFIRMSAVETASK).setSource(AnnularQueue.getInstance().getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_CONFIRMSAVETASK).setSource(ClusterService.getConfig().getAddress())
                     .setBody(transactionId);
             NettyClient client = follow.getClientWithCount(1);
             boolean ret = ClusterUtil.sendSyncMsgWithCount(client, builder.build(), 1);
@@ -104,7 +102,7 @@ public class SaveTaskTCC {
         while (items.hasNext()) {
             Node follow = items.next();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_CANCELSAVETASK).setSource(AnnularQueue.getInstance().getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_CANCELSAVETASK).setSource(ClusterService.getConfig().getAddress())
                     .setBody(transactionId);
             NettyClient client = follow.getClientWithCount(1);
             boolean ret = ClusterUtil.sendSyncMsgWithCount(client, builder.build(), 1);

@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.netty.client;
 
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
+
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ public class NettyMsgService {
         ChannelPromise promise = conn.getClientChannel().newPromise();
         conn.getHandler().setPromise(promise);
         conn.getClientChannel().writeAndFlush(msg);
-        promise.await(AnnularQueue.getInstance().getConfig().getTimeOut(), TimeUnit.SECONDS);//等待固定的时间，超时就认为失败，需要重发
+        promise.await(ClusterService.getConfig().getTimeOut(), TimeUnit.SECONDS);//等待固定的时间，超时就认为失败，需要重发
         try {
             return conn.getHandler().getResponse();
         }finally {

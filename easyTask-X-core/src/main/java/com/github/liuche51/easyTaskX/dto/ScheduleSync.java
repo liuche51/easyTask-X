@@ -1,9 +1,5 @@
 package com.github.liuche51.easyTaskX.dto;
 
-import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.core.EasyTaskConfig;
-import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
-
 public class ScheduleSync {
     private String transactionId;
     private String scheduleId;

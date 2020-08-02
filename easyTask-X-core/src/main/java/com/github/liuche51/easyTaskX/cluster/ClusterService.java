@@ -7,13 +7,10 @@ import com.github.liuche51.easyTaskX.cluster.leader.SaveTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteFollows;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.cluster.task.tran.*;
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
+import com.github.liuche51.easyTaskX.dao.*;
+import com.github.liuche51.easyTaskX.dto.Schedule;
+import com.github.liuche51.easyTaskX.netty.server.NettyServer;
 import com.github.liuche51.easyTaskX.util.Util;
-import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
-import com.github.liuche51.easyTaskX.dao.ScheduleDao;
-import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
-import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
-import com.github.liuche51.easyTaskX.dto.Task;
 import com.github.liuche51.easyTaskX.dto.zk.ZKNode;
 import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
@@ -29,6 +26,7 @@ import java.util.List;
 
 public class ClusterService {
     private static Logger log = LoggerFactory.getLogger(ClusterService.class);
+    private static EasyTaskConfig config = null;
     /**
      * 当前集群节点的Node对象
      */
@@ -45,6 +43,23 @@ public class ClusterService {
      */
     public static List<TimerTask> timerTasks = new LinkedList<TimerTask>();
 
+    public static EasyTaskConfig getConfig() {
+        return config;
+    }
+
+    public static void setConfig(EasyTaskConfig config) {
+        ClusterService.config = config;
+    }
+
+    public static void start(EasyTaskConfig config) throws Exception {
+        if (config == null)
+            throw new Exception("config is null,please set a EasyTaskConfig!");
+        EasyTaskConfig.validateNecessary(config);
+        ClusterService.config = config;
+        DbInit.init();
+        NettyServer.getInstance().run();//启动组件的Netty服务端口
+        initCurrentNode();
+    }
     /**
      * 初始化当前节点的集群。(系统重启或心跳超时重启)
      * zk注册，选follows,开始心跳
@@ -55,7 +70,7 @@ public class ClusterService {
     public static boolean initCurrentNode() throws Exception {
         clearThreadTask();
         deleteAllData();
-        CURRENTNODE = new Node(Util.getLocalIP(), AnnularQueue.getInstance().getConfig().getServerPort());
+        CURRENTNODE = new Node(Util.getLocalIP(), ClusterService.getConfig().getServerPort());
         ZKNode node = new ZKNode(CURRENTNODE.getHost(), CURRENTNODE.getPort());
         node.setCreateTime(DateUtils.getCurrentDateTime());
         node.setLastHeartbeat(DateUtils.getCurrentDateTime());
@@ -81,7 +96,7 @@ public class ClusterService {
      *使用TCC机制实现事务，达到数据最终一致性
      * @throws Exception
      */
-    public static void saveTask(Task task) throws Exception {
+    public static void submitTask(Schedule schedule) throws Exception {
         if (VoteFollows.isSelecting())
             throw new VotingException("normally exception!save():cluster is voting,please wait a moment.");
         //防止多线程下，follow元素操作竞争问题。确保参与提交的follow不受集群选举影响
@@ -90,12 +105,12 @@ public class ClusterService {
         while (items.hasNext()) {
             follows.add(items.next());
         }
-        if (follows.size() != AnnularQueue.getInstance().getConfig().getBackupCount())
+        if (follows.size() != ClusterService.getConfig().getBackupCount())
             throw new Exception("save() exception！follows.size()!=backupCount");
         String transactionId=Util.generateTransactionId();
         try {
-            SaveTaskTCC.trySave(transactionId,task, follows);
-            SaveTaskTCC.confirm(transactionId, task.getTaskExt().getId(), follows);
+            SaveTaskTCC.trySave(transactionId,schedule, follows);
+            SaveTaskTCC.confirm(transactionId, schedule.getId(), follows);
         } catch (Exception e) {
             log.error("saveTask():",e);
             try {
@@ -139,7 +154,6 @@ public class ClusterService {
      */
     public static void deleteAllData() {
         try {
-            AnnularQueue.getInstance().clearTask();
             ScheduleDao.deleteAll();
             ScheduleBakDao.deleteAll();
             ScheduleSyncDao.deleteAll();

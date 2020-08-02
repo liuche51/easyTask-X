@@ -1,15 +1,12 @@
 package com.github.liuche51.easyTaskX.util;
 
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
-import com.github.liuche51.easyTaskX.core.EasyTaskConfig;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
+
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
+
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 public class DateUtils {
     public static String getCurrentDateTime(){
@@ -29,7 +26,7 @@ public class DateUtils {
      * @return
      */
     public static boolean isGreaterThanDeadTime(String dateTime){
-        if(ZonedDateTime.now().minusSeconds(AnnularQueue.getInstance().getConfig().getDeadTimeOut())
+        if(ZonedDateTime.now().minusSeconds(ClusterService.getConfig().getDeadTimeOut())
                 .compareTo(DateUtils.parse(dateTime)) > 0)
             return true;
         else return false;
@@ -41,7 +38,7 @@ public class DateUtils {
      * @return
      */
     public static boolean isGreaterThanLoseTime(String dateTime){
-        if(ZonedDateTime.now().minusSeconds(AnnularQueue.getInstance().getConfig().getLoseTimeOut())
+        if(ZonedDateTime.now().minusSeconds(ClusterService.getConfig().getLoseTimeOut())
                 .compareTo(DateUtils.parse(dateTime)) > 0)
             return true;
         else return false;

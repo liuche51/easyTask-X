@@ -1,14 +1,13 @@
 package com.github.liuche51.easyTaskX.dto.zk;
 
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
-import com.github.liuche51.easyTaskX.core.EasyTaskConfig;
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class ZKNode {
     private String host;
-    private int port= AnnularQueue.getInstance().getConfig().getServerPort();
+    private int port= ClusterService.getConfig().getServerPort();
     /**
      * 最近一次心跳时间
      */

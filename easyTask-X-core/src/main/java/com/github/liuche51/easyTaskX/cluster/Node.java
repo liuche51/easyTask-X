@@ -1,16 +1,12 @@
 package com.github.liuche51.easyTaskX.cluster;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
-import com.github.liuche51.easyTaskX.core.EasyTaskConfig;
 import com.github.liuche51.easyTaskX.netty.client.NettyConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,7 +18,7 @@ import java.util.Map;
 public class Node implements Serializable {
     private static final Logger log = LoggerFactory.getLogger(Node.class);
     private String host = "";
-    private int port = AnnularQueue.getInstance().getConfig().getServerPort();
+    private int port = ClusterService.getConfig().getServerPort();
     /**
      * 数据一致性状态。
      */

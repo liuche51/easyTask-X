@@ -1,17 +1,14 @@
 package com.github.liuche51.easyTaskX.dao;
 
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
-import com.github.liuche51.easyTaskX.core.EasyTaskConfig;
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DbInit {
-    private static Logger log = LoggerFactory.getLogger(AnnularQueue.class);
+    private static Logger log = LoggerFactory.getLogger(DbInit.class);
     public static boolean hasInit = false;//数据库是否已经初始化
 
     /**
@@ -24,7 +21,7 @@ public class DbInit {
             return true;
         try {
             //创建db存储文件夹
-            File file = new File(AnnularQueue.getInstance().getConfig().getTaskStorePath());
+            File file = new File(ClusterService.getConfig().getTaskStorePath());
             if (!file.exists()) {
                 file.mkdirs();
             }

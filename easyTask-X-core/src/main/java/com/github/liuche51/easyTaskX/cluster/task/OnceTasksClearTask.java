@@ -1,8 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.task;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
-import com.github.liuche51.easyTaskX.core.EasyTaskConfig;
+
 
 import java.util.Iterator;
 
@@ -25,7 +24,7 @@ public class OnceTasksClearTask extends TimerTask {
                 log.error("", e);
             }
             try {
-                Thread.sleep(AnnularQueue.getInstance().getConfig().getClearScheduleBakTime());
+                Thread.sleep(ClusterService.getConfig().getClearScheduleBakTime());
             } catch (InterruptedException e) {
                 log.error("", e);
             }

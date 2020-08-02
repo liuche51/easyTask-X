@@ -1,9 +1,10 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.ClusterUtil;
 import com.github.liuche51.easyTaskX.cluster.Node;
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
+
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
 import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
@@ -53,7 +54,7 @@ public class DeleteTaskTCC {
         while (items.hasNext()) {
             Node follow = items.next();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_TRYDELTASK).setSource(AnnularQueue.getInstance().getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_TRYDELTASK).setSource(ClusterService.getConfig().getAddress())
                     .setBody(transactionId+","+taskId);
             NettyClient client = follow.getClientWithCount(1);
             boolean ret = ClusterUtil.sendSyncMsgWithCount(client, builder.build(), 1);
@@ -76,7 +77,7 @@ public class DeleteTaskTCC {
         while (items.hasNext()) {
             Node follow = items.next();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_CONFIRMDELTASK).setSource(AnnularQueue.getInstance().getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_CONFIRMDELTASK).setSource(ClusterService.getConfig().getAddress())
                     .setBody(transactionId);
             NettyClient client = follow.getClientWithCount(1);
             boolean ret = ClusterUtil.sendSyncMsgWithCount(client, builder.build(), 1);

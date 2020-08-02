@@ -1,5 +1,6 @@
 package com.github.liuche51.easyTaskX.zk;
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
+
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -24,7 +25,7 @@ public class ZKUtil {
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 10);
         //2 通过工厂创建连接
          client = CuratorFrameworkFactory.builder()
-                .connectString(AnnularQueue.getInstance().getConfig().getZkAddress()).connectionTimeoutMs(CONNECTION_TIMEOUT)
+                .connectString(ClusterService.getConfig().getZkAddress()).connectionTimeoutMs(CONNECTION_TIMEOUT)
                 .sessionTimeoutMs(SESSION_TIMEOUT)
                 .retryPolicy(retryPolicy)
                 .namespace("easyTask-L")//命名空间

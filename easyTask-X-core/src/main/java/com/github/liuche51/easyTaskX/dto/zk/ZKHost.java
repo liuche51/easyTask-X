@@ -1,13 +1,12 @@
 package com.github.liuche51.easyTaskX.dto.zk;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
-import com.github.liuche51.easyTaskX.core.EasyTaskConfig;
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 
 public class ZKHost {
     private String host;
-    private int port= AnnularQueue.getInstance().getConfig().getServerPort();
+    private int port= ClusterService.getConfig().getServerPort();
     /**
      * 数据一致性状态。
      */

@@ -2,8 +2,7 @@ package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.Node;
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
-import com.github.liuche51.easyTaskX.core.EasyTaskConfig;
+
 import com.github.liuche51.easyTaskX.dto.zk.ZKNode;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 import com.github.liuche51.easyTaskX.util.exception.VotedException;
@@ -15,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.UnknownHostException;
-import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -39,7 +37,7 @@ public class VoteFollows {
      * @return
      */
     public static void initSelectFollows() throws Exception {
-        int count = AnnularQueue.getInstance().getConfig().getBackupCount();
+        int count = ClusterService.getConfig().getBackupCount();
         List<String> availableFollows = VoteFollows.getAvailableFollows(null);
         List<Node> follows = VoteFollows.selectFollows(count, availableFollows);
         if (follows.size() < count) {
@@ -48,7 +46,7 @@ public class VoteFollows {
         } else {
             ClusterService.CURRENTNODE.setFollows(follows);
             //通知follows当前Leader位置
-            LeaderUtil.notifyFollowsLeaderPosition(follows, AnnularQueue.getInstance().getConfig().getTryCount());
+            LeaderUtil.notifyFollowsLeaderPosition(follows, ClusterService.getConfig().getTryCount());
         }
     }
 
@@ -71,7 +69,7 @@ public class VoteFollows {
             } else
                 ClusterService.CURRENTNODE.getFollows().remove(oldFollow);//移除失效的follow
             //多线程下，如果follows已经选好，则让客户端重新提交任务。以后可以优化为获取选举后的follow
-            if (ClusterService.CURRENTNODE.getFollows() != null && ClusterService.CURRENTNODE.getFollows().size() >= AnnularQueue.getInstance().getConfig().getBackupCount())
+            if (ClusterService.CURRENTNODE.getFollows() != null && ClusterService.CURRENTNODE.getFollows().size() >= ClusterService.getConfig().getBackupCount())
                 throw new VotedException("cluster is voted follow,please retry again.");
             List<String> availableFollows = getAvailableFollows(Arrays.asList(oldFollow.getAddress()));
             follows = selectFollows(1, availableFollows);
@@ -88,7 +86,7 @@ public class VoteFollows {
         }
         if (follows == null || follows.size() == 0) throw new Exception("cluster is vote follow failed,please retry later.");
         //通知follows当前Leader位置
-        LeaderUtil.notifyFollowsLeaderPosition(follows, AnnularQueue.getInstance().getConfig().getTryCount());
+        LeaderUtil.notifyFollowsLeaderPosition(follows, ClusterService.getConfig().getTryCount());
         return follows.get(0);
     }
 
@@ -98,12 +96,12 @@ public class VoteFollows {
      * @return
      */
     private static List<String> getAvailableFollows(List<String> exclude) throws Exception {
-        int count = AnnularQueue.getInstance().getConfig().getBackupCount();
+        int count = ClusterService.getConfig().getBackupCount();
         List<String> availableFollows = ZKService.getChildrenByNameSpase();
         //排除自己
         Optional<String> temp = availableFollows.stream().filter(x -> {
             try {
-                return x.equals(AnnularQueue.getInstance().getConfig().getAddress());
+                return x.equals(ClusterService.getConfig().getAddress());
             } catch (UnknownHostException e) {
                 log.error("", e);
                 return false;

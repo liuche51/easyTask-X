@@ -4,8 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.Node;
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
-import com.github.liuche51.easyTaskX.core.EasyTaskConfig;
+
 import com.github.liuche51.easyTaskX.dao.SQLliteMultiPool;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
@@ -49,14 +48,14 @@ public class ClusterMonitor {
     public static Map<String, Map<String, List>> getDBTraceInfoByTaskId(String taskId) throws Exception {
         Map<String, Map<String, List>> map = new HashMap<>(3);
         Map<String, List> leaderInfo = DBMonitor.getInfoByTaskId(taskId);
-        map.put(AnnularQueue.getInstance().getConfig().getAddress(), leaderInfo);
+        map.put(ClusterService.getConfig().getAddress(), leaderInfo);
         Iterator<Node> items = ClusterService.CURRENTNODE.getFollows().iterator();
         while (items.hasNext()) {
             Node item = items.next();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.GET_DBINFO_BY_TASKID).setSource(AnnularQueue.getInstance().getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.GET_DBINFO_BY_TASKID).setSource(ClusterService.getConfig().getAddress())
                     .setBody(taskId);
-            NettyClient client = item.getClientWithCount(AnnularQueue.getInstance().getConfig().getTryCount());
+            NettyClient client = item.getClientWithCount(ClusterService.getConfig().getTryCount());
             Object ret = NettyMsgService.sendSyncMsg(client,builder.build());
             Dto.Frame frame = (Dto.Frame) ret;
             ResultDto.Result result = ResultDto.Result.parseFrom(frame.getBodyBytes());
@@ -75,7 +74,7 @@ public class ClusterMonitor {
         return ZKService.getDataByCurrentNode();
     }
     public static Map<String, String> getNettyClientPoolInfo(){
-        Map<String, String> map=new HashMap<>(AnnularQueue.getInstance().getConfig().getBackupCount());
+        Map<String, String> map=new HashMap<>(ClusterService.getConfig().getBackupCount());
         Map<String, ConcurrentLinkedQueue<NettyClient>> pools=NettyConnectionFactory.getInstance().getPools();
         Iterator<Map.Entry<String, ConcurrentLinkedQueue<NettyClient>>> items=pools.entrySet().iterator();
         while (items.hasNext()){

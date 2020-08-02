@@ -1,15 +1,11 @@
 package com.github.liuche51.easyTaskX.cluster.follow;
 
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
-import com.github.liuche51.easyTaskX.core.EasyTaskConfig;
-import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
-import com.github.liuche51.easyTaskX.dto.ScheduleBak;
-import com.github.liuche51.easyTaskX.dto.Task;
+
 import com.github.liuche51.easyTaskX.dto.zk.ZKHost;
 import com.github.liuche51.easyTaskX.dto.zk.ZKNode;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
-import org.apache.zookeeper.server.quorum.Leader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +44,7 @@ public class VoteLeader {
             }
         }
         //自己就是新leader
-        if(newLeader!=null&&newLeader.getAddress().equals(AnnularQueue.getInstance().getConfig().getAddress())){
+        if(newLeader!=null&&newLeader.getAddress().equals(ClusterService.getConfig().getAddress())){
             log.info("selectNewLeader():start to submit new task to leader by simulate client");
             LeaderService.submitNewTaskByOldLeader(oldLeaderAddress);
         }else {

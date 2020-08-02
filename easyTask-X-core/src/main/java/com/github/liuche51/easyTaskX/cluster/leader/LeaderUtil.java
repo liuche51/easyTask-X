@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
-import com.github.liuche51.easyTaskX.core.AnnularQueue;
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.cluster.ClusterUtil;
 import com.github.liuche51.easyTaskX.cluster.Node;
@@ -30,7 +30,7 @@ public class LeaderUtil {
      * @return
      */
     public static boolean notifyFollowsLeaderPosition(List<Node> follows, int tryCount) {
-        AnnularQueue.getInstance().getConfig().getClusterPool().submit(new Runnable() {
+        ClusterService.getConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 if (follows != null) {
@@ -53,8 +53,8 @@ public class LeaderUtil {
         final boolean[] ret = {false};
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setInterfaceName(NettyInterfaceEnum.SYNC_LEADER_POSITION).setSource(AnnularQueue.getInstance().getConfig().getAddress())
-                    .setBody(AnnularQueue.getInstance().getConfig().getAddress());
+            builder.setInterfaceName(NettyInterfaceEnum.SYNC_LEADER_POSITION).setSource(ClusterService.getConfig().getAddress())
+                    .setBody(ClusterService.getConfig().getAddress());
             ChannelFuture future = NettyMsgService.sendASyncMsg(follow.getClient(),builder.build());
             tryCount--;
             future.addListener(new GenericFutureListener<Future<? super Void>>() {
@@ -90,15 +90,15 @@ public class LeaderUtil {
             builder0.addSchedules(s);
         }
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LEADER_SYNC_DATA_TO_NEW_FOLLOW).setSource(AnnularQueue.getInstance().getConfig().getAddress())
+        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LEADER_SYNC_DATA_TO_NEW_FOLLOW).setSource(ClusterService.getConfig().getAddress())
                 .setBodyBytes(builder0.build().toByteString());
-        NettyClient client = follow.getClientWithCount(AnnularQueue.getInstance().getConfig().getTryCount());
+        NettyClient client = follow.getClientWithCount(ClusterService.getConfig().getTryCount());
        /* if (client == null) {
             log.info("client == null,so start to syncDataToFollowBatch.");
             Node newFollow = VoteFollows.selectNewFollow(follow,null);
             return syncDataToFollowBatch(schedules, newFollow);
         }*/
-        boolean ret = ClusterUtil.sendSyncMsgWithCount(client, builder.build(), AnnularQueue.getInstance().getConfig().getTryCount());
+        boolean ret = ClusterUtil.sendSyncMsgWithCount(client, builder.build(), ClusterService.getConfig().getTryCount());
       /*  if (!ret) {
             log.info("sendSyncMsgWithCount return false,so start to syncDataToFollowBatch.");
             Node newFollow = VoteFollows.selectNewFollow(follow,null);
