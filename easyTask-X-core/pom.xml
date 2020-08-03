@@ -98,6 +98,18 @@
     </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5.5</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptors>
+                        <descriptor>src/main/assembly/package.xml</descriptor>
+                    </descriptors>
+                </configuration>
+            </plugin>
             <!--打包插件，jar包和依赖包分开，依赖包打包到lib下   测试可行-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -106,13 +118,20 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
+                            <!--指定程序运行时从根目录的lib目录下加载依赖的jar包-->
                             <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>com.github.liuche51.easyTaskX.EasyTaskXApp</mainClass>
                         </manifest>
                     </archive>
+                    <!--排除资源配置文件，通过外置实现加载配置-->
+                    <excludes>
+                        <exclude>easyTaskX.cfg</exclude>
+                        <exclude>log4j.properties</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
-            <plugin>
+            <!--将依赖的jar包打包到target/lib目录下。已废弃，使用maven-assembly-plugin插件替代，直接打包到压缩文件中去-->
+           <!-- <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
@@ -127,7 +146,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
 

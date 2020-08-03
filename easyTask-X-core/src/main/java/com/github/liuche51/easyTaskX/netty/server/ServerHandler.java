@@ -47,6 +47,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
             Dto.Frame frame = (Dto.Frame) msg;
             builder.setIdentity(frame.getIdentity());
             BaseHandler handler=BaseHandler.INSTANCES.get(frame.getInterfaceName());
+            if(handler==null) throw new Exception("unknown interface method!");
             result.setBody(handler.process(frame));
         } catch (Exception e) {
             log.error("Deal client msg occured error！", e);
