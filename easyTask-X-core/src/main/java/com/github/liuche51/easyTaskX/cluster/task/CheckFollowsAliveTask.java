@@ -27,7 +27,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                 Iterator<Node> items = follows.iterator();
                 while (items.hasNext()) {
                     Node oldFollow = items.next();
-                    String path = StringConstant.CHAR_SPRIT + oldFollow.getAddress();
+                    String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + oldFollow.getAddress();
                     ZKNode node = ZKService.getDataByPath(path);
                     if (node == null)//防止follow节点已经不在zk。导致不能重新选举
                     {

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.dto.zk.ZKNode;
+import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
@@ -14,7 +15,24 @@ import java.util.List;
 
 public class ZKService {
     private static Logger log = LoggerFactory.getLogger(ZKService.class);
-
+    /**
+     * 创建命名空间下某个子节点目录
+     *
+     * @param name
+     */
+    public static void createZKNode(String name) {
+        try {
+            String path = StringConstant.CHAR_SPRIT + name;
+            //检查是否存在节点。如果连不上zk，这里就会卡主线程，进入循环重试连接。直到连接成功
+            Stat stat1 = ZKUtil.getClient().checkExists().forPath(path);
+            if (stat1 == null) {
+                //创建永久节点
+                ZKUtil.getClient().create().withMode(CreateMode.PERSISTENT).forPath(path);
+            }
+        } catch (Exception e) {
+            log.error("createZKNode exception！", e);
+        }
+    }
     /**
      * 当前节点注册为永久节点
      *
@@ -22,7 +40,7 @@ public class ZKService {
      */
     public static void register(ZKNode data) {
         try {
-            String path = "/" + ClusterService.getConfig().getAddress();
+            String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + ClusterService.getConfig().getAddress();
             //检查是否存在节点。如果连不上zk，这里就会卡主线程，进入循环重试连接。直到连接成功
             Stat stat1 = ZKUtil.getClient().checkExists().forPath(path);
             if (stat1 != null) {
@@ -42,8 +60,8 @@ public class ZKService {
      *
      * @return
      */
-    public static List<String> getChildrenByNameSpase() {
-        String path = "/";
+    public static List<String> getChildrenByServerNode() {
+        String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT;
         return getChildrenByPath(path);
     }
 
@@ -53,7 +71,7 @@ public class ZKService {
      * @return
      */
     public static List<String> getChildrenByCurrentNode() throws UnknownHostException {
-        String path = "/" + ClusterService.getConfig().getAddress();
+        String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + ClusterService.getConfig().getAddress();
         return getChildrenByPath(path);
     }
 
@@ -79,7 +97,7 @@ public class ZKService {
      * @return
      */
     public static ZKNode getDataByCurrentNode() throws UnknownHostException {
-        String path = "/" + ClusterService.getConfig().getAddress();
+        String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + ClusterService.getConfig().getAddress();
         return getDataByPath(path);
     }
 
@@ -107,7 +125,7 @@ public class ZKService {
      * @return
      */
     public static boolean setDataByCurrentNode(ZKNode data) throws UnknownHostException {
-        String path = "/" + ClusterService.getConfig().getAddress();
+        String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + ClusterService.getConfig().getAddress();
         return setDataByPath(path, data);
     }
 

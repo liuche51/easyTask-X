@@ -49,9 +49,9 @@ public class ClusterService {
     }
 
 
-   /* public static void setConfig(EasyTaskConfig config) {
+    public static void setConfig(EasyTaskConfig config) {
         ClusterService.config = config;
-    }*/
+    }
 
     public static synchronized void start(EasyTaskConfig config) throws Exception {
         //避免重复执行

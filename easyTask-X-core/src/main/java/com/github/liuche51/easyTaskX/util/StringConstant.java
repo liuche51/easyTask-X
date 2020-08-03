@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.util;
 
 public class StringConstant {
+    public static final String SERVER="Server";
     public static final String CHAR_SPRIT="/";
     public static final String EMPTY="";
     public static final String TRUE="true";

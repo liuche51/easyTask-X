@@ -1,4 +1,6 @@
 import com.alibaba.fastjson.JSONObject;
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
 import com.github.liuche51.easyTaskX.dto.zk.ZKHost;
 import com.github.liuche51.easyTaskX.dto.zk.ZKNode;
 import com.github.liuche51.easyTaskX.zk.ZKService;
@@ -20,6 +22,9 @@ public class ZKTest {
     @Test
     public void register() {
         try {
+            EasyTaskConfig config=new EasyTaskConfig();
+            config.setZkAddress("127.0.0.1:2181");
+            ClusterService.setConfig(config);
             ZKNode data = new ZKNode();
             data.setHost("127.0.0.1");
             data.setCreateTime(ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
@@ -35,7 +40,20 @@ public class ZKTest {
             e.printStackTrace();
         }
     }
-
+    @Test
+   public void getChildrenByPath(){
+       try {
+           EasyTaskConfig config=new EasyTaskConfig();
+           config.setZkAddress("127.0.0.1:2181");
+           ClusterService.setConfig(config);
+           List<String> list = ZKService.getChildrenByPath("/Server");
+           list.forEach(x -> {
+               System.out.println(x);
+           });
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
+   }
     @Test
     public void getChildrenByCurrentNode() {
         try {
@@ -51,7 +69,7 @@ public class ZKTest {
     @Test
     public void getChildrenByNameSpase() {
         try {
-            List<String> list = ZKService.getChildrenByNameSpase();
+            List<String> list = ZKService.getChildrenByServerNode();
             list.forEach(x -> {
                 System.out.println(x);
             });
