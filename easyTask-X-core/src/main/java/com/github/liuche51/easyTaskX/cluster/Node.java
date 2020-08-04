@@ -1,5 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster;
 
+import com.github.liuche51.easyTaskX.dto.ClockDiffer;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.client.NettyConnectionFactory;
@@ -23,6 +24,10 @@ public class Node implements Serializable {
      * 数据一致性状态。
      */
     private int dataStatus = NodeSyncDataStatusEnum.SYNC;
+    /**
+     * 与目标主机的时钟差距
+     */
+    private ClockDiffer clockDiffer=new ClockDiffer();
     /**
      * 当前节点的所有follows
      */
@@ -59,6 +64,13 @@ public class Node implements Serializable {
 
     public void setDataStatus(int dataStatus) {
         this.dataStatus = dataStatus;
+    }
+    public ClockDiffer getClockDiffer() {
+        return clockDiffer;
+    }
+
+    public void setClockDiffer(ClockDiffer clockDiffer) {
+        this.clockDiffer = clockDiffer;
     }
 
     public List<Node> getFollows() {

@@ -23,10 +23,11 @@ public class DateUtils {
     /**
      * zk心跳时间是否超时了死亡时间阈值
      * @param dateTime
+     * @param differSecond 时钟差值
      * @return
      */
-    public static boolean isGreaterThanDeadTime(String dateTime){
-        if(ZonedDateTime.now().minusSeconds(ClusterService.getConfig().getDeadTimeOut())
+    public static boolean isGreaterThanDeadTime(String dateTime,long differSecond){
+        if(ZonedDateTime.now().minusSeconds(differSecond).minusSeconds(ClusterService.getConfig().getDeadTimeOut())
                 .compareTo(DateUtils.parse(dateTime)) > 0)
             return true;
         else return false;
@@ -35,10 +36,11 @@ public class DateUtils {
     /**
      * zk心跳时间是否超时了失效时间阈值
      * @param dateTime
+     * @param differSecond 时钟差值
      * @return
      */
-    public static boolean isGreaterThanLoseTime(String dateTime){
-        if(ZonedDateTime.now().minusSeconds(ClusterService.getConfig().getLoseTimeOut())
+    public static boolean isGreaterThanLoseTime(String dateTime,long differSecond){
+        if(ZonedDateTime.now().minusSeconds(differSecond).minusSeconds(ClusterService.getConfig().getLoseTimeOut())
                 .compareTo(DateUtils.parse(dateTime)) > 0)
             return true;
         else return false;

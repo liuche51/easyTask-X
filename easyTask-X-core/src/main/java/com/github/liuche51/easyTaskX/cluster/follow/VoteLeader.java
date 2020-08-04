@@ -6,6 +6,7 @@ import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.dto.zk.ZKHost;
 import com.github.liuche51.easyTaskX.dto.zk.ZKNode;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
+import com.github.liuche51.easyTaskX.netty.client.NettyConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,5 +56,7 @@ public class VoteLeader {
             }
 
         }
+        //选完新leader后，将旧leader的Netty连接池移除
+        NettyConnectionFactory.getInstance().removeHostPool(oldLeaderAddress);
     }
 }

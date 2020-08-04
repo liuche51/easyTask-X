@@ -1,10 +1,12 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.ClusterUtil;
 import com.github.liuche51.easyTaskX.cluster.Node;
 
 import com.github.liuche51.easyTaskX.dto.zk.ZKNode;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
+import com.github.liuche51.easyTaskX.netty.client.NettyConnectionFactory;
 import com.github.liuche51.easyTaskX.util.exception.VotedException;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
 import com.github.liuche51.easyTaskX.zk.ZKService;
@@ -64,10 +66,13 @@ public class VoteFollows {
         try {
             lock.lock();
             if (ClusterService.CURRENTNODE.getFollows().contains(oldFollow)) {
-                if (items != null) items.remove();//如果使用以下List集合方法移除，会导致下次items.next()方法报错
+                if (items != null)
+                    items.remove();//如果使用以下List集合方法移除，会导致下次items.next()方法报错
+                else
+                    ClusterService.CURRENTNODE.getFollows().remove(oldFollow);//移除失效的follow
+                NettyConnectionFactory.getInstance().removeHostPool(oldFollow.getAddress());
                 log.info("leader remove follow {}", oldFollow.getAddress());
-            } else
-                ClusterService.CURRENTNODE.getFollows().remove(oldFollow);//移除失效的follow
+            }
             //多线程下，如果follows已经选好，则让客户端重新提交任务。以后可以优化为获取选举后的follow
             if (ClusterService.CURRENTNODE.getFollows() != null && ClusterService.CURRENTNODE.getFollows().size() >= ClusterService.getConfig().getBackupCount())
                 throw new VotedException("cluster is voted follow,please retry again.");
@@ -144,10 +149,12 @@ public class VoteFollows {
         for (int i = 0; i < size; i++) {
             int index = random.nextInt(availableFollows.size());//随机生成的随机数范围就变成[0,size)。
             ZKNode node2 = ZKService.getDataByPath(StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + availableFollows.get(index));
+            Node newFollow=new Node(node2.getHost(), node2.getPort());
+            ClusterUtil.syncObjectNodeClockDiffer(newFollow,1,0);
             //如果最后心跳时间超过60s，则直接删除该节点信息。
-            if (DateUtils.isGreaterThanLoseTime(node2.getLastHeartbeat())) {
+            if (DateUtils.isGreaterThanLoseTime(node2.getLastHeartbeat(),newFollow.getClockDiffer().getDifferSecond())) {
                 ZKService.deleteNodeByPathIgnoreResult(StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + availableFollows.get(index));
-            } else if (DateUtils.isGreaterThanDeadTime(node2.getLastHeartbeat())) {
+            } else if (DateUtils.isGreaterThanDeadTime(node2.getLastHeartbeat(),newFollow.getClockDiffer().getDifferSecond())) {
                 //如果最后心跳时间超过30s，也不能将该节点作为follow
             } else if (follows.size() < count) {
                 follows.add(new Node(node2.getHost(), node2.getPort()));

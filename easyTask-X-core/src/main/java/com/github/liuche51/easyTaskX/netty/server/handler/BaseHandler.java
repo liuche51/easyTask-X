@@ -20,6 +20,7 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.LEADER_SYNC_DATA_TO_NEW_FOLLOW,new LeaderSyncDataToNewFollowHandler());
                 put(NettyInterfaceEnum.SYNC_LEADER_POSITION,new SyncLeaderPositionHandler());
                 put(NettyInterfaceEnum.GET_DBINFO_BY_TASKID,new GetDBInfoByTaskIdHandler());
+                put(NettyInterfaceEnum.SYNC_CLOCK_DIFFER,new SyncClockDifferHandler());
             }
         };
     }

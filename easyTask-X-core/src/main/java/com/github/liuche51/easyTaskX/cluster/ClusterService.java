@@ -241,4 +241,30 @@ public class ClusterService {
         task.start();
         return task;
     }
+    /**
+     * 启动同步与其他关联节点的时钟差定时任务
+     */
+    public static TimerTask nodeClockAdjustTask() {
+        NodeClockAdjustTask task=new NodeClockAdjustTask();
+        task.start();
+        return task;
+    }
+    /**
+     * 同步与目标主机的时间差
+     * @param nodes
+     * @return
+     */
+    public static void syncObjectNodeClockDiffer(List<Node> nodes, int tryCount)
+    {
+        ClusterService.getConfig().getClusterPool().submit(new Runnable() {
+            @Override
+            public void run() {
+                if (nodes != null) {
+                    nodes.forEach(x -> {
+                        ClusterUtil.syncObjectNodeClockDiffer(x,tryCount,5);
+                    });
+                }
+            }
+        });
+    }
 }
