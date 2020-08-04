@@ -49,6 +49,7 @@ public class VoteFollows {
             ClusterService.CURRENTNODE.setFollows(follows);
             //通知follows当前Leader位置
             LeaderUtil.notifyFollowsLeaderPosition(follows, ClusterService.getConfig().getTryCount());
+            ClusterService.syncObjectNodeClockDiffer(follows, ClusterService.getConfig().getTryCount());
         }
     }
 
@@ -92,6 +93,7 @@ public class VoteFollows {
         if (follows == null || follows.size() == 0) throw new Exception("cluster is vote follow failed,please retry later.");
         //通知follows当前Leader位置
         LeaderUtil.notifyFollowsLeaderPosition(follows, ClusterService.getConfig().getTryCount());
+        ClusterService.syncObjectNodeClockDiffer(follows, ClusterService.getConfig().getTryCount());
         return follows.get(0);
     }
 

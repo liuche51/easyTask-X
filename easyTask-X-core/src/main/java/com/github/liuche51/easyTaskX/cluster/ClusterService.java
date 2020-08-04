@@ -93,6 +93,7 @@ public class ClusterService {
         timerTasks.add(cancelSaveTransactionTask());
         timerTasks.add(retryCancelSaveTransactionTask());
         timerTasks.add(retryDelTransactionTask());
+        timerTasks.add(nodeClockAdjustTask());
     }
     /**
      * 客户端提交任务。允许线程等待，直到easyTask组件启动完成
