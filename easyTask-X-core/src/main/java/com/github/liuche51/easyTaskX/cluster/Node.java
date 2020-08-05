@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 节点对象
@@ -31,11 +32,11 @@ public class Node implements Serializable {
     /**
      * 当前节点的所有follows
      */
-    private List<Node> follows = new LinkedList<>();
+    private ConcurrentHashMap<String, Node> follows = new ConcurrentHashMap<String, Node>();
     /**
      * 当前节点的所有leader
      */
-    private Map<String, Node> leaders = new HashMap<>();
+    private ConcurrentHashMap<String, Node> leaders = new ConcurrentHashMap<>();
 
     public Node(String host, int port) {
         this.host = host;
@@ -73,19 +74,19 @@ public class Node implements Serializable {
         this.clockDiffer = clockDiffer;
     }
 
-    public List<Node> getFollows() {
+    public ConcurrentHashMap<String, Node> getFollows() {
         return follows;
     }
 
-    public void setFollows(List<Node> follows) {
+    public void setFollows(ConcurrentHashMap<String, Node> follows) {
         this.follows = follows;
     }
 
-    public Map<String, Node> getLeaders() {
+    public ConcurrentHashMap<String, Node> getLeaders() {
         return leaders;
     }
 
-    public void setLeaders(Map<String, Node> leaders) {
+    public void setLeaders(ConcurrentHashMap<String, Node> leaders) {
         this.leaders = leaders;
     }
 

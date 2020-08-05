@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -46,7 +47,11 @@ public class VoteFollows {
             log.info("follows.size() < count,so start to initSelectFollows");
             initSelectFollows();//数量不够递归重新选VoteFollows.selectFollows中
         } else {
-            ClusterService.CURRENTNODE.setFollows(follows);
+            ConcurrentHashMap<String,Node> follows2=new ConcurrentHashMap<>(follows.size());
+            follows.forEach(x->{
+                follows2.put(x.getAddress(),x);
+            });
+            ClusterService.CURRENTNODE.setFollows(follows2);
             //通知follows当前Leader位置
             LeaderUtil.notifyFollowsLeaderPosition(follows, ClusterService.getConfig().getTryCount());
             ClusterService.syncObjectNodeClockDiffer(follows, ClusterService.getConfig().getTryCount());
@@ -57,40 +62,37 @@ public class VoteFollows {
      * 选择新follow
      * leader同步数据失败或心跳检测失败，则进入选新follow程序
      *
-     * @param items 是否在迭代器中访问，是则使用迭代器移除元素
      * @return
      */
-    public static Node selectNewFollow(Node oldFollow, Iterator<Node> items) throws Exception {
+    public static Node selectNewFollow(Node oldFollow) throws Exception {
         if (selecting) throw new VotingException("cluster is voting new follow,please retry later.");
         selecting = true;
         List<Node> follows = null;
         try {
             lock.lock();
-            if (ClusterService.CURRENTNODE.getFollows().contains(oldFollow)) {
-                if (items != null)
-                    items.remove();//如果使用以下List集合方法移除，会导致下次items.next()方法报错
-                else
-                    ClusterService.CURRENTNODE.getFollows().remove(oldFollow);//移除失效的follow
-                NettyConnectionFactory.getInstance().removeHostPool(oldFollow.getAddress());
-                log.info("leader remove follow {}", oldFollow.getAddress());
-            }
+            ClusterService.CURRENTNODE.getFollows().remove(oldFollow.getAddress());//移除失效的follow
+            NettyConnectionFactory.getInstance().removeHostPool(oldFollow.getAddress());
+            log.info("leader remove follow {}", oldFollow.getAddress());
+
             //多线程下，如果follows已经选好，则让客户端重新提交任务。以后可以优化为获取选举后的follow
             if (ClusterService.CURRENTNODE.getFollows() != null && ClusterService.CURRENTNODE.getFollows().size() >= ClusterService.getConfig().getBackupCount())
                 throw new VotedException("cluster is voted follow,please retry again.");
             List<String> availableFollows = getAvailableFollows(Arrays.asList(oldFollow.getAddress()));
             follows = selectFollows(1, availableFollows);
             if (follows.size() < 1)
-                selectNewFollow(oldFollow, items);//数量不够递归重新选
+                selectNewFollow(oldFollow);//数量不够递归重新选
             else {
-                follows.get(0).setDataStatus(NodeSyncDataStatusEnum.UNSYNC);//选举成功，将新follow数据同步状态标记为未同步
-                ClusterService.CURRENTNODE.getFollows().add(follows.get(0));
+                Node newFollow=follows.get(0);
+                newFollow.setDataStatus(NodeSyncDataStatusEnum.UNSYNC);//选举成功，将新follow数据同步状态标记为未同步
+                ClusterService.CURRENTNODE.getFollows().put(newFollow.getAddress(),newFollow);
             }
 
         } finally {
             selecting = false;//复原选举装填
             lock.unlock();
         }
-        if (follows == null || follows.size() == 0) throw new Exception("cluster is vote follow failed,please retry later.");
+        if (follows == null || follows.size() == 0)
+            throw new Exception("cluster is vote follow failed,please retry later.");
         //通知follows当前Leader位置
         LeaderUtil.notifyFollowsLeaderPosition(follows, ClusterService.getConfig().getTryCount());
         ClusterService.syncObjectNodeClockDiffer(follows, ClusterService.getConfig().getTryCount());
@@ -116,11 +118,14 @@ public class VoteFollows {
         }).findFirst();
         if (temp.isPresent())
             availableFollows.remove(temp.get());
-        ClusterService.CURRENTNODE.getFollows().forEach(x -> {//排除现有的
-            Optional<String> temp1 = availableFollows.stream().filter(y -> y.equals(x.getAddress())).findFirst();
+        //排除现有的
+        Iterator<Map.Entry<String, Node>> items = ClusterService.CURRENTNODE.getFollows().entrySet().iterator();
+        while (items.hasNext()) {
+            Map.Entry<String, Node> item = items.next();
+            Optional<String> temp1 = availableFollows.stream().filter(y -> y.equals(item.getValue().getAddress())).findFirst();
             if (temp1.isPresent())
                 availableFollows.remove(temp1.get());
-        });
+        }
         //排除旧的失效节点
         if (exclude != null) {
             exclude.forEach(x -> {
@@ -150,13 +155,13 @@ public class VoteFollows {
         Random random = new Random();
         for (int i = 0; i < size; i++) {
             int index = random.nextInt(availableFollows.size());//随机生成的随机数范围就变成[0,size)。
-            ZKNode node2 = ZKService.getDataByPath(StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + availableFollows.get(index));
-            Node newFollow=new Node(node2.getHost(), node2.getPort());
-            ClusterUtil.syncObjectNodeClockDiffer(newFollow,1,0);
+            ZKNode node2 = ZKService.getDataByPath(StringConstant.CHAR_SPRIT + StringConstant.SERVER + StringConstant.CHAR_SPRIT + availableFollows.get(index));
+            Node newFollow = new Node(node2.getHost(), node2.getPort());
+            ClusterUtil.syncObjectNodeClockDiffer(newFollow, 1, 0);
             //如果最后心跳时间超过60s，则直接删除该节点信息。
-            if (DateUtils.isGreaterThanLoseTime(node2.getLastHeartbeat(),newFollow.getClockDiffer().getDifferSecond())) {
-                ZKService.deleteNodeByPathIgnoreResult(StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + availableFollows.get(index));
-            } else if (DateUtils.isGreaterThanDeadTime(node2.getLastHeartbeat(),newFollow.getClockDiffer().getDifferSecond())) {
+            if (DateUtils.isGreaterThanLoseTime(node2.getLastHeartbeat(), newFollow.getClockDiffer().getDifferSecond())) {
+                ZKService.deleteNodeByPathIgnoreResult(StringConstant.CHAR_SPRIT + StringConstant.SERVER + StringConstant.CHAR_SPRIT + availableFollows.get(index));
+            } else if (DateUtils.isGreaterThanDeadTime(node2.getLastHeartbeat(), newFollow.getClockDiffer().getDifferSecond())) {
                 //如果最后心跳时间超过30s，也不能将该节点作为follow
             } else if (follows.size() < count) {
                 follows.add(new Node(node2.getHost(), node2.getPort()));

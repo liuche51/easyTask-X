@@ -7,6 +7,7 @@ import com.github.liuche51.easyTaskX.dto.ClockDiffer;
 
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 同步与其他关联节点的时钟差定时任务
@@ -23,12 +24,12 @@ public class NodeClockAdjustTask extends TimerTask {
                     ClockDiffer differ = item.getValue().getClockDiffer();
                     dealSyncObjectNodeClockDiffer(item.getValue(), differ);
                 }
-                List<Node> follows = ClusterService.CURRENTNODE.getFollows();
-                Iterator<Node> items2 = follows.iterator();
+                ConcurrentHashMap<String, Node> follows = ClusterService.CURRENTNODE.getFollows();
+                Iterator<Map.Entry<String, Node>> items2 = follows.entrySet().iterator();
                 while (items2.hasNext()) {
-                    Node item = items2.next();
-                    ClockDiffer differ = item.getClockDiffer();
-                    dealSyncObjectNodeClockDiffer(item, differ);
+                    Map.Entry<String, Node> item = items2.next();
+                    ClockDiffer differ = item.getValue().getClockDiffer();
+                    dealSyncObjectNodeClockDiffer(item.getValue(), differ);
                 }
             } catch (ConcurrentModificationException e) {
                 //多线程并发导致items.next()异常，但是没啥太大影响(影响后续元素迭代)。可以直接忽略

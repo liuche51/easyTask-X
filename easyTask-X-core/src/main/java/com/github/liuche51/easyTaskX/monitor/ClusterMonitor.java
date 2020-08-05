@@ -49,9 +49,9 @@ public class ClusterMonitor {
         Map<String, Map<String, List>> map = new HashMap<>(3);
         Map<String, List> leaderInfo = DBMonitor.getInfoByTaskId(taskId);
         map.put(ClusterService.getConfig().getAddress(), leaderInfo);
-        Iterator<Node> items = ClusterService.CURRENTNODE.getFollows().iterator();
+        Iterator<Map.Entry<String,Node>> items = ClusterService.CURRENTNODE.getFollows().entrySet().iterator();
         while (items.hasNext()) {
-            Node item = items.next();
+            Node item = items.next().getValue();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.GET_DBINFO_BY_TASKID).setSource(ClusterService.getConfig().getAddress())
                     .setBody(taskId);

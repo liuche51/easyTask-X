@@ -6,6 +6,7 @@ import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.cluster.leader.SaveTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteFollows;
 import com.github.liuche51.easyTaskX.cluster.task.*;
+import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.tran.*;
 import com.github.liuche51.easyTaskX.dao.*;
 import com.github.liuche51.easyTaskX.dto.Schedule;
@@ -19,10 +20,8 @@ import com.github.liuche51.easyTaskX.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ClusterService {
     private static Logger log = LoggerFactory.getLogger(ClusterService.class);
@@ -120,9 +119,9 @@ public class ClusterService {
             throw new VotingException("normally exception!save():cluster is voting,please wait a moment.");
         //防止多线程下，follow元素操作竞争问题。确保参与提交的follow不受集群选举影响
         List<Node> follows = new ArrayList<>(CURRENTNODE.getFollows().size());
-        Iterator<Node> items = CURRENTNODE.getFollows().iterator();
+        Iterator<Map.Entry<String,Node>> items = CURRENTNODE.getFollows().entrySet().iterator();
         while (items.hasNext()) {
-            follows.add(items.next());
+            follows.add(items.next().getValue());
         }
         if (follows.size() != ClusterService.getConfig().getBackupCount())
             throw new Exception("save() exception！follows.size()!=backupCount");
@@ -152,9 +151,9 @@ public class ClusterService {
     public static boolean deleteTask(String taskId) {
         //防止多线程下，follow元素操作竞争问题。确保参与提交的follow不受集群选举影响
         List<Node> follows = new ArrayList<>(CURRENTNODE.getFollows().size());
-        Iterator<Node> items = CURRENTNODE.getFollows().iterator();
+        Iterator<Map.Entry<String,Node>> items = CURRENTNODE.getFollows().entrySet().iterator();
         while (items.hasNext()) {
-            follows.add(items.next());
+            follows.add(items.next().getValue());
         }
         String transactionId=Util.generateTransactionId();
         try {
