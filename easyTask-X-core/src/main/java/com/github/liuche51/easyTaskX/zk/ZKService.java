@@ -70,7 +70,7 @@ public class ZKService {
      *
      * @return
      */
-    public static List<String> getChildrenByCurrentNode() throws UnknownHostException {
+    public static List<String> getChildrenByCurrentNode() throws Exception {
         String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + ClusterService.getConfig().getAddress();
         return getChildrenByPath(path);
     }
@@ -96,7 +96,7 @@ public class ZKService {
      *
      * @return
      */
-    public static ZKNode getDataByCurrentNode() throws UnknownHostException {
+    public static ZKNode getDataByCurrentNode() throws Exception {
         String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + ClusterService.getConfig().getAddress();
         return getDataByPath(path);
     }
@@ -124,7 +124,7 @@ public class ZKService {
      * @param data
      * @return
      */
-    public static boolean setDataByCurrentNode(ZKNode data) throws UnknownHostException {
+    public static boolean setDataByCurrentNode(ZKNode data) throws Exception {
         String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + ClusterService.getConfig().getAddress();
         return setDataByPath(path, data);
     }

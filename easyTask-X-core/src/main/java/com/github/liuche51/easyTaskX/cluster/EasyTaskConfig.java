@@ -128,7 +128,7 @@ public class EasyTaskConfig {
         this.nettyPoolSize = nettyPoolSize;
     }
 
-    public String getAddress() throws UnknownHostException {
+    public String getAddress() throws Exception {
         StringBuffer buffer = new StringBuffer(Util.getLocalIP());
         buffer.append(":").append(getServerPort());
         return buffer.toString();
