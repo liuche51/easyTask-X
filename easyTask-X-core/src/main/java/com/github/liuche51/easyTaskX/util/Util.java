@@ -164,4 +164,9 @@ public class Util {
             source=ClusterService.getConfig().getAddress()+"<-"+oldSource;
         return source;
     }
+    public static boolean isDevEnvironment(String[] args){
+        if(args.length==2&&"env".equals(args[0])&&"dev".equals(args[1]))
+            return true;
+        else return false;
+    }
 }

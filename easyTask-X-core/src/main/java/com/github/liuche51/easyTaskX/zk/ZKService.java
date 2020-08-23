@@ -61,7 +61,7 @@ public class ZKService {
      * @return
      */
     public static List<String> getChildrenByServerNode() {
-        String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT;
+        String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER;
         return getChildrenByPath(path);
     }
 
