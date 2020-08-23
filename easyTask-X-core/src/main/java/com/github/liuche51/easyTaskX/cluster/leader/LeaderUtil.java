@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.cluster.ClusterUtil;
 import com.github.liuche51.easyTaskX.cluster.Node;
@@ -9,6 +10,7 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
+import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
 import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.Future;
@@ -29,13 +31,13 @@ public class LeaderUtil {
      *
      * @return
      */
-    public static boolean notifyFollowsLeaderPosition(List<Node> follows, int tryCount) {
+    public static boolean notifyFollowsLeaderPosition(List<Node> follows, int tryCount, int waiteSecond) {
         ClusterService.getConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 if (follows != null) {
                     follows.forEach(x -> {
-                        notifyFollowLeaderPosition(x, tryCount);
+                        notifyFollowLeaderPosition(x, tryCount,waiteSecond);
                     });
                 }
             }
@@ -48,30 +50,31 @@ public class LeaderUtil {
      * @param tryCount
      * @return
      */
-    public static boolean notifyFollowLeaderPosition(Node follow, int tryCount) {
+    public static boolean notifyFollowLeaderPosition(Node follow, int tryCount, int waiteSecond) {
         if (tryCount == 0) return false;
-        final boolean[] ret = {false};
+        String error = StringConstant.EMPTY;
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
             builder.setInterfaceName(NettyInterfaceEnum.SYNC_LEADER_POSITION).setSource(ClusterService.getConfig().getAddress())
                     .setBody(ClusterService.getConfig().getAddress());
-            ChannelFuture future = NettyMsgService.sendASyncMsg(follow.getClient(),builder.build());
-            tryCount--;
-            future.addListener(new GenericFutureListener<Future<? super Void>>() {
-                @Override
-                public void operationComplete(Future<? super Void> future) throws Exception {
-                    if (future.isSuccess()) {
-                        ret[0] = true;
-                    }
-                }
-            });
-            if (ret[0])
+            Dto.Frame frame = NettyMsgService.sendSyncMsg(follow.getClient(), builder.build());
+            ResultDto.Result result = ResultDto.Result.parseFrom(frame.getBodyBytes());
+            if (StringConstant.TRUE.equals(result.getResult())) {
                 return true;
+            } else
+                error = result.getMsg();
         } catch (Exception e) {
-            tryCount--;
             log.error("notifyFollowLeaderPosition.tryCount=" + tryCount, e);
+        } finally {
+            tryCount--;
         }
-        return notifyFollowLeaderPosition(follow, tryCount);
+        log.info("notifyFollowLeaderPosition()-> error" + error + ",tryCount=" + tryCount + ",objectHost=" + follow.getAddress());
+        try {
+            Thread.sleep(waiteSecond*1000);
+        } catch (InterruptedException e) {
+            log.error("",e);
+        }
+        return notifyFollowLeaderPosition(follow, tryCount,waiteSecond);
     }
     /**
      * 同步任务数据到follow，批量方式

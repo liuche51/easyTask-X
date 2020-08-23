@@ -12,7 +12,7 @@ public class SyncClientPositionHandler extends BaseHandler {
     @Override
     public String process(Dto.Frame frame) throws Exception {
         String ret = frame.getBody();
-        ClientService.updateBrokerPosition(ret);
+        ClientService.updateClientPosition(ret);
         return StringConstant.EMPTY;
     }
 }
