@@ -18,6 +18,7 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.TRAN_CANCELSAVETASK,new TranCancelSaveTaskHandler());
                 put(NettyInterfaceEnum.TRAN_TRYDELTASK,new TranTryDelTaskHandler());
                 put(NettyInterfaceEnum.LEADER_SYNC_DATA_TO_NEW_FOLLOW,new LeaderSyncDataToNewFollowHandler());
+                put(NettyInterfaceEnum.SYNC_CLIENT_POSITION,new SyncClientPositionHandler());
                 put(NettyInterfaceEnum.SYNC_LEADER_POSITION,new SyncLeaderPositionHandler());
                 put(NettyInterfaceEnum.GET_DBINFO_BY_TASKID,new GetDBInfoByTaskIdHandler());
                 put(NettyInterfaceEnum.SYNC_CLOCK_DIFFER,new SyncClockDifferHandler());

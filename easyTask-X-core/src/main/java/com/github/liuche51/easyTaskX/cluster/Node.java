@@ -30,6 +30,10 @@ public class Node implements Serializable {
      */
     private ClockDiffer clockDiffer=new ClockDiffer();
     /**
+     * 当前节点的所有clients
+     */
+    private ConcurrentHashMap<String, Node> clients = new ConcurrentHashMap<String, Node>();
+    /**
      * 当前节点的所有follows
      */
     private ConcurrentHashMap<String, Node> follows = new ConcurrentHashMap<String, Node>();
@@ -72,6 +76,14 @@ public class Node implements Serializable {
 
     public void setClockDiffer(ClockDiffer clockDiffer) {
         this.clockDiffer = clockDiffer;
+    }
+
+    public ConcurrentHashMap<String, Node> getClients() {
+        return clients;
+    }
+
+    public void setClients(ConcurrentHashMap<String, Node> clients) {
+        this.clients = clients;
     }
 
     public ConcurrentHashMap<String, Node> getFollows() {
