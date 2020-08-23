@@ -29,7 +29,6 @@ public class CheckLeadersAliveTask extends TimerTask {
                     if (node == null)//防止leader节点已经不在zk。此处不需要选leader
                     {
                         log.info("CheckLeadersAliveTask():leader is not exist in zk");
-                        VoteLeader.selectNewLeader(node, item.getValue().getAddress());
                         items.remove();
                         continue;
                     }
