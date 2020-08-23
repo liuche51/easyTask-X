@@ -6,6 +6,7 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.StringConstant;
+import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,7 @@ public class ClusterUtil {
         Dto.Frame frame = null;
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setInterfaceName(NettyInterfaceEnum.SYNC_CLOCK_DIFFER).setSource(ClusterService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.SYNC_CLOCK_DIFFER).setSource(ClusterService.getConfig().getAddress())
                     .setBody(ClusterService.getConfig().getAddress());
             long start = System.currentTimeMillis();
             frame = NettyMsgService.sendSyncMsg(node.getClient(), builder.build());

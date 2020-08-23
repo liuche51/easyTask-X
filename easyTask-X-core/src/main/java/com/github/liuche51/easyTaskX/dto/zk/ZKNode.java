@@ -14,6 +14,10 @@ public class ZKNode {
     private String lastHeartbeat;
     private String createTime;
     /**
+     * clients
+     */
+    private List<ZKHost> clients=new LinkedList<>();
+    /**
      * follows
      */
     private List<ZKHost> follows=new LinkedList<>();
@@ -41,6 +45,14 @@ public class ZKNode {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public List<ZKHost> getClients() {
+        return clients;
+    }
+
+    public void setClients(List<ZKHost> clients) {
+        this.clients = clients;
     }
 
     public List<ZKHost> getFollows() {

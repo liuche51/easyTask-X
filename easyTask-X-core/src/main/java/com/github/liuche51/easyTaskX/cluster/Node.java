@@ -24,7 +24,7 @@ public class Node implements Serializable {
     /**
      * 数据一致性状态。
      */
-    private int dataStatus = NodeSyncDataStatusEnum.SYNC;
+    private Short dataStatus = NodeSyncDataStatusEnum.SYNC;
     /**
      * 与目标主机的时钟差距
      */
@@ -46,7 +46,11 @@ public class Node implements Serializable {
         this.host = host;
         this.port = port;
     }
-
+    public Node(String host, int port,Short dataStatus) {
+        this.host = host;
+        this.port = port;
+        this.dataStatus=dataStatus;
+    }
     public String getHost() {
         return host;
     }
@@ -63,11 +67,11 @@ public class Node implements Serializable {
         this.port = port;
     }
 
-    public int getDataStatus() {
+    public Short getDataStatus() {
         return dataStatus;
     }
 
-    public void setDataStatus(int dataStatus) {
+    public void setDataStatus(Short dataStatus) {
         this.dataStatus = dataStatus;
     }
     public ClockDiffer getClockDiffer() {

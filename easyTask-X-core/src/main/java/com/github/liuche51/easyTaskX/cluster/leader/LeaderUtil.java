@@ -55,7 +55,7 @@ public class LeaderUtil {
         String error = StringConstant.EMPTY;
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setInterfaceName(NettyInterfaceEnum.SYNC_LEADER_POSITION).setSource(ClusterService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.SYNC_LEADER_POSITION).setSource(ClusterService.getConfig().getAddress())
                     .setBody(ClusterService.getConfig().getAddress());
             Dto.Frame frame = NettyMsgService.sendSyncMsg(follow.getClient(), builder.build());
             ResultDto.Result result = ResultDto.Result.parseFrom(frame.getBodyBytes());

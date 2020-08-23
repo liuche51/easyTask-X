@@ -37,6 +37,7 @@ public class HeartbeatsTask extends TimerTask{
                     node.setLastHeartbeat(DateUtils.getCurrentDateTime());
                     node.setLeaders(Util.nodeToZKHost(ClusterService.CURRENTNODE.getLeaders()));//直接将本地数据覆盖到zk
                     node.setFollows(Util.nodeToZKHost(ClusterService.CURRENTNODE.getFollows()));//直接将本地数据覆盖到zk
+                    node.setClients(Util.nodeToZKHost(ClusterService.CURRENTNODE.getClients()));
                     boolean ret = ZKService.setDataByCurrentNode(node);
                     if (!ret) {//设置新值失败，说明zk注册信息已经被follow删除，follows已经重新选举出一个新leader。本节点只能重新选follows了
                        System.out.println("ZKService.setDataByCurrentNode 设置新值失败");

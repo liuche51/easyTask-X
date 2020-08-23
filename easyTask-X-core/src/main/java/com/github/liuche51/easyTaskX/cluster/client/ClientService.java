@@ -26,7 +26,7 @@ public class ClientService {
             String[] temp = client.split(":");
             if (temp.length != 2) return false;
             Map<String, Node> clients = ClusterService.CURRENTNODE.getClients();
-            Node newclient=new Node(temp[0], Integer.valueOf(temp[1]).intValue());
+            Node newclient=new Node(temp[0], Integer.valueOf(temp[1]).intValue(),null);
             clients.put(client, newclient);
             ClusterService.syncObjectNodeClockDiffer(Arrays.asList(newclient), ClusterService.getConfig().getTryCount());
             return true;

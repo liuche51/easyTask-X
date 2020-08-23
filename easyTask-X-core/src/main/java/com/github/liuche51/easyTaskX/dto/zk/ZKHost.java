@@ -10,7 +10,7 @@ public class ZKHost {
     /**
      * 数据一致性状态。
      */
-    private int dataStatus= NodeSyncDataStatusEnum.SYNC;
+    private Short dataStatus= NodeSyncDataStatusEnum.SYNC;
     public ZKHost(String host) {
         this.host = host;
     }
@@ -18,7 +18,11 @@ public class ZKHost {
         this.host = host;
         this.port = port;
     }
-
+    public ZKHost(String host, int port,Short dataStatus) {
+        this.host = host;
+        this.port = port;
+        this.dataStatus=dataStatus;
+    }
     public String getHost() {
         return host;
     }
@@ -39,7 +43,7 @@ public class ZKHost {
         return dataStatus;
     }
 
-    public void setDataStatus(int dataStatus) {
+    public void setDataStatus(Short dataStatus) {
         this.dataStatus = dataStatus;
     }
 
