@@ -35,26 +35,23 @@ public class CheckFollowsAliveTask extends TimerTask {
                     ZKNode node = ZKService.getDataByPath(path);
                     if (node == null)//防止follow节点已经不在zk。导致不能重新选举
                     {
-                        log.info("heartBeatToFollow():oldFollow is not exist in zk,so to selectNewFollow.");
+                        log.info("CheckFollowsAliveTask():oldFollow is not exist in zk,so to selectNewFollow.");
                         VoteFollows.selectNewFollow(oldFollow);
                         continue;
                     }
-                    //如果最后心跳时间超过60s，则直接删除该节点信息。
+                    //如果最后心跳时间超过60s，则直接删除该节点信息。不需要移除此follow，下次心跳就会进入上面的选举
                     if (DateUtils.isGreaterThanLoseTime(node.getLastHeartbeat(),oldFollow.getClockDiffer().getDifferSecond())) {
                         ZKService.deleteNodeByPathIgnoreResult(path);
                     }
                     //如果最后心跳时间超过30s，进入选举新follow流程
                     else if (DateUtils.isGreaterThanDeadTime(node.getLastHeartbeat(),oldFollow.getClockDiffer().getDifferSecond())) {
-                        log.info("heartBeatToFollow():start to selectNewFollow");
+                        log.info("CheckFollowsAliveTask():start to selectNewFollow");
                         Node newFollow = VoteFollows.selectNewFollow(oldFollow);
-                        log.info("heartBeatToFollow():start to syncDataToNewFollow");
+                        log.info("CheckFollowsAliveTask():start to syncDataToNewFollow");
                         LeaderService.syncDataToNewFollow(oldFollow, newFollow);
                     }
 
                 }
-            } catch (ConcurrentModificationException e) {
-                //多线程并发导致items.next()异常，但是没啥太大影响(影响后续元素迭代)。可以直接忽略
-                log.error("normally exception error.can ignore."+e.getMessage());
             } catch (VotingException e) {
                 //异常导致选新follow。但此时刚好有其他地方触发正在选举中。
                 //心跳这里就没必要继续触发选新follow了
@@ -63,12 +60,12 @@ public class CheckFollowsAliveTask extends TimerTask {
                 //原因同上VotingException
                 log.error("normally exception error.can ignore."+e.getMessage());
             } catch (Exception e) {
-                log.error("heartBeatToFollow()", e);
+                log.error("CheckFollowsAliveTask()", e);
             }
             try {
                 Thread.sleep(ClusterService.getConfig().getHeartBeat());
             } catch (InterruptedException e) {
-                log.error("heartBeatToFollow()", e);
+                log.error("CheckFollowsAliveTask()", e);
             }
         }
     }
