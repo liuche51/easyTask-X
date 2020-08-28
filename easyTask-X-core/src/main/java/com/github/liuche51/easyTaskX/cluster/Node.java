@@ -41,6 +41,10 @@ public class Node implements Serializable {
      * 当前节点的所有leader
      */
     private ConcurrentHashMap<String, Node> leaders = new ConcurrentHashMap<>();
+    /**
+     * 集群leader
+     */
+    private Node clusterLeader=null;
 
     public Node(String host, int port) {
         this.host = host;
@@ -104,6 +108,14 @@ public class Node implements Serializable {
 
     public void setLeaders(ConcurrentHashMap<String, Node> leaders) {
         this.leaders = leaders;
+    }
+
+    public Node getClusterLeader() {
+        return clusterLeader;
+    }
+
+    public void setClusterLeader(Node clusterLeader) {
+        this.clusterLeader = clusterLeader;
     }
 
     public String getAddress() {

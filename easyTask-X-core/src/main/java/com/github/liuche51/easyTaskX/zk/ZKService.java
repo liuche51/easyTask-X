@@ -100,7 +100,15 @@ public class ZKService {
         String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + ClusterService.getConfig().getAddress();
         return getDataByPath(path);
     }
-
+    /**
+     * 获取当前节点的值信息
+     *
+     * @return
+     */
+    public static ZKNode getClusterLeaderData() throws Exception {
+        String path = StringConstant.CHAR_SPRIT+ StringConstant.LEADER;
+        return getDataByPath(path);
+    }
     /**
      * 根据节点路径，获取节点值信息
      *
