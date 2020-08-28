@@ -13,6 +13,7 @@ public abstract class BaseHandler {
         INSTANCES=new HashMap<String,BaseHandler>(){
             {
                 put(NettyInterfaceEnum.CLIENT_SUBMIT_TASK,new ClientSubmitTaskHandler());
+                put(NettyInterfaceEnum.CLIENT_DELETE_TASK,new ClientDeleteTaskHandler());
                 put(NettyInterfaceEnum.TRAN_TRYSAVETASK,new TranTrySaveTaskHandler());
                 put(NettyInterfaceEnum.TRAN_CONFIRMSAVETASK,new TranConfirmSaveTaskHandler());
                 put(NettyInterfaceEnum.TRAN_CANCELSAVETASK,new TranCancelSaveTaskHandler());
