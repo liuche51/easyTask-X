@@ -79,11 +79,11 @@ public class ClusterService {
         ZKNode node = new ZKNode(CURRENTNODE.getHost(), CURRENTNODE.getPort());
         node.setCreateTime(DateUtils.getCurrentDateTime());
         node.setLastHeartbeat(DateUtils.getCurrentDateTime());
-        ZKService.register(node);
+        //ZKService.register(node);
         timerTasks.add(LeaderService.initHeartBeatToZK());
         LeaderService.initSelectFollows();
         node.setFollows(Util.nodeToZKHost(CURRENTNODE.getFollows()));
-        ZKService.setDataByCurrentNode(node);
+        //ZKService.setDataByCurrentNode(node);
         timerTasks.add(LeaderService.initCheckFollowAlive());
         timerTasks.add(FollowService.initCheckLeaderAlive());
         timerTasks.add(clearDataTask());

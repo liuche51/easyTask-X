@@ -27,7 +27,7 @@ public class LeaderServiceTest {
         List<Node> list=new LinkedList<>();
         Node node1=new Node(Util.getLocalIP(),2021);
         list.add(node1);
-        LeaderUtil.notifyFollowsLeaderPosition(list,3);
+       // LeaderUtil.notifyFollowsLeaderPosition(list,3);
             while (true){
                 Thread.sleep(5000);
             }

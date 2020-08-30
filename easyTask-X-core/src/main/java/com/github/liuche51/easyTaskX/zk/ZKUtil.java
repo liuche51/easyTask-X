@@ -34,7 +34,7 @@ public class ZKUtil {
         //3 开启连接
         client.start();
         //4 创建注册二级节点目录
-        ZKService.createZKNode(StringConstant.SERVER);
+        //ZKService.createZKNode(StringConstant.SERVER);
         return client;
     }
 

@@ -24,7 +24,7 @@ public class CheckLeadersAliveTask extends TimerTask {
                 Iterator<Map.Entry<String, Node>> items = leaders.entrySet().iterator();//使用遍历+移除操作安全的迭代器方式
                 while (items.hasNext()) {
                     Map.Entry<String, Node> item = items.next();
-                    String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + item.getValue().getAddress();
+                    String path = StringConstant.CHAR_SPRIT+StringConstant.CHAR_SPRIT + item.getValue().getAddress();
                     ZKNode node = ZKService.getDataByPath(path);
                     if (node == null)//防止leader节点已经不在zk。此处不需要选leader
                     {

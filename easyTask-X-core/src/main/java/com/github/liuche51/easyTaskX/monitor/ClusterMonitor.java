@@ -69,10 +69,6 @@ public class ClusterMonitor {
         }
         return map;
     }
-
-    public static ZKNode getCurrentZKNodeInfo() throws Exception {
-        return ZKService.getDataByCurrentNode();
-    }
     public static Map<String, String> getNettyClientPoolInfo(){
         Map<String, String> map=new HashMap<>(ClusterService.getConfig().getBackupCount());
         Map<String, ConcurrentLinkedQueue<NettyClient>> pools=NettyConnectionFactory.getInstance().getPools();

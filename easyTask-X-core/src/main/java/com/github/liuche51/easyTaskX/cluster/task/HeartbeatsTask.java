@@ -18,7 +18,12 @@ public class HeartbeatsTask extends TimerTask{
         while (!isExit()) {
             try {
                 Node leader=ClusterService.CURRENTNODE.getClusterLeader();
-                if(leader==null)
+                if(leader==null){
+                    ZKNode node=ZKService.getClusterLeaderData();
+                    if(node!=null){
+
+                    }
+                }
 
 
             } catch (Exception e) {

@@ -1,8 +1,11 @@
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
+import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.cluster.leader.VoteClusterLeader;
 import com.github.liuche51.easyTaskX.dto.zk.ZKHost;
 import com.github.liuche51.easyTaskX.dto.zk.ZKNode;
+import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.zk.ZKService;
 import org.junit.Test;
 
@@ -20,7 +23,7 @@ public class ZKTest {
         }
     }
     @Test
-    public void register() {
+    public void registerLeader() {
         try {
             EasyTaskConfig config=new EasyTaskConfig();
             config.setZkAddress("127.0.0.1:2181");
@@ -35,7 +38,7 @@ public class ZKTest {
             follows.add(follow1);
             follows.add(follow2);
             data.setFollows(follows);
-            ZKService.register(data);
+            ZKService.registerLeader(data);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -55,36 +58,27 @@ public class ZKTest {
        }
    }
     @Test
-    public void getChildrenByCurrentNode() {
-        try {
-            List<String> list = ZKService.getChildrenByCurrentNode();
-            list.forEach(x -> {
-                System.out.println(x);
+    public void competeLeader() {
+        EasyTaskConfig config=new EasyTaskConfig();
+        config.setZkAddress("127.0.0.1:2181");
+        ClusterService.setConfig(config);
+        ClusterService.CURRENTNODE=new Node("127.0.0.1",2121);
+        for(int i=0;i<5;i++){
+            int name=i;
+            Thread th=new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    VoteClusterLeader.competeLeader();
+                }
             });
-        } catch (Exception e) {
-            e.printStackTrace();
+            th.start();
         }
-    }
-
-    @Test
-    public void getChildrenByNameSpase() {
-        try {
-            List<String> list = ZKService.getChildrenByServerNode();
-            list.forEach(x -> {
-                System.out.println(x);
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void getDataByCurrentNode() {
-        try {
-            ZKNode node = ZKService.getDataByCurrentNode();
-            System.out.println(JSONObject.toJSON(node));
-        } catch (Exception e) {
-            e.printStackTrace();
+        while (true){
+            try {
+                Thread.sleep(1000l);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

@@ -2,15 +2,12 @@ package com.github.liuche51.easyTaskX.zk;
 
 import com.alibaba.fastjson.JSONObject;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.dto.zk.ZKNode;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.UnknownHostException;
 import java.util.List;
 
 public class ZKService {
@@ -34,45 +31,25 @@ public class ZKService {
         }
     }
     /**
-     * 当前节点注册为永久节点
+     * 当前节点注册为Leader节点
      *
      * @param data
      */
-    public static void register(ZKNode data) {
+    public static void registerLeader(ZKNode data) {
         try {
-            String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + ClusterService.getConfig().getAddress();
+            String path = StringConstant.CHAR_SPRIT+ StringConstant.LEADER;
             //检查是否存在节点。如果连不上zk，这里就会卡主线程，进入循环重试连接。直到连接成功
             Stat stat1 = ZKUtil.getClient().checkExists().forPath(path);
             if (stat1 != null) {
                 ZKUtil.getClient().setData().forPath(path, JSONObject.toJSONString(data).getBytes());//重新覆盖注册信息
                 return;
             } else {
-                //创建永久节点
-                ZKUtil.getClient().create().withMode(CreateMode.PERSISTENT).forPath(path, JSONObject.toJSONString(data).getBytes());
+                //创建临时节点
+                ZKUtil.getClient().create().withMode(CreateMode.EPHEMERAL).forPath(path, JSONObject.toJSONString(data).getBytes());
             }
         } catch (Exception e) {
-            log.error("register exception！", e);
+            log.error("registerLeader() exception！", e);
         }
-    }
-
-    /**
-     * 获取命名空间下的的子节点信息
-     *
-     * @return
-     */
-    public static List<String> getChildrenByServerNode() {
-        String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER;
-        return getChildrenByPath(path);
-    }
-
-    /**
-     * 获取当前节点下的子节点信息
-     *
-     * @return
-     */
-    public static List<String> getChildrenByCurrentNode() throws Exception {
-        String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + ClusterService.getConfig().getAddress();
-        return getChildrenByPath(path);
     }
 
     /**
@@ -89,16 +66,6 @@ public class ZKService {
             log.error("getChildrenByPath exception!", e);
         }
         return null;
-    }
-
-    /**
-     * 获取当前节点的值信息
-     *
-     * @return
-     */
-    public static ZKNode getDataByCurrentNode() throws Exception {
-        String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + ClusterService.getConfig().getAddress();
-        return getDataByPath(path);
     }
     /**
      * 获取当前节点的值信息
@@ -124,17 +91,6 @@ public class ZKService {
             log.error("normally exception!getDataByPath():"+e.getMessage());
         }
         return null;
-    }
-
-    /**
-     * 设置当前节点的值信息
-     *
-     * @param data
-     * @return
-     */
-    public static boolean setDataByCurrentNode(ZKNode data) throws Exception {
-        String path = StringConstant.CHAR_SPRIT+ StringConstant.SERVER+StringConstant.CHAR_SPRIT + ClusterService.getConfig().getAddress();
-        return setDataByPath(path, data);
     }
 
     /**

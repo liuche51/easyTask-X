@@ -106,7 +106,7 @@ public class VoteFollows {
      */
     private static List<String> getAvailableFollows(List<String> exclude) throws Exception {
         int count = ClusterService.getConfig().getBackupCount();
-        List<String> availableFollows = ZKService.getChildrenByServerNode();
+        List<String> availableFollows = null;
         //排除自己
         Optional<String> temp = availableFollows.stream().filter(x -> {
             try {
@@ -155,12 +155,12 @@ public class VoteFollows {
         Random random = new Random();
         for (int i = 0; i < size; i++) {
             int index = random.nextInt(availableFollows.size());//随机生成的随机数范围就变成[0,size)。
-            ZKNode node2 = ZKService.getDataByPath(StringConstant.CHAR_SPRIT + StringConstant.SERVER + StringConstant.CHAR_SPRIT + availableFollows.get(index));
+            ZKNode node2 = ZKService.getDataByPath(StringConstant.CHAR_SPRIT + StringConstant.CHAR_SPRIT + availableFollows.get(index));
             Node newFollow = new Node(node2.getHost(), node2.getPort());
             ClusterUtil.syncObjectNodeClockDiffer(newFollow, 1, 0);
             //如果最后心跳时间超过60s，则直接删除该节点信息。
             if (DateUtils.isGreaterThanLoseTime(node2.getLastHeartbeat(), newFollow.getClockDiffer().getDifferSecond())) {
-                ZKService.deleteNodeByPathIgnoreResult(StringConstant.CHAR_SPRIT + StringConstant.SERVER + StringConstant.CHAR_SPRIT + availableFollows.get(index));
+                ZKService.deleteNodeByPathIgnoreResult(StringConstant.CHAR_SPRIT+ StringConstant.CHAR_SPRIT + availableFollows.get(index));
             } else if (DateUtils.isGreaterThanDeadTime(node2.getLastHeartbeat(), newFollow.getClockDiffer().getDifferSecond())) {
                 //如果最后心跳时间超过30s，也不能将该节点作为follow
             } else if (follows.size() < count) {
