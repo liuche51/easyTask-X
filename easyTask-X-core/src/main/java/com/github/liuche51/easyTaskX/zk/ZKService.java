@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.zk;
 
 import com.alibaba.fastjson.JSONObject;
 
+import com.github.liuche51.easyTaskX.dto.zk.LeaderData;
 import com.github.liuche51.easyTaskX.dto.zk.ZKNode;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.apache.zookeeper.CreateMode;
@@ -72,9 +73,9 @@ public class ZKService {
      *
      * @return
      */
-    public static ZKNode getClusterLeaderData() throws Exception {
+    public static LeaderData getClusterLeaderData() throws Exception {
         String path = StringConstant.CHAR_SPRIT+ StringConstant.LEADER;
-        return getDataByPath(path);
+        return getDataByPath(path,LeaderData.class);
     }
     /**
      * 根据节点路径，获取节点值信息
@@ -82,10 +83,10 @@ public class ZKService {
      * @param path
      * @return
      */
-    public static ZKNode getDataByPath(String path) {
+    public static <T> T getDataByPath(String path,Class clazz) {
         try {
             byte[] bytes = ZKUtil.getClient().getData().forPath(path);
-            return JSONObject.parseObject(bytes, ZKNode.class);
+            return JSONObject.parseObject(bytes, clazz);
         } catch (Exception e) {
             //节点不存在了，属于正常情况。
             log.error("normally exception!getDataByPath():"+e.getMessage());

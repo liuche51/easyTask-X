@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster;
 
-import com.github.liuche51.easyTaskX.dto.ClockDiffer;
+import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.client.NettyConnectionFactory;
@@ -25,10 +25,6 @@ public class Node implements Serializable {
      * 数据一致性状态。
      */
     private Short dataStatus = NodeSyncDataStatusEnum.SYNC;
-    /**
-     * 与目标主机的时钟差距
-     */
-    private ClockDiffer clockDiffer=new ClockDiffer();
     /**
      * 当前节点的所有clients
      */
@@ -77,13 +73,6 @@ public class Node implements Serializable {
 
     public void setDataStatus(Short dataStatus) {
         this.dataStatus = dataStatus;
-    }
-    public ClockDiffer getClockDiffer() {
-        return clockDiffer;
-    }
-
-    public void setClockDiffer(ClockDiffer clockDiffer) {
-        this.clockDiffer = clockDiffer;
     }
 
     public ConcurrentHashMap<String, Node> getClients() {
@@ -145,5 +134,10 @@ public class Node implements Serializable {
         } finally {
             tryCount--;
         }
+    }
+    public static Node parse(NodeDto.Node node){
+        Node node1=new Node(node.getHost(),node.getPort());
+        node1.setDataStatus(new Short(String.valueOf(node.getDataStatus())));
+        return node1;
     }
 }

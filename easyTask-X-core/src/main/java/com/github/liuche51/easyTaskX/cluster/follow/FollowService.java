@@ -140,7 +140,6 @@ public class FollowService {
             Map<String, Node> leaders = ClusterService.CURRENTNODE.getLeaders();
             Node newleader=new Node(temp[0], Integer.valueOf(temp[1]).intValue());
             leaders.put(leader, newleader);
-            ClusterService.syncObjectNodeClockDiffer(Arrays.asList(newleader), ClusterService.getConfig().getTryCount());
             return true;
         } catch (Exception e) {
             log.error("updateLeaderPosition", e);

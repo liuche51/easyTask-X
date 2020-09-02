@@ -1,7 +1,9 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.dto.zk.LeaderData;
 import com.github.liuche51.easyTaskX.dto.zk.ZKNode;
+import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.zk.ZKService;
 import com.github.liuche51.easyTaskX.zk.ZKUtil;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
@@ -22,8 +24,8 @@ public class VoteClusterLeader {
         try {
             if(zkMutex.acquire(1, TimeUnit.SECONDS)){
                 hasLock=true;
-                ZKNode node=ZKService.getClusterLeaderData();
-                if(node==null){//leader节点为空时才需要选新leader
+                LeaderData data=ZKService.getClusterLeaderData();
+                if(data==null&& !StringUtils.isNullOrEmpty(data.getHost())){//leader节点为空时才需要选新leader
                     ZKService.registerLeader(new ZKNode(ClusterService.CURRENTNODE.getHost(),ClusterService.CURRENTNODE.getPort()));
                     return true;
                 }

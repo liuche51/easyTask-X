@@ -1,0 +1,6 @@
+option java_outer_classname = "NodeDto";//生成的数据访问类的类名
+message Node {
+  required string host = 1;
+  required int32 port = 2;
+  optional int32 dataStatus = 3;
+}

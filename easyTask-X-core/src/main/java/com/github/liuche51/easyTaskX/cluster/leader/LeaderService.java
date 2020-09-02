@@ -43,7 +43,7 @@ public class LeaderService {
     /**
      * 节点对zk的心跳。2s一次
      */
-    public static TimerTask initHeartBeatToZK() {
+    public static TimerTask initHeartBeatToClusterLeader() {
         HeartbeatsTask task=new HeartbeatsTask();
         task.start();
        return task;

@@ -28,8 +28,7 @@ public class ClientService {
             Map<String, Node> clients = ClusterService.CURRENTNODE.getClients();
             Node newclient=new Node(temp[0], Integer.valueOf(temp[1]).intValue(),null);
             clients.put(client, newclient);
-            ClusterService.syncObjectNodeClockDiffer(Arrays.asList(newclient), ClusterService.getConfig().getTryCount());
-            return true;
+             return true;
         } catch (Exception e) {
             log.error("updateClientPosition", e);
             return false;

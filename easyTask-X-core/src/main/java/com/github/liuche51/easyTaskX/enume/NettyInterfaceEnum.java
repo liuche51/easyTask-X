@@ -50,7 +50,7 @@ public class NettyInterfaceEnum {
      */
     public static final String GET_DBINFO_BY_TASKID="GetDBInfoByTaskId";
     /**
-     * 获取与目标主机的时钟差距接口
+     * Follow对Leader的心跳接口
      */
-    public static final String SYNC_CLOCK_DIFFER="SyncClockDiffer";
+    public static final String FOLLOW_TO_LEADER_HEARTBEAT="FollowToLeaderHeartbeat";
 }

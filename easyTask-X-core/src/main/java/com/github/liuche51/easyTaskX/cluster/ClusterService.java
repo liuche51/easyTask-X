@@ -79,8 +79,7 @@ public class ClusterService {
         ZKNode node = new ZKNode(CURRENTNODE.getHost(), CURRENTNODE.getPort());
         node.setCreateTime(DateUtils.getCurrentDateTime());
         node.setLastHeartbeat(DateUtils.getCurrentDateTime());
-        //ZKService.register(node);
-        timerTasks.add(LeaderService.initHeartBeatToZK());
+        timerTasks.add(LeaderService.initHeartBeatToClusterLeader());
         LeaderService.initSelectFollows();
         node.setFollows(Util.nodeToZKHost(CURRENTNODE.getFollows()));
         //ZKService.setDataByCurrentNode(node);
@@ -249,22 +248,5 @@ public class ClusterService {
         task.start();
         return task;
     }
-    /**
-     * 同步与目标主机的时间差
-     * @param nodes
-     * @return
-     */
-    public static void syncObjectNodeClockDiffer(List<Node> nodes, int tryCount)
-    {
-        ClusterService.getConfig().getClusterPool().submit(new Runnable() {
-            @Override
-            public void run() {
-                if (nodes != null) {
-                    nodes.forEach(x -> {
-                        ClusterUtil.syncObjectNodeClockDiffer(x,tryCount,5);
-                    });
-                }
-            }
-        });
-    }
+
 }

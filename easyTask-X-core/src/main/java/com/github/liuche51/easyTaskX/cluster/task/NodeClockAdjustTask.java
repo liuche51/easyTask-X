@@ -3,7 +3,6 @@ package com.github.liuche51.easyTaskX.cluster.task;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.Node;
-import com.github.liuche51.easyTaskX.dto.ClockDiffer;
 
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -21,15 +20,11 @@ public class NodeClockAdjustTask extends TimerTask {
                 Iterator<Map.Entry<String, Node>> items = leaders.entrySet().iterator();
                 while (items.hasNext()) {
                     Map.Entry<String, Node> item = items.next();
-                    ClockDiffer differ = item.getValue().getClockDiffer();
-                    dealSyncObjectNodeClockDiffer(item.getValue(), differ);
                 }
                 ConcurrentHashMap<String, Node> follows = ClusterService.CURRENTNODE.getFollows();
                 Iterator<Map.Entry<String, Node>> items2 = follows.entrySet().iterator();
                 while (items2.hasNext()) {
                     Map.Entry<String, Node> item = items2.next();
-                    ClockDiffer differ = item.getValue().getClockDiffer();
-                    dealSyncObjectNodeClockDiffer(item.getValue(), differ);
                 }
             } catch (ConcurrentModificationException e) {
                 //多线程并发导致items.next()异常，但是没啥太大影响(影响后续元素迭代)。可以直接忽略
@@ -45,13 +40,5 @@ public class NodeClockAdjustTask extends TimerTask {
             }
         }
 
-    }
-
-    private void dealSyncObjectNodeClockDiffer(Node node, ClockDiffer differ) {
-        //如果还没有同步过时钟差或距离上次同步已经过去5分钟了，则重新同步一次
-        if (!differ.isHasSync() || ZonedDateTime.now().minusMinutes(5)
-                .compareTo(differ.getLastSyncDate()) > 0) {
-            ClusterService.syncObjectNodeClockDiffer(Arrays.asList(node), ClusterService.getConfig().getTryCount());
-        }
     }
 }

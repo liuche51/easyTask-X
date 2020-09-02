@@ -32,34 +32,10 @@ public class CheckFollowsAliveTask extends TimerTask {
                     Map.Entry<String, Node> item = items.next();
                     Node oldFollow=item.getValue();
                     String path = StringConstant.CHAR_SPRIT+StringConstant.CHAR_SPRIT + oldFollow.getAddress();
-                    ZKNode node = ZKService.getDataByPath(path);
-                    if (node == null)//防止follow节点已经不在zk。导致不能重新选举
-                    {
-                        log.info("CheckFollowsAliveTask():oldFollow is not exist in zk,so to selectNewFollow.");
-                        VoteFollows.selectNewFollow(oldFollow);
-                        continue;
-                    }
-                    //如果最后心跳时间超过60s，则直接删除该节点信息。不需要移除此follow，下次心跳就会进入上面的选举
-                    if (DateUtils.isGreaterThanLoseTime(node.getLastHeartbeat(),oldFollow.getClockDiffer().getDifferSecond())) {
-                        ZKService.deleteNodeByPathIgnoreResult(path);
-                    }
-                    //如果最后心跳时间超过30s，进入选举新follow流程
-                    else if (DateUtils.isGreaterThanDeadTime(node.getLastHeartbeat(),oldFollow.getClockDiffer().getDifferSecond())) {
-                        log.info("CheckFollowsAliveTask():start to selectNewFollow");
-                        Node newFollow = VoteFollows.selectNewFollow(oldFollow);
-                        log.info("CheckFollowsAliveTask():start to syncDataToNewFollow");
-                        LeaderService.syncDataToNewFollow(oldFollow, newFollow);
-                    }
+
 
                 }
-            } catch (VotingException e) {
-                //异常导致选新follow。但此时刚好有其他地方触发正在选举中。
-                //心跳这里就没必要继续触发选新follow了
-                log.error("normally exception error.can ignore."+e.getMessage());
-            } catch (VotedException e) {
-                //原因同上VotingException
-                log.error("normally exception error.can ignore."+e.getMessage());
-            } catch (Exception e) {
+            }  catch (Exception e) {
                 log.error("CheckFollowsAliveTask()", e);
             }
             try {
