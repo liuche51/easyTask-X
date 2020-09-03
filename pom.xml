@@ -11,6 +11,7 @@
     <modules>
         <module>easyTask-X-core</module>
         <module>easyTask-X-test</module>
+        <module>easyTask-X-cmd</module>
     </modules>
 
 

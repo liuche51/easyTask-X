@@ -76,15 +76,7 @@ public class ClusterService {
         clearThreadTask();
         deleteAllData();
         CURRENTNODE = new Node(Util.getLocalIP(), ClusterService.getConfig().getServerPort());
-        ZKNode node = new ZKNode(CURRENTNODE.getHost(), CURRENTNODE.getPort());
-        node.setCreateTime(DateUtils.getCurrentDateTime());
-        node.setLastHeartbeat(DateUtils.getCurrentDateTime());
         timerTasks.add(LeaderService.initHeartBeatToClusterLeader());
-        LeaderService.initSelectFollows();
-        node.setFollows(Util.nodeToZKHost(CURRENTNODE.getFollows()));
-        //ZKService.setDataByCurrentNode(node);
-        timerTasks.add(LeaderService.initCheckFollowAlive());
-        timerTasks.add(FollowService.initCheckLeaderAlive());
         timerTasks.add(clearDataTask());
         timerTasks.add(commitSaveTransactionTask());
         timerTasks.add(commitDelTransactionTask());
