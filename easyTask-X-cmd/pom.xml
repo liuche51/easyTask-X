@@ -23,5 +23,36 @@
             <version>1.7.26</version>
         </dependency>
     </dependencies>
-
+    <build>
+        <finalName>easyTask-X-cmd</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5.5</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptors>
+                        <descriptor>src/main/assembly/package.xml</descriptor>
+                    </descriptors>
+                </configuration>
+            </plugin>
+            <!--打包插件，jar包和依赖包分开，依赖包打包到lib下   测试可行-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <!--指定程序运行时从根目录的lib目录下加载依赖的jar包-->
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>com.github.liuche51.easyTaskX.cmd.CMDApp</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

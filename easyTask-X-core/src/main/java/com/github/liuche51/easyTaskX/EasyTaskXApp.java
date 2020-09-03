@@ -68,12 +68,11 @@ public class EasyTaskXApp {
         String taskStorePath = properties.getProperty("taskStorePath");
         //以下是可选配置
         String serverPort = properties.getProperty("serverPort");
+        String cmdPort = properties.getProperty("cmdPort");
         String backupCount = properties.getProperty("backupCount");
-        String sQLlitePoolSize = properties.getProperty("sQLlitePoolSize");
+        String dbPoolSize = properties.getProperty("dbPoolSize");
         String nettyPoolSize = properties.getProperty("nettyPoolSize");
         String timeOut = properties.getProperty("timeOut");
-        String loseTimeOut = properties.getProperty("loseTimeOut");
-        String deadTimeOut = properties.getProperty("deadTimeOut");
         String heartBeat = properties.getProperty("heartBeat");
         String tryCount = properties.getProperty("tryCount");
         String clearScheduleBakTime = properties.getProperty("clearScheduleBakTime");
@@ -86,18 +85,16 @@ public class EasyTaskXApp {
         //以下是可选配置
         if (!StringUtils.isNullOrEmpty(serverPort))
             config.setServerPort(Integer.parseInt(serverPort));
+        if (!StringUtils.isNullOrEmpty(cmdPort))
+            config.setCmdPort(Integer.parseInt(cmdPort));
         if (!StringUtils.isNullOrEmpty(backupCount))
             config.setBackupCount(Integer.parseInt(backupCount));
-        if (!StringUtils.isNullOrEmpty(sQLlitePoolSize))
-            config.setSQLlitePoolSize(Integer.parseInt(sQLlitePoolSize));
+        if (!StringUtils.isNullOrEmpty(dbPoolSize))
+            config.setSQLlitePoolSize(Integer.parseInt(dbPoolSize));
         if (!StringUtils.isNullOrEmpty(nettyPoolSize))
             config.setNettyPoolSize(Integer.parseInt(nettyPoolSize));
         if (!StringUtils.isNullOrEmpty(timeOut))
             config.setTimeOut(Integer.parseInt(timeOut));
-        if (!StringUtils.isNullOrEmpty(loseTimeOut))
-            config.setLoseTimeOut(Integer.parseInt(loseTimeOut));
-        if (!StringUtils.isNullOrEmpty(deadTimeOut))
-            config.setDeadTimeOut(Integer.parseInt(deadTimeOut));
         if (!StringUtils.isNullOrEmpty(heartBeat))
             config.setHeartBeat(Integer.parseInt(heartBeat));
         if (!StringUtils.isNullOrEmpty(tryCount))

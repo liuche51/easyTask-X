@@ -1,5 +1,6 @@
 package com.github.liuche51.easyTaskX.socket;
 
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +18,7 @@ public class CmdServer {
     private static Logger log = LoggerFactory.getLogger(CmdServer.class);
 
     public static void start() throws IOException {
-        ServerSocket server = new ServerSocket(5678);//启动端口提供服务
+        ServerSocket server = new ServerSocket(ClusterService.getConfig().getCmdPort());//启动端口提供服务
         log.info("CmdServer started!");
         while (true) {//循环监听客户端。如果当前客户端断开连接，则进入下一次客户连接等待
             try {
@@ -25,13 +26,19 @@ public class CmdServer {
                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
                 PrintWriter out = new PrintWriter(client.getOutputStream());
                 while (true) {//循环监听当前客户端的发送消息
-                    String str = in.readLine();
-                    log.info("received cmd client msg:{}", str);
-                    out.println("server say：" + str);
+                    String cmd = in.readLine();
+                    log.info("received cmd client cmd:{}", cmd);
+                    String interfaces=CmdEngine.parse(cmd);
+                    if(interfaces==null){
+                        out.println("invalid command!" + cmd);
+                    }else {
+                        String ret=CmdService.excuteCmd(interfaces);
+                        out.println(ret);
+                    }
                     out.flush();
                 }
             } catch (Exception e) {
-                log.error("会话异常!", e);
+                log.error("CMD Session exception!", e);
             }
         }
 

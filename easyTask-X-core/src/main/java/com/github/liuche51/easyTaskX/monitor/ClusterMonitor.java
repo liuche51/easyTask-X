@@ -5,6 +5,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.Node;
 
+import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
 import com.github.liuche51.easyTaskX.dao.SQLliteMultiPool;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
@@ -21,6 +22,7 @@ import com.github.liuche51.easyTaskX.zk.ZKService;
 import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -81,5 +83,8 @@ public class ClusterMonitor {
             map.put(item.getKey(),builder.toString());
         }
         return map;
+    }
+    public static ConcurrentHashMap<String, Node> getAllNodeRegisterInfo(){
+        return ClusterLeaderService.REGISTERCENTER;
     }
 }

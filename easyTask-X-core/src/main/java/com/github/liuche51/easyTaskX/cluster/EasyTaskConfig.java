@@ -29,7 +29,7 @@ public class EasyTaskConfig {
     /**
      * sqlite连接池大小设置。默认3
      */
-    private int sQLlitePoolSize = 3;
+    private int dbPoolSize = 3;
     /**
      * Netty客户端连接池大小设置。默认3
      */
@@ -39,17 +39,16 @@ public class EasyTaskConfig {
      */
     private int serverPort = 2020;
     /**
+     * 设置当前节点CMD服务端口号。默认3030
+     */
+    private int cmdPort = 3030;
+    /**
      * 设置集群Netty通信调用超时时间。默认30秒
      */
     private int timeOut = 30;
     /**
      * ZK节点信息失效超时时间。默认超过60s就判断为失效节点，任何其他节点可删除掉
      */
-    private int loseTimeOut = 60;
-    /**
-     * ZK节点信息死亡超时时间。默认超过30s就判断为Leader失效节点，其Follow节点可进入选举新Leader
-     */
-    private int deadTimeOut = 30;
     /**
      * 节点对zk的心跳频率。默认2s一次
      */
@@ -103,19 +102,19 @@ public class EasyTaskConfig {
     }
 
     public int getsQLlitePoolSize() {
-        return sQLlitePoolSize;
+        return dbPoolSize;
     }
 
     /**
      * set SQLlitePool Size，default qty 3
      *
-     * @param sQLlitePoolSize
+     * @param dbPoolSize
      * @throws Exception
      */
-    public void setSQLlitePoolSize(int sQLlitePoolSize) throws Exception {
-        if (sQLlitePoolSize < 1)
+    public void setSQLlitePoolSize(int dbPoolSize) throws Exception {
+        if (dbPoolSize < 1)
             throw new Exception("sQLlitePoolSize must >1");
-        this.sQLlitePoolSize = sQLlitePoolSize;
+        this.dbPoolSize = dbPoolSize;
     }
 
     public int getNettyPoolSize() {
@@ -150,26 +149,20 @@ public class EasyTaskConfig {
         this.serverPort = port;
     }
 
+    public int getCmdPort() {
+        return cmdPort;
+    }
+
+    public void setCmdPort(int cmdPort) {
+        this.cmdPort = cmdPort;
+    }
+
     public int getTimeOut() {
         return timeOut;
     }
 
     public void setTimeOut(int timeOut) {
         this.timeOut = timeOut;
-    }
-    public int getLoseTimeOut() {
-        return loseTimeOut;
-    }
-    public void setLoseTimeOut(int loseTimeOut) {
-        this.loseTimeOut = loseTimeOut;
-    }
-
-    public int getDeadTimeOut() {
-        return deadTimeOut;
-    }
-
-    public void setDeadTimeOut(int deadTimeOut) {
-        this.deadTimeOut = deadTimeOut;
     }
 
     public int getHeartBeat() {
