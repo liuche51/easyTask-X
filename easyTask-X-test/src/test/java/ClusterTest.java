@@ -23,6 +23,7 @@ public class ClusterTest {
         try {
             config.setTaskStorePath("C:/easyTaskX/node1");
             config.setServerPort(2021);
+            config.setCmdPort(3031);
             initData(config,"Node1");
         } catch (Exception e) {
             e.printStackTrace();
@@ -35,6 +36,7 @@ public class ClusterTest {
         try {
             config.setTaskStorePath("C:/easyTaskX/node2");
             config.setServerPort(2022);
+            config.setCmdPort(3031);
             initData(config,"Node2");
         } catch (Exception e) {
             e.printStackTrace();
@@ -47,6 +49,7 @@ public class ClusterTest {
         try {
             config.setTaskStorePath("C:/easyTaskX/node3");
             config.setServerPort(2023);
+            config.setCmdPort(3031);
             initData(config,"Node3");
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,6 +62,7 @@ public class ClusterTest {
         try {
             config.setTaskStorePath("C:/easyTaskX/node4");
             config.setServerPort(2024);
+            config.setCmdPort(3031);
             initData(config,"Node4");
         } catch (Exception e) {
             e.printStackTrace();

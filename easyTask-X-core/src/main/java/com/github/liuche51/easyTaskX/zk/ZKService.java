@@ -3,7 +3,6 @@ package com.github.liuche51.easyTaskX.zk;
 import com.alibaba.fastjson.JSONObject;
 
 import com.github.liuche51.easyTaskX.dto.zk.LeaderData;
-import com.github.liuche51.easyTaskX.dto.zk.ZKNode;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
@@ -36,7 +35,7 @@ public class ZKService {
      *
      * @param data
      */
-    public static void registerLeader(ZKNode data) {
+    public static void registerLeader(LeaderData data) {
         try {
             String path = StringConstant.CHAR_SPRIT+ StringConstant.LEADER;
             //检查是否存在节点。如果连不上zk，这里就会卡主线程，进入循环重试连接。直到连接成功
@@ -100,7 +99,7 @@ public class ZKService {
      * @param path
      * @return
      */
-    public static boolean setDataByPath(String path, ZKNode data) {
+  /*  public static boolean setDataByPath(String path, ZKNode data) {
         try {
             ZKUtil.getClient().setData().forPath(path, JSONObject.toJSONString(data).getBytes());
             return true;
@@ -108,7 +107,7 @@ public class ZKService {
             log.error("", e);
         }
         return false;
-    }
+    }*/
 
     /**
      * 根据节点路径，删除节点

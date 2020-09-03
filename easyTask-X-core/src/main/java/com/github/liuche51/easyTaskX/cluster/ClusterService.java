@@ -11,8 +11,8 @@ import com.github.liuche51.easyTaskX.cluster.task.tran.*;
 import com.github.liuche51.easyTaskX.dao.*;
 import com.github.liuche51.easyTaskX.dto.Schedule;
 import com.github.liuche51.easyTaskX.netty.server.NettyServer;
+import com.github.liuche51.easyTaskX.socket.CmdServer;
 import com.github.liuche51.easyTaskX.util.Util;
-import com.github.liuche51.easyTaskX.dto.zk.ZKNode;
 import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
 import com.github.liuche51.easyTaskX.zk.ZKService;
@@ -62,6 +62,7 @@ public class ClusterService {
         ClusterService.config = config;
         DbInit.init();
         NettyServer.getInstance().run();//启动组件的Netty服务端口
+        CmdServer.start();
         initCurrentNode();
         isStarted=true;
     }
@@ -83,7 +84,6 @@ public class ClusterService {
         timerTasks.add(cancelSaveTransactionTask());
         timerTasks.add(retryCancelSaveTransactionTask());
         timerTasks.add(retryDelTransactionTask());
-        timerTasks.add(nodeClockAdjustTask());
     }
     /**
      * 客户端提交任务。允许线程等待，直到easyTask组件启动完成
@@ -229,14 +229,6 @@ public class ClusterService {
      */
     public static TimerTask retryDelTransactionTask() {
         RetryDelTransactionTask task=new RetryDelTransactionTask();
-        task.start();
-        return task;
-    }
-    /**
-     * 启动同步与其他关联节点的时钟差定时任务
-     */
-    public static TimerTask nodeClockAdjustTask() {
-        NodeClockAdjustTask task=new NodeClockAdjustTask();
         task.start();
         return task;
     }

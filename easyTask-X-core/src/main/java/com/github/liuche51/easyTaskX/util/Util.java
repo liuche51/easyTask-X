@@ -2,7 +2,6 @@ package com.github.liuche51.easyTaskX.util;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.Node;
-import com.github.liuche51.easyTaskX.dto.zk.ZKHost;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,74 +80,6 @@ public class Util {
     }
     private static boolean isWindows() {
         return System.getProperty("os.name").toLowerCase().contains("windows");
-    }
-
-    /**
-     * 集合对象转换
-     *
-     * @param list
-     * @return
-     */
-    public static List<ZKHost> nodeToZKHost(List<Node> list) {
-        if (list == null) return null;
-        List<ZKHost> ret = new LinkedList<>();
-        Iterator<Node> items = list.iterator();//防止remove操作导致线程不安全异常
-        while (items.hasNext()) {
-            Node x = items.next();
-            ZKHost temp = new ZKHost(x.getHost(), x.getPort());
-            ret.add(temp);
-        }
-        return ret;
-    }
-
-    /**
-     * 集合对象转换
-     *
-     * @param list
-     * @return
-     */
-    public static List<ZKHost> nodeToZKHost(Map<String, Node> list) {
-        if (list == null) return null;
-        List<ZKHost> ret = new ArrayList<>(list.size());
-        for (Map.Entry<String, Node> key : list.entrySet()) {
-            Node x = key.getValue();
-            ZKHost temp = new ZKHost(x.getHost(), x.getPort());
-            temp.setDataStatus(x.getDataStatus());
-            ret.add(temp);
-        }
-        return ret;
-    }
-
-    /**
-     * 集合对象转换
-     *
-     * @param list
-     * @return
-     */
-    public static List<Node> zKHostToNode(List<ZKHost> list) {
-        if (list == null) return null;
-        List<Node> ret = new ArrayList<>(list.size());
-        list.forEach(x -> {
-            Node temp = new Node(x.getHost(), x.getPort());
-            ret.add(temp);
-        });
-        return ret;
-    }
-
-    /**
-     * 集合对象转换
-     *
-     * @param list
-     * @return
-     */
-    public static Map<String, Node> zKHostToNodes(List<ZKHost> list) {
-        if (list == null) return null;
-        Map<String, Node> ret = new HashMap<>();
-        list.forEach(x -> {
-            Node node = new Node(x.getHost(), x.getPort());
-            ret.put(x.getHost() + x.getPort(), node);
-        });
-        return ret;
     }
 
     /**

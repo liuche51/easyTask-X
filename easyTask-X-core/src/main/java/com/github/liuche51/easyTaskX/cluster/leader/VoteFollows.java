@@ -4,7 +4,6 @@ import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.ClusterUtil;
 import com.github.liuche51.easyTaskX.cluster.Node;
 
-import com.github.liuche51.easyTaskX.dto.zk.ZKNode;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyConnectionFactory;
 import com.github.liuche51.easyTaskX.util.exception.VotedException;
@@ -154,13 +153,7 @@ public class VoteFollows {
         Random random = new Random();
         for (int i = 0; i < size; i++) {
             int index = random.nextInt(availableFollows.size());//随机生成的随机数范围就变成[0,size)。
-            ZKNode node2 =null;// ZKService.getDataByPath(StringConstant.CHAR_SPRIT + StringConstant.CHAR_SPRIT + availableFollows.get(index));
-            Node newFollow = new Node(node2.getHost(), node2.getPort());
-             if (follows.size() < count) {
-                follows.add(new Node(node2.getHost(), node2.getPort()));
-                if (follows.size() == count)//已选数量够了就跳出
-                    break;
-            }
+
             availableFollows.remove(index);
         }
         if (follows.size() < count) Thread.sleep(1000);//此处防止不满足条件时重复高频递归本方法

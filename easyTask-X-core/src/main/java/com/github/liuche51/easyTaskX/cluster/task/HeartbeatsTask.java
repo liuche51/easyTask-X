@@ -14,8 +14,6 @@ import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
-import com.github.liuche51.easyTaskX.dto.zk.ZKNode;
-import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.zk.ZKService;
 import io.netty.channel.ChannelFuture;
 
@@ -39,7 +37,7 @@ public class HeartbeatsTask extends TimerTask{
                 }else {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FOLLOW_TO_LEADER_HEARTBEAT).setSource(ClusterService.getConfig().getAddress())
-                            .setBody(ClusterService.getConfig().getAddress());
+                            .setBody("NODE");//服务端节点
                     ChannelFuture future = NettyMsgService.sendASyncMsg(leader.getClient(), builder.build());//这里使用异步即可。也不需要返回值
                 }
             } catch (Exception e) {

@@ -11,15 +11,18 @@ public class CmdService {
     static {
         SERVICE=new HashMap<String,String>(){
             {
-                put("allregister","getAllRegisterInfo");
+                put("allregister","getBrokerRegisterInfo");
+                put("allregister","getClinetRegisterInfo");
             }
         };
     }
     public static String excuteCmd(String cmd){
         String interfaces=SERVICE.get(cmd);
         switch (interfaces){
-            case "getAllRegisterInfo":
-                return JSONObject.toJSONString(ClusterMonitor.getAllNodeRegisterInfo());
+            case "getBrokerRegisterInfo":
+                return JSONObject.toJSONString(ClusterMonitor.getBrokerRegisterInfo());
+            case "getClinetRegisterInfo":
+                return JSONObject.toJSONString(ClusterMonitor.getClinetRegisterInfo());
             default:return null;
         }
     }

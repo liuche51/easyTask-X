@@ -3,8 +3,6 @@ import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
 import com.github.liuche51.easyTaskX.cluster.Node;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteClusterLeader;
-import com.github.liuche51.easyTaskX.dto.zk.ZKHost;
-import com.github.liuche51.easyTaskX.dto.zk.ZKNode;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.zk.ZKService;
 import org.junit.Test;
@@ -28,17 +26,7 @@ public class ZKTest {
             EasyTaskConfig config=new EasyTaskConfig();
             config.setZkAddress("127.0.0.1:2181");
             ClusterService.setConfig(config);
-            ZKNode data = new ZKNode();
-            data.setHost("127.0.0.1");
-            data.setCreateTime(ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            data.setLastHeartbeat(ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            List<ZKHost> follows = new LinkedList<>();
-            ZKHost follow1 = new ZKHost("127.0.0.2");
-            ZKHost follow2 = new ZKHost("127.0.0.3");
-            follows.add(follow1);
-            follows.add(follow2);
-            data.setFollows(follows);
-            ZKService.registerLeader(data);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

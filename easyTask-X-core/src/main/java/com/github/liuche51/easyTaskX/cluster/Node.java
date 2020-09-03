@@ -51,6 +51,11 @@ public class Node implements Serializable {
         this.port = port;
         this.dataStatus=dataStatus;
     }
+    public Node(String address) {
+        String[] ret=address.split(":");
+        this.host = ret[0];
+        this.port = Integer.parseInt(ret[1]);
+    }
     public String getHost() {
         return host;
     }

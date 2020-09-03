@@ -10,7 +10,10 @@ public class LeaderData {
      */
     private String lastHeartbeat;
     private String createTime;
-
+    public LeaderData(String host,int port){
+        this.host=host;
+        this.port=port;
+    }
     public String getHost() {
         return host;
     }
