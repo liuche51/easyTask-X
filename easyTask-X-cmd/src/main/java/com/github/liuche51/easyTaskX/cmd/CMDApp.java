@@ -18,8 +18,8 @@ public class CMDApp {
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
         System.out.print("connect host address:");
-        String address = sc.nextLine();
-        String[] arry=address.split(":");//127.0.0.1:5678
+        String address ="127.0.0.1:3031";// sc.nextLine();//127.0.0.1:3031
+        String[] arry=address.split(":");
         Client.connect(arry[0],Integer.parseInt(arry[1]));
        while (true){//反复保持与服务端通信
            System.out.print("["+address+"]:");

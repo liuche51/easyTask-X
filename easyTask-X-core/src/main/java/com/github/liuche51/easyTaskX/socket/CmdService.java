@@ -16,14 +16,16 @@ public class CmdService {
             }
         };
     }
-    public static String excuteCmd(String cmd){
-        String interfaces=SERVICE.get(cmd);
-        switch (interfaces){
-            case "getBrokerRegisterInfo":
-                return JSONObject.toJSONString(ClusterMonitor.getBrokerRegisterInfo());
-            case "getClinetRegisterInfo":
-                return JSONObject.toJSONString(ClusterMonitor.getClinetRegisterInfo());
-            default:return null;
+    public static String excuteCmd(Command cmd){
+        switch (cmd.getType()){
+            case "get":
+                switch (cmd.getMethod()){
+                    case "getBrokerRegisterInfo":
+                        return JSONObject.toJSONString(ClusterMonitor.getBrokerRegisterInfo());
+                    case "getClinetRegisterInfo":
+                        return JSONObject.toJSONString(ClusterMonitor.getClinetRegisterInfo());
+                }
         }
+        return "unknown command!";
     }
 }

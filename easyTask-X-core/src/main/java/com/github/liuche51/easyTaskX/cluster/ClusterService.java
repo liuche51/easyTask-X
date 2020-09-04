@@ -62,7 +62,7 @@ public class ClusterService {
         ClusterService.config = config;
         DbInit.init();
         NettyServer.getInstance().run();//启动组件的Netty服务端口
-        CmdServer.start();
+        CmdServer.init();
         initCurrentNode();
         isStarted=true;
     }

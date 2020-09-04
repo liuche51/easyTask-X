@@ -7,8 +7,8 @@ public class CmdServerTest {
     @Test
     public void test() {
         try {
-            CmdServer.start();
-        } catch (IOException e) {
+            CmdServer.init();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

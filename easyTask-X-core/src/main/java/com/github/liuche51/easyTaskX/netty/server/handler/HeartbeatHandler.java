@@ -5,6 +5,8 @@ import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
 import com.github.liuche51.easyTaskX.dto.RegisterNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
+import com.github.liuche51.easyTaskX.util.StringConstant;
+import com.github.liuche51.easyTaskX.util.StringUtils;
 
 import java.util.Date;
 
@@ -39,6 +41,6 @@ public class HeartbeatHandler extends BaseHandler{
                 break;
             default:break;
         }
-        return null;
+        return StringConstant.EMPTY;
     }
 }

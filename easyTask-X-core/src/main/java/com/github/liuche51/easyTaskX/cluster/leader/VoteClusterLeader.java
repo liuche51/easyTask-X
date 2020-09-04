@@ -24,7 +24,7 @@ public class VoteClusterLeader {
             if(zkMutex.acquire(1, TimeUnit.SECONDS)){
                 hasLock=true;
                 LeaderData data=ZKService.getClusterLeaderData();
-                if(data==null&& !StringUtils.isNullOrEmpty(data.getHost())){//leader节点为空时才需要选新leader
+                if(data==null|| StringUtils.isNullOrEmpty(data.getHost())){//leader节点为空时才需要选新leader
                     ZKService.registerLeader(new LeaderData(ClusterService.CURRENTNODE.getHost(),ClusterService.CURRENTNODE.getPort()));
                     return true;
                 }

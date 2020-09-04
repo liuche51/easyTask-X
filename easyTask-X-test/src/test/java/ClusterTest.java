@@ -89,7 +89,7 @@ public class ClusterTest {
         schedule.setSource("127.0.0.1:"+ClusterService.getConfig().getServerPort());
         schedule.setTaskType("PERIOD");
         schedule.setUnit("SECONDS");
-        ClusterService.submitTask(schedule);
+        //ClusterService.submitTask(schedule);
         //JUnit默认是非守护线程启动和Main方法不同。这里防止当前主线程退出导致子线程也退出了
         while (true) {
             Thread.sleep(1000);
