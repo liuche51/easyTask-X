@@ -5,6 +5,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.Node;
 
+import com.github.liuche51.easyTaskX.dto.RegisterNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
@@ -39,22 +40,20 @@ public class VoteSliceFollows {
      *
      * @return
      */
-    public static void initSelectFollows() throws Exception {
+    public static void initSelectFollows(RegisterNode regNode) throws Exception {
         int count = ClusterService.getConfig().getBackupCount();
-        List<String> availableFollows = VoteSliceFollows.getAvailableFollows(null);
+        List<String> availableFollows = VoteSliceFollows.getAvailableFollows(regNode);
         List<Node> follows = VoteSliceFollows.selectFollows(count, availableFollows);
         if (follows.size() < count) {
             log.info("follows.size() < count,so start to initSelectFollows");
-            initSelectFollows();//数量不够递归重新选VoteFollows.selectFollows中
+            initSelectFollows(regNode);//数量不够递归重新选VoteFollows.selectFollows中
         } else {
-            ConcurrentHashMap<String,Node> follows2=new ConcurrentHashMap<>(follows.size());
-            follows.forEach(x->{
-                follows2.put(x.getAddress(),x);
+            ConcurrentHashMap<String, Node> follows2 = new ConcurrentHashMap<>(follows.size());
+            follows.forEach(x -> {
+                follows2.put(x.getAddress(), x);
             });
+            regNode.getNode().setFollows(follows2);
             ClusterService.CURRENTNODE.setFollows(follows2);
-            //通知follows当前Leader位置
-            SliceLeaderUtil.notifyFollowsLeaderPosition(follows, ClusterService.getConfig().getTryCount(),5);
-            SliceLeaderUtil.notifyClusterLeaderUpdateRegeditForASync(ClusterService.CURRENTNODE.getFollows(), ClusterService.getConfig().getTryCount(),5);
         }
     }
 
@@ -82,9 +81,9 @@ public class VoteSliceFollows {
             if (follows.size() < 1)
                 selectNewFollow(oldFollow);//数量不够递归重新选
             else {
-                Node newFollow=follows.get(0);
+                Node newFollow = follows.get(0);
                 newFollow.setDataStatus(NodeSyncDataStatusEnum.UNSYNC);//选举成功，将新follow数据同步状态标记为未同步
-                ClusterService.CURRENTNODE.getFollows().put(newFollow.getAddress(),newFollow);
+                ClusterService.CURRENTNODE.getFollows().put(newFollow.getAddress(), newFollow);
             }
 
         } finally {
@@ -94,8 +93,8 @@ public class VoteSliceFollows {
         if (follows == null || follows.size() == 0)
             throw new Exception("cluster is vote follow failed,please retry later.");
         //通知follows当前Leader位置
-        SliceLeaderUtil.notifyFollowsLeaderPosition(follows, ClusterService.getConfig().getTryCount(),5);
-        SliceLeaderUtil.notifyClusterLeaderUpdateRegeditForASync(ClusterService.CURRENTNODE.getFollows(), ClusterService.getConfig().getTryCount(),5);
+        SliceLeaderUtil.notifyFollowsLeaderPosition(follows, ClusterService.getConfig().getTryCount(), 5);
+        SliceLeaderUtil.notifyClusterLeaderUpdateRegeditForASync(ClusterService.CURRENTNODE.getFollows(), ClusterService.getConfig().getTryCount(), 5);
         return follows.get(0);
     }
 
@@ -104,13 +103,13 @@ public class VoteSliceFollows {
      *
      * @return
      */
-    private static List<String> getAvailableFollows(List<String> exclude) throws Exception {
+    private static List<String> getAvailableFollows(RegisterNode regNode) throws Exception {
         int count = ClusterService.getConfig().getBackupCount();
-        List<String> availableFollows = getRegisteredBokers();
+        List<String> availableFollows = ClusterLeaderService.getRegisteredBokers();
         //排除自己
         Optional<String> temp = availableFollows.stream().filter(x -> {
             try {
-                return x.equals(ClusterService.getConfig().getAddress());
+                return x.equals(regNode.getNode().getAddress());
             } catch (Exception e) {
                 log.error("", e);
                 return false;
@@ -119,26 +118,18 @@ public class VoteSliceFollows {
         if (temp.isPresent())
             availableFollows.remove(temp.get());
         //排除现有的
-        Iterator<Map.Entry<String, Node>> items = ClusterService.CURRENTNODE.getFollows().entrySet().iterator();
+        Iterator<Map.Entry<String, Node>> items = regNode.getNode().getFollows().entrySet().iterator();
         while (items.hasNext()) {
             Map.Entry<String, Node> item = items.next();
             Optional<String> temp1 = availableFollows.stream().filter(y -> y.equals(item.getValue().getAddress())).findFirst();
             if (temp1.isPresent())
                 availableFollows.remove(temp1.get());
         }
-        //排除旧的失效节点
-        if (exclude != null) {
-            exclude.forEach(x -> {
-                Optional<String> temp1 = availableFollows.stream().filter(y -> y.equals(x)).findFirst();
-                if (temp1.isPresent())
-                    availableFollows.remove(temp1.get());
-            });
-        }
         if (availableFollows.size() < count - ClusterService.CURRENTNODE.getFollows().size())//如果可选备库节点数量不足，则等待1s，然后重新选。注意：等待会阻塞整个服务可用性
         {
             log.info("availableFollows is not enough! only has {},current own {}", availableFollows.size(), ClusterService.CURRENTNODE.getFollows().size());
             Thread.sleep(1000);
-            return getAvailableFollows(exclude);
+            return getAvailableFollows(regNode);
         } else
             return availableFollows;
     }
@@ -154,26 +145,26 @@ public class VoteSliceFollows {
         int size = availableFollows.size();
         Random random = new Random();
         for (int i = 0; i < size; i++) {
-            int index = random.nextInt(availableFollows.size());//随机生成的随机数范围就变成[0,size)。
-
+            int index = random.nextInt(availableFollows.size());//随机生成的随机数范围就变成[0,size)。注意这里size会动态变动。
+            String ret = availableFollows.get(index);
+            RegisterNode regNode2 = ClusterLeaderService.BROKER_REGISTER_CENTER.get(ret);
+            Node newFollow = regNode2.getNode();
             availableFollows.remove(index);
+            if (follows.size() < count) {
+                follows.add(newFollow);
+            } else break;//已选数量够了就跳出
         }
         if (follows.size() < count) Thread.sleep(1000);//此处防止不满足条件时重复高频递归本方法
         return follows;
     }
-
-    /**
-     *
-     * @return
-     * @throws InterruptedException
-     */
-    private static List<String> getRegisteredBokers() throws InterruptedException {
-        Dto.Frame.Builder builder=Dto.Frame.newBuilder();
-        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.GET_REGISTERED_BOKERS);
-        Object msg= NettyMsgService.sendSyncMsg(ClusterService.CURRENTNODE.getClusterLeader().getClient(),builder.build());
-        Dto.Frame frame= (Dto.Frame) msg;
-        String ret=frame.getBody();
-        List<String> list= JSONObject.parseObject(ret,new TypeReference<List<String>>(){});
-        return list;
+    public static boolean updateRegedit(Map<String, RegisterNode> brokers,String oldLeader){
+        Iterator<Map.Entry<String, Node>> items = brokers.get(oldLeader).getNode().getFollows().entrySet().iterator();
+        while (items.hasNext()) {
+            Map.Entry<String, Node> item = items.next();
+            Node node = item.getValue();
+            node.getLeaders().remove(oldLeader);
+        }
+        brokers.remove(oldLeader);
+        return true;
     }
 }

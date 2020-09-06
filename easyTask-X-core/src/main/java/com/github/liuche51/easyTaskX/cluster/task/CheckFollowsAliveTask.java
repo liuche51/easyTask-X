@@ -30,10 +30,14 @@ public class CheckFollowsAliveTask extends TimerTask {
                    ClusterService.getConfig().getClusterPool().submit(new Runnable() {
                        @Override
                        public void run() {
-                           if (DateUtils.isGreaterThanLoseTime(node.getLastHeartbeat())) {
+                           //分片leader节点失效。选新leader
+                           if (DateUtils.isGreaterThanLoseTime(node.getLastHeartbeat())&&
+                                   node.getNode().getFollows()!=null&&node.getNode().getFollows().size()>0) {
                                Node newleader=VoteSliceLeader.voteNewLeader(node.getNode().getFollows());
                                VoteSliceLeader.notifySliceFollowsNewLeader(node.getNode().getFollows(),newleader.getAddress(),node.getNode().getAddress(),3,5);
                                VoteSliceLeader.updateRegedit(brokers,node.getNode().getAddress());
+                           }else if(node.getNode().getFollows()!=null&&node.getNode().getFollows().size()==0){
+
                            }
                        }
                    });

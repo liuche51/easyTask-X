@@ -19,7 +19,7 @@ public class HeartbeatHandler extends BaseHandler{
         String address =frame.getSource();
         String body=frame.getBody();
         switch (body){
-            case "NODE":
+            case "Broker":
                 RegisterNode registerNode=ClusterLeaderService.BROKER_REGISTER_CENTER.get(address);
                 if(registerNode==null){
                     Node node=new Node(address);
@@ -29,7 +29,7 @@ public class HeartbeatHandler extends BaseHandler{
                     registerNode.setLastHeartbeat(ZonedDateTime.now());
                 }
                 break;
-            case "CLIENT":
+            case "Client":
                 RegisterNode clientNode=ClusterLeaderService.CLIENT_REGISTER_CENTER.get(address);
                 if(clientNode==null){
                     Node node=new Node(address);

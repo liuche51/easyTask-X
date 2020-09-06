@@ -14,12 +14,12 @@ public class NewSliceLeaderNotiyHandler extends BaseHandler {
     public ByteString process(Dto.Frame frame) throws Exception {
         String body=frame.getBody();
         String[] items=body.split("|");
+        ClusterService.updateRegedit();
         if(ClusterService.CURRENTNODE.getAddress().equals(items[1])){
             SliceLeaderService.submitNewTaskByOldLeader(items[0]);
         }else {
             SliceLeaderService.deleteOldLeaderBackTask(items[0]);
         }
-        ClusterService.updateRegedit();
         return null;
     }
 }
