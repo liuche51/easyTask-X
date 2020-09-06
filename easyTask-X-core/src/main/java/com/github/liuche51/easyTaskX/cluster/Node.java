@@ -1,6 +1,5 @@
 package com.github.liuche51.easyTaskX.cluster;
 
-import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.client.NettyConnectionFactory;
@@ -8,10 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -139,10 +134,5 @@ public class Node implements Serializable {
         } finally {
             tryCount--;
         }
-    }
-    public static Node parse(NodeDto.Node node){
-        Node node1=new Node(node.getHost(),node.getPort());
-        node1.setDataStatus(new Short(String.valueOf(node.getDataStatus())));
-        return node1;
     }
 }

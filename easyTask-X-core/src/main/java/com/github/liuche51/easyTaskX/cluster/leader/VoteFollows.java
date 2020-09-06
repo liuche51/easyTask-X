@@ -1,11 +1,17 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.ClusterUtil;
 import com.github.liuche51.easyTaskX.cluster.Node;
 
+import com.github.liuche51.easyTaskX.dto.proto.Dto;
+import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyConnectionFactory;
+import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
+import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.util.exception.VotedException;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
 import com.github.liuche51.easyTaskX.zk.ZKService;
@@ -53,7 +59,7 @@ public class VoteFollows {
             ClusterService.CURRENTNODE.setFollows(follows2);
             //通知follows当前Leader位置
             LeaderUtil.notifyFollowsLeaderPosition(follows, ClusterService.getConfig().getTryCount(),5);
-
+            LeaderUtil.notifyClusterLeaderUpdateRegeditForASync(ClusterService.CURRENTNODE.getFollows(), ClusterService.getConfig().getTryCount(),5);
         }
     }
 
@@ -94,6 +100,7 @@ public class VoteFollows {
             throw new Exception("cluster is vote follow failed,please retry later.");
         //通知follows当前Leader位置
         LeaderUtil.notifyFollowsLeaderPosition(follows, ClusterService.getConfig().getTryCount(),5);
+        LeaderUtil.notifyClusterLeaderUpdateRegeditForASync(ClusterService.CURRENTNODE.getFollows(), ClusterService.getConfig().getTryCount(),5);
         return follows.get(0);
     }
 
@@ -104,7 +111,7 @@ public class VoteFollows {
      */
     private static List<String> getAvailableFollows(List<String> exclude) throws Exception {
         int count = ClusterService.getConfig().getBackupCount();
-        List<String> availableFollows = null;
+        List<String> availableFollows = getRegisteredBokers();
         //排除自己
         Optional<String> temp = availableFollows.stream().filter(x -> {
             try {
@@ -158,5 +165,20 @@ public class VoteFollows {
         }
         if (follows.size() < count) Thread.sleep(1000);//此处防止不满足条件时重复高频递归本方法
         return follows;
+    }
+
+    /**
+     *
+     * @return
+     * @throws InterruptedException
+     */
+    private static List<String> getRegisteredBokers() throws InterruptedException {
+        Dto.Frame.Builder builder=Dto.Frame.newBuilder();
+        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.GET_REGISTERED_BOKERS);
+        Object msg= NettyMsgService.sendSyncMsg(ClusterService.CURRENTNODE.getClusterLeader().getClient(),builder.build());
+        Dto.Frame frame= (Dto.Frame) msg;
+        String ret=frame.getBody();
+        List<String> list= JSONObject.parseObject(ret,new TypeReference<List<String>>(){});
+        return list;
     }
 }

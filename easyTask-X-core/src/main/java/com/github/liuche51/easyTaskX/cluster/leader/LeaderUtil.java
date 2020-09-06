@@ -1,5 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPObject;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
@@ -19,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * leader类
@@ -44,7 +47,51 @@ public class LeaderUtil {
         });
         return true;
     }
-
+    /**
+     * 通知集群leader更新注册表新follow信息。异步调用即可
+     *
+     * @return
+     */
+    public static boolean notifyClusterLeaderUpdateRegeditForASync(Map<String,Node> follows, int tryCount, int waiteSecond) {
+        ClusterService.getConfig().getClusterPool().submit(new Runnable() {
+            @Override
+            public void run() {
+               notifyClusterLeaderUpdateRegedit(follows,tryCount,waiteSecond);
+            }
+        });
+        return true;
+    }
+    /**
+     * @param follows
+     * @param tryCount
+     * @return
+     */
+    public static boolean notifyClusterLeaderUpdateRegedit(Map<String,Node> follows, int tryCount, int waiteSecond) {
+        if (tryCount == 0) return false;
+        String error = StringConstant.EMPTY;
+        try {
+            Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.UPDATE_CLUSTER_LEADER_BROKER_REGEDIT).setSource(ClusterService.getConfig().getAddress())
+                    .setBody("follow|"+ JSONObject.toJSONString(follows));
+            Dto.Frame frame = NettyMsgService.sendSyncMsg(ClusterService.CURRENTNODE.getClusterLeader().getClient(), builder.build());
+            ResultDto.Result result = ResultDto.Result.parseFrom(frame.getBodyBytes());
+            if (StringConstant.TRUE.equals(result.getResult())) {
+                return true;
+            } else
+                error = result.getMsg();
+        } catch (Exception e) {
+            log.error("notifyClusterLeaderUpdate.tryCount=" + tryCount, e);
+        } finally {
+            tryCount--;
+        }
+        log.info("notifyClusterLeaderUpdate()-> error" + error + ",tryCount=" + tryCount + ",objectHost=" + ClusterService.CURRENTNODE.getClusterLeader().getAddress());
+        try {
+            Thread.sleep(waiteSecond*1000);
+        } catch (InterruptedException e) {
+            log.error("",e);
+        }
+        return notifyClusterLeaderUpdateRegedit(follows, tryCount,waiteSecond);
+    }
     /**
      * @param follow
      * @param tryCount
