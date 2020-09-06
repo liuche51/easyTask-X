@@ -1,14 +1,9 @@
 package com.github.liuche51.easyTaskX.netty.server;
 
-import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.cluster.follow.FollowService;
 
-import com.github.liuche51.easyTaskX.monitor.DBMonitor;
 import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
-import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
-import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import io.netty.channel.ChannelHandlerContext;
@@ -17,8 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
-import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -48,7 +41,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
             builder.setIdentity(frame.getIdentity());
             BaseHandler handler=BaseHandler.INSTANCES.get(frame.getInterfaceName());
             if(handler==null) throw new Exception("unknown interface method!");
-            result.setBody(handler.process(frame));
+            result.setBodyBytes(handler.process(frame));
         } catch (Exception e) {
             log.error("Deal client msg occured error！", e);
             result.setResult(StringConstant.FALSE);

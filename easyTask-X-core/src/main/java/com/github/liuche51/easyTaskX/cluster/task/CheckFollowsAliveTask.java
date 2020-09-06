@@ -2,6 +2,10 @@ package com.github.liuche51.easyTaskX.cluster.task;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.cluster.follow.VoteSliceLeader;
+import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
+import com.github.liuche51.easyTaskX.cluster.leader.VoteSliceFollows;
+import com.github.liuche51.easyTaskX.dto.RegisterNode;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import java.util.Iterator;
@@ -18,15 +22,22 @@ public class CheckFollowsAliveTask extends TimerTask {
     public void run() {
         while (!isExit()) {
             try {
-                ConcurrentHashMap<String, Node> follows = ClusterService.CURRENTNODE.getFollows();
-                Iterator<Map.Entry<String, Node>> items = follows.entrySet().iterator();
-                while (items.hasNext()) {
-                    Map.Entry<String, Node> item = items.next();
-                    Node oldFollow=item.getValue();
-                    String path = StringConstant.CHAR_SPRIT+StringConstant.CHAR_SPRIT + oldFollow.getAddress();
-
-
-                }
+               Map<String, RegisterNode> brokers= ClusterLeaderService.BROKER_REGISTER_CENTER;
+               Iterator<Map.Entry<String, RegisterNode>> items=brokers.entrySet().iterator();
+               while (items.hasNext()){
+                   Map.Entry<String, RegisterNode> item=items.next();
+                   RegisterNode node=item.getValue();
+                   ClusterService.getConfig().getClusterPool().submit(new Runnable() {
+                       @Override
+                       public void run() {
+                           if (DateUtils.isGreaterThanLoseTime(node.getLastHeartbeat())) {
+                               Node newleader=VoteSliceLeader.voteNewLeader(node.getNode().getFollows());
+                               VoteSliceLeader.notifySliceFollowsNewLeader(node.getNode().getFollows(),newleader.getAddress(),node.getNode().getAddress(),3,5);
+                               VoteSliceLeader.updateRegedit(brokers,node.getNode().getAddress());
+                           }
+                       }
+                   });
+               }
             }  catch (Exception e) {
                 log.error("CheckFollowsAliveTask()", e);
             }

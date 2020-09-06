@@ -4,7 +4,8 @@ package com.github.liuche51.easyTaskX.netty.server.handler;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.server.handler.leader.GetRegisteredBokersHandler;
-import com.github.liuche51.easyTaskX.netty.server.handler.leader.UpdateBrokerRegeditHandler;
+import com.github.liuche51.easyTaskX.netty.server.handler.leader.UpdateRegeditHandler;
+import com.google.protobuf.ByteString;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,9 +27,9 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.GET_DBINFO_BY_TASKID,new GetDBInfoByTaskIdHandler());
                 put(NettyInterfaceEnum.FOLLOW_TO_LEADER_HEARTBEAT,new HeartbeatHandler());
                 put(NettyInterfaceEnum.GET_REGISTERED_BOKERS,new GetRegisteredBokersHandler());
-                put(NettyInterfaceEnum.UPDATE_CLUSTER_LEADER_BROKER_REGEDIT,new UpdateBrokerRegeditHandler());
+                put(NettyInterfaceEnum.UPDATE_REGEDIT,new UpdateRegeditHandler());
             }
         };
     }
-    public abstract String process(Dto.Frame frame) throws Exception;
+    public abstract ByteString process(Dto.Frame frame) throws Exception;
 }

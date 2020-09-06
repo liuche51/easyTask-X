@@ -1,7 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPObject;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
@@ -14,9 +13,6 @@ import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
-import io.netty.channel.ChannelFuture;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +22,8 @@ import java.util.Map;
 /**
  * leader类
  */
-public class LeaderUtil {
-    private static final Logger log = LoggerFactory.getLogger(LeaderUtil.class);
+public class SliceLeaderUtil {
+    private static final Logger log = LoggerFactory.getLogger(SliceLeaderUtil.class);
 
     /**
      * 通知follows当前Leader位置。异步调用即可
@@ -72,7 +68,7 @@ public class LeaderUtil {
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.UPDATE_CLUSTER_LEADER_BROKER_REGEDIT).setSource(ClusterService.getConfig().getAddress())
-                    .setBody("follow|"+ JSONObject.toJSONString(follows));
+                    .setBody("follows|"+ JSONObject.toJSONString(follows));
             Dto.Frame frame = NettyMsgService.sendSyncMsg(ClusterService.CURRENTNODE.getClusterLeader().getClient(), builder.build());
             ResultDto.Result result = ResultDto.Result.parseFrom(frame.getBodyBytes());
             if (StringConstant.TRUE.equals(result.getResult())) {

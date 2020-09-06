@@ -1,17 +1,13 @@
 package com.github.liuche51.easyTaskX.cluster.task;
 
-import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.Node;
-import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 
 import com.github.liuche51.easyTaskX.cluster.leader.VoteClusterLeader;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
-import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
 import com.github.liuche51.easyTaskX.dto.zk.LeaderData;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
-import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.zk.ZKService;

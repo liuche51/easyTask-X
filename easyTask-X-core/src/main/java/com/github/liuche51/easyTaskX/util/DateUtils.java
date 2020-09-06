@@ -19,4 +19,15 @@ public class DateUtils {
     public static long getTimeStamp(ZonedDateTime dateTime){
         return ZonedDateTime.now().toInstant().toEpochMilli();
     }
+    /**
+     * 集群系欸但心跳时间是否超时了失效时间阈值
+     * @param dateTime
+     * @return
+     */
+    public static boolean isGreaterThanLoseTime(ZonedDateTime dateTime){
+        if(ZonedDateTime.now().minusSeconds(ClusterService.getConfig().getLoseTimeOut())
+                .compareTo(dateTime) > 0)
+            return true;
+        else return false;
+    }
 }

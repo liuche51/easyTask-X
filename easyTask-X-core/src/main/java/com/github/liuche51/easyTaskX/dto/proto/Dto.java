@@ -90,9 +90,9 @@ public final class Dto {
     com.google.protobuf.ByteString
         getSourceBytes();
 
-    // required string body = 4;
+    // optional string body = 4;
     /**
-     * <code>required string body = 4;</code>
+     * <code>optional string body = 4;</code>
      *
      * <pre>
      *消息体
@@ -100,7 +100,7 @@ public final class Dto {
      */
     boolean hasBody();
     /**
-     * <code>required string body = 4;</code>
+     * <code>optional string body = 4;</code>
      *
      * <pre>
      *消息体
@@ -108,7 +108,7 @@ public final class Dto {
      */
     String getBody();
     /**
-     * <code>required string body = 4;</code>
+     * <code>optional string body = 4;</code>
      *
      * <pre>
      *消息体
@@ -393,11 +393,11 @@ public final class Dto {
       }
     }
 
-    // required string body = 4;
+    // optional string body = 4;
     public static final int BODY_FIELD_NUMBER = 4;
     private Object body_;
     /**
-     * <code>required string body = 4;</code>
+     * <code>optional string body = 4;</code>
      *
      * <pre>
      *消息体
@@ -407,7 +407,7 @@ public final class Dto {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>required string body = 4;</code>
+     * <code>optional string body = 4;</code>
      *
      * <pre>
      *消息体
@@ -428,7 +428,7 @@ public final class Dto {
       }
     }
     /**
-     * <code>required string body = 4;</code>
+     * <code>optional string body = 4;</code>
      *
      * <pre>
      *消息体
@@ -460,10 +460,6 @@ public final class Dto {
       if (isInitialized != -1) return isInitialized == 1;
 
       if (!hasInterfaceName()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasBody()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -721,10 +717,6 @@ public final class Dto {
 
       public final boolean isInitialized() {
         if (!hasInterfaceName()) {
-          
-          return false;
-        }
-        if (!hasBody()) {
           
           return false;
         }
@@ -1044,10 +1036,10 @@ public final class Dto {
         return this;
       }
 
-      // required string body = 4;
+      // optional string body = 4;
       private Object body_ = "";
       /**
-       * <code>required string body = 4;</code>
+       * <code>optional string body = 4;</code>
        *
        * <pre>
        *消息体
@@ -1057,7 +1049,7 @@ public final class Dto {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>required string body = 4;</code>
+       * <code>optional string body = 4;</code>
        *
        * <pre>
        *消息体
@@ -1075,7 +1067,7 @@ public final class Dto {
         }
       }
       /**
-       * <code>required string body = 4;</code>
+       * <code>optional string body = 4;</code>
        *
        * <pre>
        *消息体
@@ -1095,7 +1087,7 @@ public final class Dto {
         }
       }
       /**
-       * <code>required string body = 4;</code>
+       * <code>optional string body = 4;</code>
        *
        * <pre>
        *消息体
@@ -1112,7 +1104,7 @@ public final class Dto {
         return this;
       }
       /**
-       * <code>required string body = 4;</code>
+       * <code>optional string body = 4;</code>
        *
        * <pre>
        *消息体
@@ -1125,7 +1117,7 @@ public final class Dto {
         return this;
       }
       /**
-       * <code>required string body = 4;</code>
+       * <code>optional string body = 4;</code>
        *
        * <pre>
        *消息体
@@ -1169,7 +1161,7 @@ public final class Dto {
     String[] descriptorData = {
       "\n\tDto.proto\"N\n\005Frame\022\025\n\rinterfaceName\030\001 " +
       "\002(\t\022\020\n\010identity\030\002 \001(\t\022\016\n\006source\030\003 \001(\t\022\014\n" +
-      "\004body\030\004 \002(\tB\005B\003Dto"
+      "\004body\030\004 \001(\tB\005B\003Dto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

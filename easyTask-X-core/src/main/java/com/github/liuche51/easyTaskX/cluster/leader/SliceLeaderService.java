@@ -4,22 +4,16 @@ import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.Node;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
-import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
-import com.github.liuche51.easyTaskX.dto.Schedule;
-import com.github.liuche51.easyTaskX.dto.ScheduleSync;
-import com.github.liuche51.easyTaskX.enume.ScheduleSyncStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Leader服务入口
  */
-public class LeaderService {
-    private static final Logger log = LoggerFactory.getLogger(LeaderService.class);
+public class SliceLeaderService {
+    private static final Logger log = LoggerFactory.getLogger(SliceLeaderService.class);
 
     /**
      * 节点启动初始化选举follows。
@@ -27,7 +21,7 @@ public class LeaderService {
      * @return
      */
     public static void initSelectFollows() throws Exception {
-        VoteFollows.initSelectFollows();
+        VoteSliceFollows.initSelectFollows();
     }
 
     /**

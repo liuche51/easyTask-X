@@ -6,6 +6,7 @@ import com.github.liuche51.easyTaskX.dto.Schedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.util.StringConstant;
+import com.google.protobuf.ByteString;
 
 /**
  * 客户端删除任务处理类
@@ -14,10 +15,10 @@ import com.github.liuche51.easyTaskX.util.StringConstant;
 public class ClientDeleteTaskHandler extends BaseHandler {
 
     @Override
-    public String process(Dto.Frame frame) throws Exception {
+    public ByteString process(Dto.Frame frame) throws Exception {
         String taskId = frame.getBody();
         boolean ret=ClusterService.deleteTask(taskId);
         if(!ret) throw new Exception("deleteTask()-> exception!");
-        return taskId;
+        return ByteString.copyFromUtf8(taskId);
     }
 }

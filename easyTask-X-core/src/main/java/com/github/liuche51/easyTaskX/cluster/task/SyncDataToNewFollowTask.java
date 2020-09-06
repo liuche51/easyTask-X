@@ -1,7 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.task;
 
 import com.github.liuche51.easyTaskX.cluster.Node;
-import com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil;
+import com.github.liuche51.easyTaskX.cluster.leader.SliceLeaderUtil;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
 import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
 import com.github.liuche51.easyTaskX.dto.Schedule;
@@ -55,7 +55,7 @@ public class SyncDataToNewFollowTask extends OnceTask {
                 String[] ids = list.stream().distinct().map(ScheduleSync::getScheduleId).toArray(String[]::new);
                 ScheduleSyncDao.updateStatusByFollowAndScheduleIds(newFollow.getAddress(), ids, ScheduleSyncStatusEnum.SYNCING);
                 List<Schedule> list1 = ScheduleDao.selectByIds(ids);
-                boolean ret = LeaderUtil.syncDataToFollowBatch(list1, newFollow);
+                boolean ret = SliceLeaderUtil.syncDataToFollowBatch(list1, newFollow);
                 if (ret)
                     ScheduleSyncDao.updateStatusByFollowAndStatus(newFollow.getAddress(), ScheduleSyncStatusEnum.SYNCING, ScheduleSyncStatusEnum.SYNCED);
             }

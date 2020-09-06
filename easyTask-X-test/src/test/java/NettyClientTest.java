@@ -1,5 +1,10 @@
 
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.ClusterUtil;
 import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
+import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
+import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
@@ -12,6 +17,8 @@ import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.junit.Test;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 public class NettyClientTest {
     @Test
@@ -106,6 +113,29 @@ public class NettyClientTest {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+    @Test
+    public void getList() throws Exception {
+        EasyTaskConfig config=new EasyTaskConfig();
+        ClusterService.setConfig(config);
+        Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.UPDATE_REGEDIT).setSource("127.0.0.1:2021")
+        .setBody("broker");
+        Dto.Frame frame = NettyMsgService.sendSyncMsg(new Node("127.0.0.1",2021).getClient(), builder.build());
+        ResultDto.Result result = ResultDto.Result.parseFrom(frame.getBodyBytes());
+        if (StringConstant.TRUE.equals(result.getResult())) {
+            NodeDto.Node node=NodeDto.Node.parseFrom(result.getBodyBytes());
+            NodeDto.NodeList clientNodes=node.getClients();
+            ConcurrentHashMap<String, Node> clients=new ConcurrentHashMap<>();
+            clientNodes.getNodesList().forEach(x->{
+                clients.put(x.getHost()+":"+x.getPort(),new Node(x.getHost(),x.getPort()));
+            });
+            NodeDto.NodeList followNodes=node.getClients();
+            ConcurrentHashMap<String,Node> follows=new ConcurrentHashMap<>();
+            followNodes.getNodesList().forEach(x->{
+                follows.put(x.getHost()+":"+x.getPort(),new Node(x.getHost(),x.getPort()));
+            });
         }
     }
 }

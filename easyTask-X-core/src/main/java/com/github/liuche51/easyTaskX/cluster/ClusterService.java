@@ -1,10 +1,9 @@
 package com.github.liuche51.easyTaskX.cluster;
 
-import com.github.liuche51.easyTaskX.cluster.follow.FollowService;
 import com.github.liuche51.easyTaskX.cluster.leader.DeleteTaskTCC;
-import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
+import com.github.liuche51.easyTaskX.cluster.leader.SliceLeaderService;
 import com.github.liuche51.easyTaskX.cluster.leader.SaveTaskTCC;
-import com.github.liuche51.easyTaskX.cluster.leader.VoteFollows;
+import com.github.liuche51.easyTaskX.cluster.leader.VoteSliceFollows;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.tran.*;
@@ -15,13 +14,11 @@ import com.github.liuche51.easyTaskX.socket.CmdServer;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
-import com.github.liuche51.easyTaskX.zk.ZKService;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ClusterService {
     private static Logger log = LoggerFactory.getLogger(ClusterService.class);
@@ -77,7 +74,7 @@ public class ClusterService {
         clearThreadTask();
         deleteAllData();
         CURRENTNODE = new Node(Util.getLocalIP(), ClusterService.getConfig().getServerPort());
-        timerTasks.add(LeaderService.initHeartBeatToClusterLeader());
+        timerTasks.add(SliceLeaderService.initHeartBeatToClusterLeader());
         timerTasks.add(clearDataTask());
         timerTasks.add(commitSaveTransactionTask());
         timerTasks.add(commitDelTransactionTask());
@@ -94,7 +91,7 @@ public class ClusterService {
      */
     public void submitTaskAllowWait(Schedule schedule) throws Exception {
         //集群未启动或正在选举follow中，则继续等待完成
-        while (!isStarted||VoteFollows.isSelecting()) {
+        while (!isStarted|| VoteSliceFollows.isSelecting()) {
             Thread.sleep(1000l);
         }
         this.submitTask(schedule);
@@ -106,7 +103,7 @@ public class ClusterService {
      */
     public static void submitTask(Schedule schedule) throws Exception {
         if (!isStarted) throw new Exception("the easyTask has not started,please wait a moment!");
-        if (VoteFollows.isSelecting())
+        if (VoteSliceFollows.isSelecting())
             throw new VotingException("normally exception!save():cluster is voting,please wait a moment.");
         //防止多线程下，follow元素操作竞争问题。确保参与提交的follow不受集群选举影响
         List<Node> follows = new ArrayList<>(CURRENTNODE.getFollows().size());
@@ -231,6 +228,13 @@ public class ClusterService {
         RetryDelTransactionTask task=new RetryDelTransactionTask();
         task.start();
         return task;
+    }
+
+    /**
+     * 获取集群leader最新节点注册信息
+     */
+    public static void updateRegedit(){
+        ClusterUtil.updateRegedit(3,5);
     }
 
 }

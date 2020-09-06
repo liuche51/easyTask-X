@@ -7,6 +7,7 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.StringUtils;
+import com.google.protobuf.ByteString;
 
 /**
  * 客户端提交任务处理类
@@ -14,10 +15,10 @@ import com.github.liuche51.easyTaskX.util.StringUtils;
 public class ClientSubmitTaskHandler extends BaseHandler{
 
     @Override
-    public String process(Dto.Frame frame) throws Exception {
+    public ByteString process(Dto.Frame frame) throws Exception {
         ScheduleDto.Schedule dto = ScheduleDto.Schedule.parseFrom(frame.getBodyBytes());
         Schedule schedule=Schedule.valueOf(dto);
         ClusterService.submitTask(schedule);
-        return StringConstant.EMPTY;
+        return null;
     }
 }

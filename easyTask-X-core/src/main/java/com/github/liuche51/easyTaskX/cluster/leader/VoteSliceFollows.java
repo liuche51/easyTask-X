@@ -3,7 +3,6 @@ package com.github.liuche51.easyTaskX.cluster.leader;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.cluster.ClusterUtil;
 import com.github.liuche51.easyTaskX.cluster.Node;
 
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
@@ -14,13 +13,9 @@ import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.util.exception.VotedException;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
-import com.github.liuche51.easyTaskX.zk.ZKService;
-import com.github.liuche51.easyTaskX.util.DateUtils;
-import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -29,8 +24,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * leader选举follow。
  * 使用多线程互斥机制
  */
-public class VoteFollows {
-    private static final Logger log = LoggerFactory.getLogger(VoteFollows.class);
+public class VoteSliceFollows {
+    private static final Logger log = LoggerFactory.getLogger(VoteSliceFollows.class);
     private static volatile boolean selecting = false;//选举状态。多线程控制
     private static ReentrantLock lock = new ReentrantLock();//选举互斥锁
 
@@ -46,8 +41,8 @@ public class VoteFollows {
      */
     public static void initSelectFollows() throws Exception {
         int count = ClusterService.getConfig().getBackupCount();
-        List<String> availableFollows = VoteFollows.getAvailableFollows(null);
-        List<Node> follows = VoteFollows.selectFollows(count, availableFollows);
+        List<String> availableFollows = VoteSliceFollows.getAvailableFollows(null);
+        List<Node> follows = VoteSliceFollows.selectFollows(count, availableFollows);
         if (follows.size() < count) {
             log.info("follows.size() < count,so start to initSelectFollows");
             initSelectFollows();//数量不够递归重新选VoteFollows.selectFollows中
@@ -58,8 +53,8 @@ public class VoteFollows {
             });
             ClusterService.CURRENTNODE.setFollows(follows2);
             //通知follows当前Leader位置
-            LeaderUtil.notifyFollowsLeaderPosition(follows, ClusterService.getConfig().getTryCount(),5);
-            LeaderUtil.notifyClusterLeaderUpdateRegeditForASync(ClusterService.CURRENTNODE.getFollows(), ClusterService.getConfig().getTryCount(),5);
+            SliceLeaderUtil.notifyFollowsLeaderPosition(follows, ClusterService.getConfig().getTryCount(),5);
+            SliceLeaderUtil.notifyClusterLeaderUpdateRegeditForASync(ClusterService.CURRENTNODE.getFollows(), ClusterService.getConfig().getTryCount(),5);
         }
     }
 
@@ -99,8 +94,8 @@ public class VoteFollows {
         if (follows == null || follows.size() == 0)
             throw new Exception("cluster is vote follow failed,please retry later.");
         //通知follows当前Leader位置
-        LeaderUtil.notifyFollowsLeaderPosition(follows, ClusterService.getConfig().getTryCount(),5);
-        LeaderUtil.notifyClusterLeaderUpdateRegeditForASync(ClusterService.CURRENTNODE.getFollows(), ClusterService.getConfig().getTryCount(),5);
+        SliceLeaderUtil.notifyFollowsLeaderPosition(follows, ClusterService.getConfig().getTryCount(),5);
+        SliceLeaderUtil.notifyClusterLeaderUpdateRegeditForASync(ClusterService.CURRENTNODE.getFollows(), ClusterService.getConfig().getTryCount(),5);
         return follows.get(0);
     }
 

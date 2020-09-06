@@ -5,7 +5,9 @@ import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
 import com.github.liuche51.easyTaskX.dto.RegisterNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.util.StringConstant;
+import com.google.protobuf.ByteString;
 
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 /**
@@ -13,7 +15,7 @@ import java.util.Date;
  */
 public class HeartbeatHandler extends BaseHandler{
     @Override
-    public String process(Dto.Frame frame) throws Exception {
+    public ByteString process(Dto.Frame frame) throws Exception {
         String address =frame.getSource();
         String body=frame.getBody();
         switch (body){
@@ -24,7 +26,7 @@ public class HeartbeatHandler extends BaseHandler{
                     registerNode=new RegisterNode(node);
                     ClusterLeaderService.BROKER_REGISTER_CENTER.put(address,registerNode);
                 }else {
-                    registerNode.setLastHeartbeat(new Date());
+                    registerNode.setLastHeartbeat(ZonedDateTime.now());
                 }
                 break;
             case "CLIENT":
@@ -34,11 +36,11 @@ public class HeartbeatHandler extends BaseHandler{
                     clientNode=new RegisterNode(node);
                     ClusterLeaderService.CLIENT_REGISTER_CENTER.put(address,clientNode);
                 }else {
-                    clientNode.setLastHeartbeat(new Date());
+                    clientNode.setLastHeartbeat(ZonedDateTime.now());
                 }
                 break;
             default:break;
         }
-        return StringConstant.EMPTY;
+        return null;
     }
 }

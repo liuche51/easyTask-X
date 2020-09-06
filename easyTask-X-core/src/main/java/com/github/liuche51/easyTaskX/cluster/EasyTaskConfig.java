@@ -47,8 +47,9 @@ public class EasyTaskConfig {
      */
     private int timeOut = 30;
     /**
-     * ZK节点信息失效超时时间。默认超过60s就判断为失效节点，任何其他节点可删除掉
+     * 集群节点失效判定时间。默认10s
      */
+    private int loseTimeOut = 10;
     /**
      * 节点对zk的心跳频率。默认2s一次
      */
@@ -163,6 +164,14 @@ public class EasyTaskConfig {
 
     public void setTimeOut(int timeOut) {
         this.timeOut = timeOut;
+    }
+
+    public int getLoseTimeOut() {
+        return loseTimeOut;
+    }
+
+    public void setLoseTimeOut(int loseTimeOut) {
+        this.loseTimeOut = loseTimeOut;
     }
 
     public int getHeartBeat() {

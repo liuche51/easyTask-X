@@ -3,10 +3,8 @@ package com.github.liuche51.easyTaskX.cluster.follow;
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.Node;
-import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
-import com.github.liuche51.easyTaskX.cluster.task.CheckLeadersAliveTask;
+import com.github.liuche51.easyTaskX.cluster.leader.SliceLeaderService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
-import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
 import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
 import com.github.liuche51.easyTaskX.dto.ScheduleBak;
 import com.github.liuche51.easyTaskX.dto.TransactionLog;
@@ -30,8 +28,8 @@ import java.util.Map;
 /**
  * Follow服务入口
  */
-public class FollowService {
-    private static final Logger log = LoggerFactory.getLogger(LeaderService.class);
+public class SliceFollowService {
+    private static final Logger log = LoggerFactory.getLogger(SliceLeaderService.class);
 
     /**
      * 接受leader同步任务入备库
@@ -145,16 +143,6 @@ public class FollowService {
             log.error("updateLeaderPosition", e);
             return false;
         }
-    }
-
-    /**
-     * 节点对zk的心跳。检查leader是否失效。
-     * 失效则进入选举
-     */
-    public static TimerTask initCheckLeaderAlive() {
-        CheckLeadersAliveTask task = new CheckLeadersAliveTask();
-        task.start();
-        return task;
     }
 
 }

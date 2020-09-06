@@ -1,7 +1,6 @@
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.Node;
-import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
-import com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil;
+import com.github.liuche51.easyTaskX.cluster.leader.SliceLeaderService;
 
 import com.github.liuche51.easyTaskX.util.Util;
 import org.junit.Test;
@@ -15,7 +14,7 @@ public class LeaderServiceTest {
         try {
             ClusterService.getConfig().setBackupCount(2);
             ClusterService.CURRENTNODE=new Node("127.0.0.1",2020);
-            LeaderService.initSelectFollows();
+            SliceLeaderService.initSelectFollows();
         } catch (Exception e) {
             e.printStackTrace();
         }

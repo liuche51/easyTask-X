@@ -1,0 +1,12 @@
+option java_outer_classname = "NodeDto";//生成的数据访问类的类名
+message Node {
+  optional string host = 1;
+  optional int32 port = 2;
+  optional NodeList clients=3;
+  optional NodeList follows=4;
+  optional NodeList leaders=5;
+
+}
+message NodeList {
+  repeated Node nodes = 1;
+}

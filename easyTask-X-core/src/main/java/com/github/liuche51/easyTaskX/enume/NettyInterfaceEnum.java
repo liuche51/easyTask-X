@@ -61,4 +61,12 @@ public class NettyInterfaceEnum {
      * 更新Broker注册表信息
      */
     public static final String UPDATE_CLUSTER_LEADER_BROKER_REGEDIT="UpdateClusterLeaderBrokerRegedit";
+    /**
+     * 通知分片follow新leader变更
+     */
+    public static final String NOTIFY_SLICE_FOLLOW_NEW_LEADER="NotifySliceFollowNewLeader";
+    /**
+     * 更新注册表信息
+     */
+    public static final String UPDATE_REGEDIT="UpdateRegedit";
 }
