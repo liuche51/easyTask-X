@@ -40,50 +40,43 @@ public class VoteSliceFollows {
      *
      * @return
      */
-    public static void initSelectFollows(RegisterNode regNode) throws Exception {
+    public static void initVoteFollows(RegisterNode regNode) throws Exception {
         int count = ClusterService.getConfig().getBackupCount();
         List<String> availableFollows = VoteSliceFollows.getAvailableFollows(regNode);
-        List<Node> follows = VoteSliceFollows.selectFollows(count, availableFollows);
+        List<Node> follows = VoteSliceFollows.voteFollows(count, availableFollows);
         if (follows.size() < count) {
-            log.info("follows.size() < count,so start to initSelectFollows");
-            initSelectFollows(regNode);//数量不够递归重新选VoteFollows.selectFollows中
+            log.info("follows.size() < count,so start to initVoteFollows()");
+            initVoteFollows(regNode);//数量不够递归重新选VoteFollows.selectFollows中
         } else {
             ConcurrentHashMap<String, Node> follows2 = new ConcurrentHashMap<>(follows.size());
             follows.forEach(x -> {
                 follows2.put(x.getAddress(), x);
             });
-            regNode.getNode().setFollows(follows2);
-            ClusterService.CURRENTNODE.setFollows(follows2);
+            updateRegedit(regNode, follows2);
         }
     }
 
     /**
-     * 选择新follow
-     * leader同步数据失败或心跳检测失败，则进入选新follow程序
+     * 选择新follow。旧follow失效
      *
      * @return
      */
-    public static Node selectNewFollow(Node oldFollow) throws Exception {
+    public static Node voteNewFollow(RegisterNode regNode, Node oldFollow) throws Exception {
         if (selecting) throw new VotingException("cluster is voting new follow,please retry later.");
         selecting = true;
         List<Node> follows = null;
         try {
             lock.lock();
-            ClusterService.CURRENTNODE.getFollows().remove(oldFollow.getAddress());//移除失效的follow
-            NettyConnectionFactory.getInstance().removeHostPool(oldFollow.getAddress());
-            log.info("leader remove follow {}", oldFollow.getAddress());
-
             //多线程下，如果follows已经选好，则让客户端重新提交任务。以后可以优化为获取选举后的follow
-            if (ClusterService.CURRENTNODE.getFollows() != null && ClusterService.CURRENTNODE.getFollows().size() >= ClusterService.getConfig().getBackupCount())
+            if (regNode.getNode().getFollows().size() >= ClusterService.getConfig().getBackupCount())
                 throw new VotedException("cluster is voted follow,please retry again.");
-            List<String> availableFollows = getAvailableFollows(Arrays.asList(oldFollow.getAddress()));
-            follows = selectFollows(1, availableFollows);
+            List<String> availableFollows = getAvailableFollows(regNode);
+            follows = voteFollows(1, availableFollows);
             if (follows.size() < 1)
-                selectNewFollow(oldFollow);//数量不够递归重新选
+                voteNewFollow(regNode, oldFollow);//数量不够递归重新选
             else {
                 Node newFollow = follows.get(0);
-                newFollow.setDataStatus(NodeSyncDataStatusEnum.UNSYNC);//选举成功，将新follow数据同步状态标记为未同步
-                ClusterService.CURRENTNODE.getFollows().put(newFollow.getAddress(), newFollow);
+                updateRegedit(regNode, oldFollow.getAddress(), newFollow);
             }
 
         } finally {
@@ -92,9 +85,6 @@ public class VoteSliceFollows {
         }
         if (follows == null || follows.size() == 0)
             throw new Exception("cluster is vote follow failed,please retry later.");
-        //通知follows当前Leader位置
-        SliceLeaderUtil.notifyFollowsLeaderPosition(follows, ClusterService.getConfig().getTryCount(), 5);
-        SliceLeaderUtil.notifyClusterLeaderUpdateRegeditForASync(ClusterService.CURRENTNODE.getFollows(), ClusterService.getConfig().getTryCount(), 5);
         return follows.get(0);
     }
 
@@ -140,7 +130,7 @@ public class VoteSliceFollows {
      * @param count            需要的数量
      * @param availableFollows 可用follows
      */
-    private static List<Node> selectFollows(int count, List<String> availableFollows) throws InterruptedException {
+    private static List<Node> voteFollows(int count, List<String> availableFollows) throws InterruptedException {
         List<Node> follows = new LinkedList<>();//备选follows
         int size = availableFollows.size();
         Random random = new Random();
@@ -151,20 +141,39 @@ public class VoteSliceFollows {
             Node newFollow = regNode2.getNode();
             availableFollows.remove(index);
             if (follows.size() < count) {
-                follows.add(newFollow);
+                follows.add(new Node(newFollow.getHost(), newFollow.getPort()));//这里一定要用新对象。否则对象重用会导致属性值也被公用了
             } else break;//已选数量够了就跳出
         }
         if (follows.size() < count) Thread.sleep(1000);//此处防止不满足条件时重复高频递归本方法
         return follows;
     }
-    public static boolean updateRegedit(Map<String, RegisterNode> brokers,String oldLeader){
-        Iterator<Map.Entry<String, Node>> items = brokers.get(oldLeader).getNode().getFollows().entrySet().iterator();
+
+    /**
+     * 节点初始化选新follows，更新注册表
+     *
+     * @param regNode
+     * @param newfollows
+     */
+    private static void updateRegedit(RegisterNode regNode, ConcurrentHashMap<String, Node> newfollows) {
+        regNode.getNode().setFollows(newfollows);
+        Iterator<Map.Entry<String, Node>> items = newfollows.entrySet().iterator();
         while (items.hasNext()) {
             Map.Entry<String, Node> item = items.next();
             Node node = item.getValue();
-            node.getLeaders().remove(oldLeader);
+            node.getLeaders().put(node.getAddress(), node);
         }
-        brokers.remove(oldLeader);
-        return true;
+    }
+
+    /**
+     * 旧follow失效，选新follow。更新注册表
+     *
+     * @param regNode
+     * @param oldFollow
+     */
+    private static void updateRegedit(RegisterNode regNode, String oldFollow, Node newFollow) {
+        regNode.getNode().getFollows().remove(oldFollow);
+        newFollow.setDataStatus(NodeSyncDataStatusEnum.UNSYNC);//选举成功，将新follow数据同步状态标记为未同步
+        regNode.getNode().getFollows().put(newFollow.getAddress(), newFollow);
+        ClusterLeaderService.BROKER_REGISTER_CENTER.remove(oldFollow);
     }
 }

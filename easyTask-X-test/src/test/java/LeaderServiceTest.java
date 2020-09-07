@@ -14,7 +14,7 @@ public class LeaderServiceTest {
         try {
             ClusterService.getConfig().setBackupCount(2);
             ClusterService.CURRENTNODE=new Node("127.0.0.1",2020);
-            SliceLeaderService.initSelectFollows();
+            //SliceLeaderService.initSelectFollows();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -53,6 +53,16 @@ public class VoteSliceLeader {
         brokers.remove(oldLeader);
         return true;
     }
+
+    /**
+     * 通知follow。旧leader失效，已选新leader。
+     * @param follow
+     * @param oldLeader
+     * @param newLeader
+     * @param tryCount
+     * @param waiteSecond
+     * @return
+     */
     private static boolean notifySliceFollowNewLeader(Node follow, String oldLeader, String newLeader, int tryCount, int waiteSecond) {
         if (tryCount == 0) return false;
         String error = StringConstant.EMPTY;

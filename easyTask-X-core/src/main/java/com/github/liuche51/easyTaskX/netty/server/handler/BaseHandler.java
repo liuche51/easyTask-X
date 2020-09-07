@@ -28,6 +28,7 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.FOLLOW_TO_LEADER_HEARTBEAT,new HeartbeatHandler());
                 put(NettyInterfaceEnum.GET_REGISTERED_BOKERS,new GetRegisteredBokersHandler());
                 put(NettyInterfaceEnum.UPDATE_REGEDIT,new UpdateRegeditHandler());
+                put(NettyInterfaceEnum.NOTIFY_NODE_UPDATE_REGEDIT,new NotifyNodeUpdateRegeditHandler());
             }
         };
     }

@@ -66,6 +66,10 @@ public class NettyInterfaceEnum {
      */
     public static final String NOTIFY_SLICE_FOLLOW_NEW_LEADER="NotifySliceFollowNewLeader";
     /**
+     * 通知集群节点获取最新注册表信息
+     */
+    public static final String NOTIFY_NODE_UPDATE_REGEDIT="NotifyNodeUpdateRegedit";
+    /**
      * 更新注册表信息
      */
     public static final String UPDATE_REGEDIT="UpdateRegedit";

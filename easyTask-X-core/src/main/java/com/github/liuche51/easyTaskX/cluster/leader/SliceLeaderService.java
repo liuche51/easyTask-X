@@ -16,15 +16,6 @@ public class SliceLeaderService {
     private static final Logger log = LoggerFactory.getLogger(SliceLeaderService.class);
 
     /**
-     * 节点启动初始化选举follows。
-     *
-     * @return
-     */
-    public static void initSelectFollows() throws Exception {
-        VoteSliceFollows.initSelectFollows();
-    }
-
-    /**
      * 将失效的leader的备份任务数据删除掉
      * @param oldLeaderAddress
      * @throws SQLException
