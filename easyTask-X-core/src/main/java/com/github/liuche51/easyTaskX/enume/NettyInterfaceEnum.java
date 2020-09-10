@@ -38,14 +38,6 @@ public class NettyInterfaceEnum {
      */
     public static final String LEADER_SYNC_DATA_TO_NEW_FOLLOW="LeaderSyncDataToNewFollow";
     /**
-     * 同步client位置信息接口
-     */
-    public static final String SYNC_CLIENT_POSITION="SyncClientPosition";
-    /**
-     * 同步leader位置信息接口
-     */
-    public static final String SYNC_LEADER_POSITION="SyncLeaderPosition";
-    /**
      * 获取数据库表信息接口
      */
     public static final String GET_DBINFO_BY_TASKID="GetDBInfoByTaskId";

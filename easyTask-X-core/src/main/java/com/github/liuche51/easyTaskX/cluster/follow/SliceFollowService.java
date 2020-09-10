@@ -124,25 +124,4 @@ public class SliceFollowService {
         }
     }
 
-    /**
-     * 更新leader位置信息
-     *
-     * @param leader
-     * @return
-     */
-    public static boolean updateLeaderPosition(String leader) {
-        try {
-            if (StringUtils.isNullOrEmpty(leader)) return false;
-            String[] temp = leader.split(":");
-            if (temp.length != 2) return false;
-            Map<String, Node> leaders = ClusterService.CURRENTNODE.getLeaders();
-            Node newleader=new Node(temp[0], Integer.valueOf(temp[1]).intValue());
-            leaders.put(leader, newleader);
-            return true;
-        } catch (Exception e) {
-            log.error("updateLeaderPosition", e);
-            return false;
-        }
-    }
-
 }

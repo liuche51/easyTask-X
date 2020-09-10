@@ -8,6 +8,8 @@ import com.github.liuche51.easyTaskX.cluster.leader.VoteSliceFollows;
 import com.github.liuche51.easyTaskX.dto.RegisterNode;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.StringConstant;
+
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -62,10 +64,12 @@ public class CheckFollowsAliveTask extends TimerTask {
                             //follow没有注册信息或者心跳超时了。（没有注册信息，可能是因为上面判断过程中已经将其移除注册表了）
                             if (regNodeFollow==null||DateUtils.isGreaterThanLoseTime(regNodeFollow.getLastHeartbeat())) {
                                 try {
-                                    VoteSliceFollows.voteNewFollow(regNode,node);
+                                    Node newNode=VoteSliceFollows.voteNewFollow(regNode,node);
+                                    ClusterLeaderService.notifyNodeUpdateRegedit(Collections.singletonList(newNode));
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
+                                items.remove();
                             }
                         }
                     }

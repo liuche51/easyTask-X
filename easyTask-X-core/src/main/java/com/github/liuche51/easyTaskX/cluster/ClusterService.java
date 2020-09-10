@@ -233,8 +233,8 @@ public class ClusterService {
     /**
      * 获取集群leader最新节点注册信息
      */
-    public static void updateRegedit(){
+   /* public static void updateRegedit(){
         ClusterUtil.updateRegedit(3,5);
-    }
+    }*/
 
 }

@@ -24,24 +24,49 @@ public class ClusterLeaderService {
     /**
      * 集群NODE注册表
      */
-    public static ConcurrentHashMap<String, RegisterNode> BROKER_REGISTER_CENTER=new ConcurrentHashMap<>(10);
+    public static ConcurrentHashMap<String, RegisterNode> BROKER_REGISTER_CENTER = new ConcurrentHashMap<>(10);
     /**
      * 集群CLIENT注册表
      */
-    public static ConcurrentHashMap<String, RegisterNode> CLIENT_REGISTER_CENTER=new ConcurrentHashMap<>(10);
-    public static List<String> getRegisteredBokers(){
-        Iterator<Map.Entry<String, RegisterNode>> items=BROKER_REGISTER_CENTER.entrySet().iterator();
-        List<String> list=new ArrayList<>(BROKER_REGISTER_CENTER.size());
-        while (items.hasNext()){
+    public static ConcurrentHashMap<String, RegisterNode> CLIENT_REGISTER_CENTER = new ConcurrentHashMap<>(10);
+
+    public static List<String> getRegisteredBokers() {
+        Iterator<Map.Entry<String, RegisterNode>> items = BROKER_REGISTER_CENTER.entrySet().iterator();
+        List<String> list = new ArrayList<>(BROKER_REGISTER_CENTER.size());
+        while (items.hasNext()) {
             list.add(items.next().getKey());
         }
         return list;
     }
 
+    /**
+     * 通知节点更新注册表信息
+     *
+     * @param nodes
+     */
+    public static void notifyNodeUpdateRegedit(List<Node> nodes) {
+
+        nodes.forEach(x -> {
+            ClusterService.getConfig().getClusterPool().submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+                        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NOTIFY_NODE_UPDATE_REGEDIT)
+                                .setSource(ClusterService.CURRENTNODE.getAddress());
+                        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, x.getClient(), ClusterService.getConfig().getTryCount(), 5);
+                    } catch (Exception e) {
+                        log.error("", e);
+                    }
+                }
+            });
+        });
+    }
 
     /**
      * 请求获取当前节点最新注册表信息。
      * 覆盖本地信息
+     *
      * @param tryCount
      * @param waiteSecond
      * @return
@@ -55,16 +80,16 @@ public class ClusterLeaderService {
             Dto.Frame frame = NettyMsgService.sendSyncMsg(ClusterService.CURRENTNODE.getClusterLeader().getClient(), builder.build());
             ResultDto.Result result = ResultDto.Result.parseFrom(frame.getBodyBytes());
             if (StringConstant.TRUE.equals(result.getResult())) {
-                NodeDto.Node node=NodeDto.Node.parseFrom(result.getBodyBytes());
-                NodeDto.NodeList clientNodes=node.getClients();
-                ConcurrentHashMap<String,Node> clients=new ConcurrentHashMap<>();
-                clientNodes.getNodesList().forEach(x->{
-                    clients.put(x.getHost()+":"+x.getPort(),new Node(x.getHost(),x.getPort()));
+                NodeDto.Node node = NodeDto.Node.parseFrom(result.getBodyBytes());
+                NodeDto.NodeList clientNodes = node.getClients();
+                ConcurrentHashMap<String, Node> clients = new ConcurrentHashMap<>();
+                clientNodes.getNodesList().forEach(x -> {
+                    clients.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
                 });
-                NodeDto.NodeList followNodes=node.getClients();
-                ConcurrentHashMap<String,Node> follows=new ConcurrentHashMap<>();
-                followNodes.getNodesList().forEach(x->{
-                    follows.put(x.getHost()+":"+x.getPort(),new Node(x.getHost(),x.getPort()));
+                NodeDto.NodeList followNodes = node.getClients();
+                ConcurrentHashMap<String, Node> follows = new ConcurrentHashMap<>();
+                followNodes.getNodesList().forEach(x -> {
+                    follows.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
                 });
                 ClusterService.CURRENTNODE.setFollows(follows);
                 ClusterService.CURRENTNODE.setClients(clients);
