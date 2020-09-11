@@ -16,9 +16,12 @@ public class NotiyNewSliceLeaderHandler extends BaseHandler {
         String body=frame.getBody();
         String[] items=body.split("|");
         ClusterLeaderService.requestUpdateRegedit(ClusterService.getConfig().getTryCount(),5);
+        //如果自己就是新leader。就重新提交旧leader的任务给自己
         if(ClusterService.CURRENTNODE.getAddress().equals(items[1])){
             SliceLeaderService.submitNewTaskByOldLeader(items[0]);
-        }else {
+        }
+        //如果自己不是新leader。则删除旧leader的备份数据
+        else {
             SliceLeaderService.deleteOldLeaderBackTask(items[0]);
         }
         return null;
