@@ -27,8 +27,6 @@ public class SliceLeaderUtil {
     /**
      * 同步任务数据到follow，批量方式
      *用于将数据同步给新follow
-     *暂时不支持失败进入选新follow流程。代码注释掉
-     * 目前仅在leader心跳follow是否存活那边进行选新follow流程
      * @param schedules
      * @param follow
      * @return
@@ -44,17 +42,7 @@ public class SliceLeaderUtil {
         builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LEADER_SYNC_DATA_TO_NEW_FOLLOW).setSource(ClusterService.getConfig().getAddress())
                 .setBodyBytes(builder0.build().toByteString());
         NettyClient client = follow.getClientWithCount(ClusterService.getConfig().getTryCount());
-       /* if (client == null) {
-            log.info("client == null,so start to syncDataToFollowBatch.");
-            Node newFollow = VoteFollows.selectNewFollow(follow,null);
-            return syncDataToFollowBatch(schedules, newFollow);
-        }*/
-        boolean ret = ClusterUtil.sendSyncMsgWithCount(client, builder.build(), ClusterService.getConfig().getTryCount());
-      /*  if (!ret) {
-            log.info("sendSyncMsgWithCount return false,so start to syncDataToFollowBatch.");
-            Node newFollow = VoteFollows.selectNewFollow(follow,null);
-            return syncDataToFollowBatch(schedules, newFollow);
-        }*/
+        boolean ret =NettyMsgService.sendSyncMsgWithCount(builder,client,ClusterService.getConfig().getTryCount(),5);
         return ret;
     }
 }

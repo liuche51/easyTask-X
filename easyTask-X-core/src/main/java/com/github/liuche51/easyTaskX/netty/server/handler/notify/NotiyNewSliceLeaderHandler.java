@@ -1,4 +1,4 @@
-package com.github.liuche51.easyTaskX.netty.server.handler.leader;
+package com.github.liuche51.easyTaskX.netty.server.handler.notify;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
@@ -15,7 +15,7 @@ public class NotiyNewSliceLeaderHandler extends BaseHandler {
     public ByteString process(Dto.Frame frame) throws Exception {
         String body=frame.getBody();
         String[] items=body.split("|");
-        ClusterLeaderService.requestUpdateRegedit(ClusterService.getConfig().getTryCount(),5);
+        ClusterLeaderService.requestUpdateRegedit();
         //如果自己就是新leader。就重新提交旧leader的任务给自己
         if(ClusterService.CURRENTNODE.getAddress().equals(items[1])){
             SliceLeaderService.submitNewTaskByOldLeader(items[0]);

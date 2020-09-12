@@ -54,9 +54,13 @@ public class NettyInterfaceEnum {
      */
     public static final String UPDATE_CLUSTER_LEADER_BROKER_REGEDIT="UpdateClusterLeaderBrokerRegedit";
     /**
-     * 通知分片follow新leader变更
+     * 集群leader通知分片follows已经选出新leader
      */
     public static final String NOTIFY_SLICE_FOLLOW_NEW_LEADER="NotifySliceFollowNewLeader";
+    /**
+     * 集群leader通知分片leader已经选出新follow
+     */
+    public static final String NotifySliceLeaderVoteNewFollow="NotifySliceLeaderVoteNewFollow";
     /**
      * 通知集群节点获取最新注册表信息
      */

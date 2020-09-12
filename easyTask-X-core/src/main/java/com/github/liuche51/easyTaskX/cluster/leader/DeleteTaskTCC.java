@@ -5,6 +5,7 @@ import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.ClusterUtil;
 import com.github.liuche51.easyTaskX.cluster.Node;
 
+import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
 import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
@@ -57,7 +58,7 @@ public class DeleteTaskTCC {
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_TRYDELTASK).setSource(ClusterService.getConfig().getAddress())
                     .setBody(transactionId+","+taskId);
             NettyClient client = follow.getClientWithCount(1);
-            boolean ret = ClusterUtil.sendSyncMsgWithCount(client, builder.build(), 1);
+            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder,client,1,0,null);
             if(!ret){
                 throw new Exception("tryDel->sendSyncMsgWithCount():exception! ");
             }

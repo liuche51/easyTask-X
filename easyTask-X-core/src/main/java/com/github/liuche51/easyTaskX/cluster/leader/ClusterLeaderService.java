@@ -2,6 +2,8 @@ package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.cluster.task.CheckFollowsAliveTask;
+import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.RegisterNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
@@ -10,6 +12,7 @@ import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
+import com.google.protobuf.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,22 +25,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClusterLeaderService {
     private static final Logger log = LoggerFactory.getLogger(VoteSliceFollows.class);
     /**
-     * 集群NODE注册表
+     * 集群BROKER注册表
      */
     public static ConcurrentHashMap<String, RegisterNode> BROKER_REGISTER_CENTER = new ConcurrentHashMap<>(10);
     /**
      * 集群CLIENT注册表
      */
     public static ConcurrentHashMap<String, RegisterNode> CLIENT_REGISTER_CENTER = new ConcurrentHashMap<>(10);
-
-    public static List<String> getRegisteredBokers() {
-        Iterator<Map.Entry<String, RegisterNode>> items = BROKER_REGISTER_CENTER.entrySet().iterator();
-        List<String> list = new ArrayList<>(BROKER_REGISTER_CENTER.size());
-        while (items.hasNext()) {
-            list.add(items.next().getKey());
-        }
-        return list;
-    }
 
     /**
      * 通知节点更新注册表信息
@@ -54,7 +48,7 @@ public class ClusterLeaderService {
                         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                         builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NOTIFY_NODE_UPDATE_REGEDIT)
                                 .setSource(ClusterService.CURRENTNODE.getAddress());
-                        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, x.getClient(), ClusterService.getConfig().getTryCount(), 5);
+                        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, x.getClient(), ClusterService.getConfig().getTryCount(), 5,null);
                     } catch (Exception e) {
                         log.error("", e);
                     }
@@ -64,23 +58,19 @@ public class ClusterLeaderService {
     }
 
     /**
-     * 请求获取当前节点最新注册表信息。
+     * 集群follow请求集群leader获取当前节点最新注册表信息。
      * 覆盖本地信息
      *
-     * @param tryCount
-     * @param waiteSecond
      * @return
      */
-    public static boolean requestUpdateRegedit(int tryCount, int waiteSecond) {
-        if (tryCount == 0) return false;
-        String error = StringConstant.EMPTY;
+    public static boolean requestUpdateRegedit() {
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.UPDATE_REGEDIT).setSource(ClusterService.getConfig().getAddress());
-            Dto.Frame frame = NettyMsgService.sendSyncMsg(ClusterService.CURRENTNODE.getClusterLeader().getClient(), builder.build());
-            ResultDto.Result result = ResultDto.Result.parseFrom(frame.getBodyBytes());
-            if (StringConstant.TRUE.equals(result.getResult())) {
-                NodeDto.Node node = NodeDto.Node.parseFrom(result.getBodyBytes());
+            ByteString respbody = ByteString.EMPTY;
+            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, ClusterService.CURRENTNODE.getClusterLeader().getClient(), ClusterService.getConfig().getTryCount(), 5, respbody);
+            if (ret) {
+                NodeDto.Node node = NodeDto.Node.parseFrom(respbody);
                 NodeDto.NodeList clientNodes = node.getClients();
                 ConcurrentHashMap<String, Node> clients = new ConcurrentHashMap<>();
                 clientNodes.getNodesList().forEach(x -> {
@@ -94,19 +84,18 @@ public class ClusterLeaderService {
                 ClusterService.CURRENTNODE.setFollows(follows);
                 ClusterService.CURRENTNODE.setClients(clients);
                 return true;
-            } else
-                error = result.getMsg();
+            }
         } catch (Exception e) {
-            log.error("updateRegedit.tryCount=" + tryCount, e);
-        } finally {
-            tryCount--;
-        }
-        log.info("updateRegedit()-> error" + error + ",tryCount=" + tryCount + ",objectHost=" + ClusterService.CURRENTNODE.getClusterLeader().getAddress());
-        try {
-            Thread.sleep(waiteSecond * 1000);
-        } catch (InterruptedException e) {
             log.error("", e);
         }
-        return requestUpdateRegedit(tryCount, waiteSecond);
+        return false;
+    }
+    /**
+     * 启动集群leader检查所有follows是否存活任务
+     */
+    public static TimerTask checkFollowAlive() {
+        CheckFollowsAliveTask task=new CheckFollowsAliveTask();
+        task.start();
+        return task;
     }
 }

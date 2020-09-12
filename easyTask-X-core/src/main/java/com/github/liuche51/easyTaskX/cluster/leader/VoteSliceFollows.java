@@ -95,7 +95,11 @@ public class VoteSliceFollows {
      */
     private static List<String> getAvailableFollows(RegisterNode regNode) throws Exception {
         int count = ClusterService.getConfig().getBackupCount();
-        List<String> availableFollows = ClusterLeaderService.getRegisteredBokers();
+        Iterator<Map.Entry<String, RegisterNode>> items = ClusterLeaderService.BROKER_REGISTER_CENTER.entrySet().iterator();
+        List<String> availableFollows = new ArrayList<>(ClusterLeaderService.BROKER_REGISTER_CENTER.size());
+        while (items.hasNext()) {
+            availableFollows.add(items.next().getKey());
+        }
         //排除自己
         Optional<String> temp = availableFollows.stream().filter(x -> {
             try {
@@ -108,9 +112,9 @@ public class VoteSliceFollows {
         if (temp.isPresent())
             availableFollows.remove(temp.get());
         //排除现有的
-        Iterator<Map.Entry<String, Node>> items = regNode.getNode().getFollows().entrySet().iterator();
-        while (items.hasNext()) {
-            Map.Entry<String, Node> item = items.next();
+        Iterator<Map.Entry<String, Node>> items2 = regNode.getNode().getFollows().entrySet().iterator();
+        while (items2.hasNext()) {
+            Map.Entry<String, Node> item = items2.next();
             Optional<String> temp1 = availableFollows.stream().filter(y -> y.equals(item.getValue().getAddress())).findFirst();
             if (temp1.isPresent())
                 availableFollows.remove(temp1.get());
@@ -148,6 +152,26 @@ public class VoteSliceFollows {
         return follows;
     }
 
+    /**
+     * 集群leader通知分片leader，已经选出新follow。
+     * @param leader
+     * @param newFollowAddress
+     */
+    public static void notifySliceLeaderVoteNewFollow(Node leader,String newFollowAddress,String oldFollowAddress){
+        ClusterService.getConfig().getClusterPool().submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NotifySliceLeaderVoteNewFollow)
+                            .setSource(ClusterService.CURRENTNODE.getAddress()).setBody(newFollowAddress+"|"+oldFollowAddress);
+                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), ClusterService.getConfig().getTryCount(), 5,null);
+                } catch (Exception e) {
+                    log.error("", e);
+                }
+            }
+        });
+    }
     /**
      * 节点初始化选新follows，更新注册表
      *

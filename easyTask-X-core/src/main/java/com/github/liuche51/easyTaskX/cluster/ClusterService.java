@@ -74,7 +74,7 @@ public class ClusterService {
         clearThreadTask();
         deleteAllData();
         CURRENTNODE = new Node(Util.getLocalIP(), ClusterService.getConfig().getServerPort());
-        timerTasks.add(SliceLeaderService.initHeartBeatToClusterLeader());
+        timerTasks.add(heartBeatToClusterLeader());
         timerTasks.add(clearDataTask());
         timerTasks.add(commitSaveTransactionTask());
         timerTasks.add(commitDelTransactionTask());
@@ -229,12 +229,13 @@ public class ClusterService {
         task.start();
         return task;
     }
-
     /**
-     * 获取集群leader最新节点注册信息
+     * 节点对集群leader的心跳。2s一次
      */
-   /* public static void updateRegedit(){
-        ClusterUtil.updateRegedit(3,5);
-    }*/
+    public static TimerTask heartBeatToClusterLeader() {
+        HeartbeatsTask task=new HeartbeatsTask();
+        task.start();
+        return task;
+    }
 
 }

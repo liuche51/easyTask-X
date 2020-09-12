@@ -3,6 +3,7 @@ package com.github.liuche51.easyTaskX.cluster.follow;
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
 import com.github.liuche51.easyTaskX.dto.RegisterNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
@@ -22,6 +23,12 @@ import java.util.stream.Collectors;
 public class VoteSliceLeader {
     private static final Logger log = LoggerFactory.getLogger(VoteSliceLeader.class);
 
+    /**
+     * 集群leader从follows中选择新的分片leader
+     *
+     * @param follows
+     * @return
+     */
     public static Node voteNewLeader(Map<String, Node> follows) {
         Iterator<Map.Entry<String, Node>> items = follows.entrySet().iterator();
         while (items.hasNext()) {
@@ -34,59 +41,41 @@ public class VoteSliceLeader {
         return null;
     }
 
-    public static boolean notifySliceFollowsNewLeader(Map<String, Node> follows, String newLeader, String oldLeader, int tryCount, int waiteSecond) {
-        Iterator<Map.Entry<String, Node>> items = follows.entrySet().iterator();
-        while (items.hasNext()) {
-            Map.Entry<String, Node> item = items.next();
-            Node node = item.getValue();
-            notifySliceFollowNewLeader(node, oldLeader, newLeader, tryCount, waiteSecond);
+    /**
+     * 集群leader通知follows。旧leader失效，集群leader已选新leader。
+     *
+     * @param follows
+     * @param newLeader
+     * @param oldLeader
+     * @return
+     */
+    public static boolean notifySliceFollowsNewLeader(Map<String, Node> follows, String newLeader, String oldLeader) {
+        Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+        try {
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum. NOTIFY_SLICE_FOLLOW_NEW_LEADER).setSource(ClusterService.getConfig().getAddress())
+                    .setBody(oldLeader + "|" + newLeader);
+            Iterator<Map.Entry<String, Node>> items = follows.entrySet().iterator();
+            while (items.hasNext()) {
+                Map.Entry<String, Node> item = items.next();
+                Node node = item.getValue();
+                NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), ClusterService.getConfig().getTryCount(), 5, null);
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("", e);
         }
-        return true;
-    }
-    public static boolean updateRegedit(Map<String, RegisterNode> brokers,String oldLeader){
-        Iterator<Map.Entry<String, Node>> items = brokers.get(oldLeader).getNode().getFollows().entrySet().iterator();
-        while (items.hasNext()) {
-            Map.Entry<String, Node> item = items.next();
-            Node node = item.getValue();
-            node.getLeaders().remove(oldLeader);
-        }
-        brokers.remove(oldLeader);
-        return true;
+        return false;
     }
 
     /**
-     * 通知follow。旧leader失效，已选新leader。
-     * @param follow
+     * 新分片leader选举后，集群leader更新注册表
+     * 这种情况只需要将失效的旧leader从注册表中移除即可。至于这个节点可能是其他节点leader的follow
+     * 则不需要本次处理。待心跳存活检查任务分析那个leader的follow时处理掉即可
+     *
      * @param oldLeader
-     * @param newLeader
-     * @param tryCount
-     * @param waiteSecond
      * @return
      */
-    private static boolean notifySliceFollowNewLeader(Node follow, String oldLeader, String newLeader, int tryCount, int waiteSecond) {
-        if (tryCount == 0) return false;
-        String error = StringConstant.EMPTY;
-        try {
-            Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NOTIFY_SLICE_FOLLOW_NEW_LEADER).setSource(ClusterService.getConfig().getAddress())
-                    .setBody(oldLeader + "|" + newLeader);
-            Dto.Frame frame = NettyMsgService.sendSyncMsg(follow.getClient(), builder.build());
-            ResultDto.Result result = ResultDto.Result.parseFrom(frame.getBodyBytes());
-            if (StringConstant.TRUE.equals(result.getResult())) {
-                return true;
-            } else
-                error = result.getMsg();
-        } catch (Exception e) {
-            log.error("notifySliceFollowsNewLeader.tryCount=" + tryCount, e);
-        } finally {
-            tryCount--;
-        }
-        log.info("notifySliceFollowsNewLeader()-> error" + error + ",tryCount=" + tryCount + ",objectHost=" + follow.getAddress());
-        try {
-            Thread.sleep(waiteSecond * 1000);
-        } catch (InterruptedException e) {
-            log.error("", e);
-        }
-        return notifySliceFollowNewLeader(follow, oldLeader, newLeader, tryCount, waiteSecond);
+    public static void updateRegedit(String oldLeader) {
+        ClusterLeaderService.BROKER_REGISTER_CENTER.remove(oldLeader);
     }
 }

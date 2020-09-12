@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.SQLException;
 
 /**
- * Leader服务入口
+ * 分片Leader服务入口
  */
 public class SliceLeaderService {
     private static final Logger log = LoggerFactory.getLogger(SliceLeaderService.class);
@@ -24,26 +24,6 @@ public class SliceLeaderService {
     public static void deleteOldLeaderBackTask(String oldLeaderAddress) throws SQLException, ClassNotFoundException {
         ScheduleBakDao.deleteBySource(oldLeaderAddress);
     }
-
-    /**
-     * 节点对zk的心跳。2s一次
-     */
-    public static TimerTask initHeartBeatToClusterLeader() {
-        HeartbeatsTask task=new HeartbeatsTask();
-        task.start();
-       return task;
-    }
-
-    /**
-     * 节点对zk的心跳。检查follows是否失效。
-     * 失效则进入选举
-     */
-    public static TimerTask initCheckFollowAlive() {
-        CheckFollowsAliveTask task=new CheckFollowsAliveTask();
-        task.start();
-        return task;
-    }
-
     /**
      * leader同步数据到新follow
      * 目前设计为只有一个线程同步给某个follow

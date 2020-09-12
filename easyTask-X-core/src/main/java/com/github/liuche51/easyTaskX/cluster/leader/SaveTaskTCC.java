@@ -5,6 +5,7 @@ import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.ClusterUtil;
 import com.github.liuche51.easyTaskX.cluster.Node;
 
+import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
 import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
@@ -55,7 +56,7 @@ public class SaveTaskTCC {
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_TRYSAVETASK).setSource(ClusterService.getConfig().getAddress())
                     .setBodyBytes(s.toByteString());
             NettyClient client = follow.getClientWithCount(1);
-            boolean ret = ClusterUtil.sendSyncMsgWithCount(client, builder.build(), 1);
+            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder,client,1,0,null);
             if(!ret){
                 throw new Exception("sendSyncMsgWithCount()->exception! ");
             }
@@ -78,7 +79,7 @@ public class SaveTaskTCC {
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_CONFIRMSAVETASK).setSource(ClusterService.getConfig().getAddress())
                     .setBody(transactionId);
             NettyClient client = follow.getClientWithCount(1);
-            boolean ret = ClusterUtil.sendSyncMsgWithCount(client, builder.build(), 1);
+            boolean ret =NettyMsgService.sendSyncMsgWithCount(builder,client,1,0,null);
             if (ret) {
                 ScheduleSyncDao.updateStatusByScheduleIdAndFollow(scheduleId, follow.getAddress(), ScheduleSyncStatusEnum.SYNCED);
             } else
@@ -105,7 +106,7 @@ public class SaveTaskTCC {
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_CANCELSAVETASK).setSource(ClusterService.getConfig().getAddress())
                     .setBody(transactionId);
             NettyClient client = follow.getClientWithCount(1);
-            boolean ret = ClusterUtil.sendSyncMsgWithCount(client, builder.build(), 1);
+            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder,client,1,0,null);
             if (ret) {
                 ScheduleSyncDao.deleteByTransactionIdAndFollow(transactionId, follow.getAddress());
             } else

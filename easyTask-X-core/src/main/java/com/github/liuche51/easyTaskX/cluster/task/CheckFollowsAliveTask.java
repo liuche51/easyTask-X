@@ -48,8 +48,8 @@ public class CheckFollowsAliveTask extends TimerTask {
                     if (DateUtils.isGreaterThanLoseTime(regNode.getLastHeartbeat())) {
                         if(regNode.getNode().getFollows().size()>0){//如果有follows
                             Node newleader=VoteSliceLeader.voteNewLeader(regNode.getNode().getFollows());
-                            VoteSliceLeader.notifySliceFollowsNewLeader(regNode.getNode().getFollows(),newleader.getAddress(),regNode.getNode().getAddress(),3,5);
-                            VoteSliceLeader.updateRegedit(brokers,regNode.getNode().getAddress());
+                            VoteSliceLeader.notifySliceFollowsNewLeader(regNode.getNode().getFollows(),newleader.getAddress(),regNode.getNode().getAddress());
+                            VoteSliceLeader.updateRegedit(regNode.getNode().getAddress());
                         }else {
                             items.remove();//如果没有follows则直接移除
                         }
@@ -65,6 +65,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                             if (regNodeFollow==null||DateUtils.isGreaterThanLoseTime(regNodeFollow.getLastHeartbeat())) {
                                 try {
                                     Node newNode=VoteSliceFollows.voteNewFollow(regNode,node);
+                                    VoteSliceFollows.notifySliceLeaderVoteNewFollow(regNode.getNode(),newNode.getAddress());
                                     ClusterLeaderService.notifyNodeUpdateRegedit(Collections.singletonList(newNode));
                                 } catch (Exception e) {
                                     e.printStackTrace();

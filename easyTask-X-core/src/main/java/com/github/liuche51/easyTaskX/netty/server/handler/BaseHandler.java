@@ -5,6 +5,8 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.server.handler.leader.GetRegisteredBokersHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.leader.UpdateRegeditHandler;
+import com.github.liuche51.easyTaskX.netty.server.handler.notify.NotifyNodeUpdateRegeditHandler;
+import com.github.liuche51.easyTaskX.netty.server.handler.notify.NotifySliceLeaderVoteNewFollowHandler;
 import com.google.protobuf.ByteString;
 
 import java.util.HashMap;
@@ -27,6 +29,7 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.GET_REGISTERED_BOKERS,new GetRegisteredBokersHandler());
                 put(NettyInterfaceEnum.UPDATE_REGEDIT,new UpdateRegeditHandler());
                 put(NettyInterfaceEnum.NOTIFY_NODE_UPDATE_REGEDIT,new NotifyNodeUpdateRegeditHandler());
+                put(NettyInterfaceEnum.NotifySliceLeaderVoteNewFollow,new NotifySliceLeaderVoteNewFollowHandler());
             }
         };
     }
