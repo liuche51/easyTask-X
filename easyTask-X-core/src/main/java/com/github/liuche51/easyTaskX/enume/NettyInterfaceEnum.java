@@ -66,6 +66,10 @@ public class NettyInterfaceEnum {
      */
     public static final String NOTIFY_NODE_UPDATE_REGEDIT="NotifyNodeUpdateRegedit";
     /**
+     * 分片leader通知集群leader，已经完成对新follow的数据同步。请求更新数据同步状态
+     */
+    public static final String NotifyClusterLeaderUpdateRegeditForDataStatus="notifyClusterLeaderUpdateRegeditForDataStatus";
+    /**
      * 更新注册表信息
      */
     public static final String UPDATE_REGEDIT="UpdateRegedit";

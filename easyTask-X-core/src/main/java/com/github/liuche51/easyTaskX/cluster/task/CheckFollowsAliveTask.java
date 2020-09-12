@@ -8,6 +8,7 @@ import com.github.liuche51.easyTaskX.cluster.leader.VoteSliceFollows;
 import com.github.liuche51.easyTaskX.dto.RegisterNode;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.StringConstant;
+import com.github.liuche51.easyTaskX.util.exception.VotingException;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -24,8 +25,8 @@ public class CheckFollowsAliveTask extends TimerTask {
     public void run() {
         while (!isExit()) {
             try {
-
-            }  catch (Exception e) {
+                dealBrokerRegedit();
+            } catch (Exception e) {
                 log.error("CheckFollowsAliveTask()", e);
             }
             try {
@@ -35,44 +36,66 @@ public class CheckFollowsAliveTask extends TimerTask {
             }
         }
     }
-    private void dealBrokerRegedit(){
-        Map<String, RegisterNode> brokers= ClusterLeaderService.BROKER_REGISTER_CENTER;
-        Iterator<Map.Entry<String, RegisterNode>> items=brokers.entrySet().iterator();
-        while (items.hasNext()){
-            Map.Entry<String, RegisterNode> item=items.next();
-            RegisterNode regNode=item.getValue();
+
+    /**
+     * 处理服务端Broker节点的存活逻辑
+     */
+    private void dealBrokerRegedit() {
+        Map<String, RegisterNode> brokers = ClusterLeaderService.BROKER_REGISTER_CENTER;
+        Iterator<Map.Entry<String, RegisterNode>> items = brokers.entrySet().iterator();
+        while (items.hasNext()) {
+            Map.Entry<String, RegisterNode> item = items.next();
+            RegisterNode regNode = item.getValue();
             ClusterService.getConfig().getClusterPool().submit(new Runnable() {
                 @Override
                 public void run() {
                     //分片leader节点失效,且有follows。选新leader
                     if (DateUtils.isGreaterThanLoseTime(regNode.getLastHeartbeat())) {
-                        if(regNode.getNode().getFollows().size()>0){//如果有follows
-                            Node newleader=VoteSliceLeader.voteNewLeader(regNode.getNode().getFollows());
-                            VoteSliceLeader.notifySliceFollowsNewLeader(regNode.getNode().getFollows(),newleader.getAddress(),regNode.getNode().getAddress());
+                        if (regNode.getNode().getFollows().size() > 0) {//如果有follows
+                            Node newleader = VoteSliceLeader.voteNewLeader(regNode.getNode().getFollows());
+                            VoteSliceLeader.notifySliceFollowsNewLeader(regNode.getNode().getFollows(), newleader.getAddress(), regNode.getNode().getAddress());
                             VoteSliceLeader.updateRegedit(regNode.getNode().getAddress());
-                        }else {
+                        } else {
                             items.remove();//如果没有follows则直接移除
                         }
 
-                    }else {
-                        ConcurrentHashMap<String, Node> follows=regNode.getNode().getFollows();
-                        Iterator<Map.Entry<String, Node>> items=follows.entrySet().iterator();
-                        while (items.hasNext()) {
-                            Map.Entry<String, Node> item = items.next();
-                            Node node = item.getValue();
-                            RegisterNode regNodeFollow=brokers.get(node.getAddress());
-                            //follow没有注册信息或者心跳超时了。（没有注册信息，可能是因为上面判断过程中已经将其移除注册表了）
-                            if (regNodeFollow==null||DateUtils.isGreaterThanLoseTime(regNodeFollow.getLastHeartbeat())) {
-                                try {
-                                    Node newNode=VoteSliceFollows.voteNewFollow(regNode,node);
-                                    VoteSliceFollows.notifySliceLeaderVoteNewFollow(regNode.getNode(),newNode.getAddress());
-                                    ClusterLeaderService.notifyNodeUpdateRegedit(Collections.singletonList(newNode));
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                                items.remove();
+                    }
+                    //分片leader没失效，但是follow失效了
+                    else {
+                        ConcurrentHashMap<String, Node> follows = regNode.getNode().getFollows();
+                        //初始化，还没有一个follow时
+                        if (follows.size() == 0) {
+                            try {
+                                VoteSliceFollows.initVoteFollows(regNode);
+                            } catch (VotingException e) {
+                                log.info("normally exception!{}", e.getMessage());
+                            } catch (Exception e) {
+                                log.error("initVoteFollows()->exception!", e);
                             }
                         }
+                        //已经有follows时
+                        else {
+                            Iterator<Map.Entry<String, Node>> items = follows.entrySet().iterator();
+                            while (items.hasNext()) {
+                                Map.Entry<String, Node> item = items.next();
+                                Node node = item.getValue();
+                                RegisterNode regNodeFollow = brokers.get(node.getAddress());
+                                //follow没有注册信息或者心跳超时了。（没有注册信息，可能是因为上面判断过程中已经将其移除注册表了）
+                                if (regNodeFollow == null || DateUtils.isGreaterThanLoseTime(regNodeFollow.getLastHeartbeat())) {
+                                    try {
+                                        Node newNode = VoteSliceFollows.voteNewFollow(regNode, node);
+                                        VoteSliceFollows.notifySliceLeaderVoteNewFollow(regNode.getNode(), newNode.getAddress(), node.getAddress());
+                                        ClusterLeaderService.notifyNodeUpdateRegedit(Collections.singletonList(newNode));
+                                    } catch (VotingException e) {
+                                        log.info("normally exception!{}", e.getMessage());
+                                    } catch (Exception e) {
+                                        log.error("voteNewFollow()->exception!", e);
+                                    }
+                                    //items.remove();这里不需要了。因为在voteNewFollow中已经移除了
+                                }
+                            }
+                        }
+
                     }
                 }
             });

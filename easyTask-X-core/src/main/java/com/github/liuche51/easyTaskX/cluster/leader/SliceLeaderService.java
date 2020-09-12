@@ -4,6 +4,11 @@ import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.Node;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
+import com.github.liuche51.easyTaskX.dto.proto.Dto;
+import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
+import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
+import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
+import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +54,25 @@ public class SliceLeaderService {
         task.start();
         ClusterService.onceTasks.add(task);
         return task;
+    }
+
+    /**
+     * 分片leader通知集群leader，已经完成对新follow的数据同步。请求更新数据同步状态
+     */
+    public static void notifyClusterLeaderUpdateRegeditForDataStatus(){
+        ClusterService.getConfig().getClusterPool().submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Dto.Frame.Builder builder=Dto.Frame.newBuilder();
+                    builder.setIdentity(Util.generateIdentityId()).setBody(NettyInterfaceEnum.NotifyClusterLeaderUpdateRegeditForDataStatus)
+                            .setSource(ClusterService.CURRENTNODE.getAddress()).setBody(String.valueOf(NodeSyncDataStatusEnum.SYNC));
+                    NettyMsgService.sendSyncMsgWithCount(builder,ClusterService.CURRENTNODE.getClusterLeader().getClient(),ClusterService.getConfig().getTryCount(),5,null);
+                }catch (Exception e){
+                    log.error("notifyClusterLeaderUpdateRegeditForDataStatus()->exception!",e);
+                }
+            }
+        });
     }
 
 }

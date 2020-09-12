@@ -41,8 +41,8 @@ public class SliceLeaderUtil {
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
         builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LEADER_SYNC_DATA_TO_NEW_FOLLOW).setSource(ClusterService.getConfig().getAddress())
                 .setBodyBytes(builder0.build().toByteString());
-        NettyClient client = follow.getClientWithCount(ClusterService.getConfig().getTryCount());
-        boolean ret =NettyMsgService.sendSyncMsgWithCount(builder,client,ClusterService.getConfig().getTryCount(),5);
+        NettyClient client = follow.getClientWithCount(1);
+        boolean ret =NettyMsgService.sendSyncMsgWithCount(builder,client,ClusterService.getConfig().getTryCount(),5,null);
         return ret;
     }
 }

@@ -36,23 +36,30 @@ public class VoteSliceFollows {
 
     /**
      * 节点启动初始化选举follows。
-     * 不存在多线程情况，不需要考虑
      *
      * @return
      */
     public static void initVoteFollows(RegisterNode regNode) throws Exception {
+        if (selecting) throw new VotingException("cluster is voting new follow,please retry later.");
+        selecting = true;
         int count = ClusterService.getConfig().getBackupCount();
-        List<String> availableFollows = VoteSliceFollows.getAvailableFollows(regNode);
-        List<Node> follows = VoteSliceFollows.voteFollows(count, availableFollows);
-        if (follows.size() < count) {
-            log.info("follows.size() < count,so start to initVoteFollows()");
-            initVoteFollows(regNode);//数量不够递归重新选VoteFollows.selectFollows中
-        } else {
-            ConcurrentHashMap<String, Node> follows2 = new ConcurrentHashMap<>(follows.size());
-            follows.forEach(x -> {
-                follows2.put(x.getAddress(), x);
-            });
-            updateRegedit(regNode, follows2);
+        try {
+            lock.lock();
+            List<String> availableFollows = VoteSliceFollows.getAvailableFollows(regNode);
+            List<Node> follows = VoteSliceFollows.voteFollows(count, availableFollows);
+            if (follows.size() < count) {
+                log.info("follows.size() < count,so start to initVoteFollows()");
+                initVoteFollows(regNode);//数量不够递归重新选VoteFollows.selectFollows中
+            } else {
+                ConcurrentHashMap<String, Node> follows2 = new ConcurrentHashMap<>(follows.size());
+                follows.forEach(x -> {
+                    follows2.put(x.getAddress(), x);
+                });
+                updateRegedit(regNode, follows2);
+            }
+        } finally {
+            selecting = false;//复原选举状态
+            lock.unlock();
         }
     }
 
@@ -154,24 +161,26 @@ public class VoteSliceFollows {
 
     /**
      * 集群leader通知分片leader，已经选出新follow。
+     *
      * @param leader
      * @param newFollowAddress
      */
-    public static void notifySliceLeaderVoteNewFollow(Node leader,String newFollowAddress,String oldFollowAddress){
+    public static void notifySliceLeaderVoteNewFollow(Node leader, String newFollowAddress, String oldFollowAddress) {
         ClusterService.getConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NotifySliceLeaderVoteNewFollow)
-                            .setSource(ClusterService.CURRENTNODE.getAddress()).setBody(newFollowAddress+"|"+oldFollowAddress);
-                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), ClusterService.getConfig().getTryCount(), 5,null);
+                            .setSource(ClusterService.CURRENTNODE.getAddress()).setBody(newFollowAddress + "|" + oldFollowAddress);
+                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), ClusterService.getConfig().getTryCount(), 5, null);
                 } catch (Exception e) {
                     log.error("", e);
                 }
             }
         });
     }
+
     /**
      * 节点初始化选新follows，更新注册表
      *

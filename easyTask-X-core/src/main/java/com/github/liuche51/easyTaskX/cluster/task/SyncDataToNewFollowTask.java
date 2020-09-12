@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.task;
 
 import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.cluster.leader.SliceLeaderService;
 import com.github.liuche51.easyTaskX.cluster.leader.SliceLeaderUtil;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
 import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
@@ -42,13 +43,11 @@ public class SyncDataToNewFollowTask extends OnceTask {
     @Override
     public void run() {
         try {
-            //先将失效的follow数据同步标记为未同步，同时修改其follow标识
-            ScheduleSyncDao.updateFollowAndStatusByFollow(oldFollow.getAddress(), newFollow.getAddress(), ScheduleSyncStatusEnum.UNSYNC);
             while (!isExit()) {
                 //获取批次数据
                 List<ScheduleSync> list = ScheduleSyncDao.selectByFollowAndStatusWithCount(newFollow.getAddress(), ScheduleSyncStatusEnum.UNSYNC, 5);
                 if (list.size() == 0) {//如果已经同步完，标记状态并则跳出循环
-                    newFollow.setDataStatus(NodeSyncDataStatusEnum.SYNC);
+                    SliceLeaderService.notifyClusterLeaderUpdateRegeditForDataStatus();
                     setExit(true);
                     break;
                 }
