@@ -26,7 +26,7 @@ public class HeartbeatsTask extends TimerTask {
                 if (leader == null) {//启动时还没获取集群leader信息，所以需要去zk获取
                     LeaderData node = ZKService.getClusterLeaderData();
                     if (node != null && !StringUtils.isNullOrEmpty(node.getHost())) {//获取集群leader信息成功
-                        leader = new Node(node.getHost(), node.getPort());
+                        leader = new Node(node.getHost(), node.getPort(),true);
                         ClusterService.CURRENTNODE.setClusterLeader(leader);
                     } else {//否则就进入选举
                         VoteClusterLeader.competeLeader();

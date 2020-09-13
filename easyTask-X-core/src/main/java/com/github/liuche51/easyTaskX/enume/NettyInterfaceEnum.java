@@ -62,7 +62,7 @@ public class NettyInterfaceEnum {
      */
     public static final String NotifyClusterLeaderUpdateRegeditForDataStatus="notifyClusterLeaderUpdateRegeditForDataStatus";
     /**
-     * 更新注册表信息
+     * broker获取集群leader最新注册表信息
      */
     public static final String UPDATE_REGEDIT="UpdateRegedit";
 }

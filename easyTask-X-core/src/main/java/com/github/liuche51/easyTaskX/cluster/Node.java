@@ -37,7 +37,16 @@ public class Node implements Serializable {
      * 集群leader
      */
     private Node clusterLeader=null;
-
+    public Node(String host, int port,boolean simple) {
+        this.host = host;
+        this.port = port;
+        if(simple){
+            this.dataStatus=null;
+            this.clients=null;
+            this.follows=null;
+            this.leaders=null;
+        }
+    }
     public Node(String host, int port) {
         this.host = host;
         this.port = port;

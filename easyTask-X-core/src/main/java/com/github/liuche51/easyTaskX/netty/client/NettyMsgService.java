@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.netty.client;
 
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.dto.ByteStringPack;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
 import com.github.liuche51.easyTaskX.util.StringConstant;
@@ -69,15 +70,15 @@ public class NettyMsgService {
      * @param waiteSecond
      * @return
      */
-    public static boolean sendSyncMsgWithCount(Dto.Frame.Builder builder, NettyClient client, int tryCount, int waiteSecond, ByteString respBody) {
+    public static boolean sendSyncMsgWithCount(Dto.Frame.Builder builder, NettyClient client, int tryCount, int waiteSecond, ByteStringPack respPack) {
         if (tryCount == 0) return false;
         String error = StringConstant.EMPTY;
         try {
             Dto.Frame frame = sendSyncMsg(client, builder.build());
             ResultDto.Result result = ResultDto.Result.parseFrom(frame.getBodyBytes());
             if (StringConstant.TRUE.equals(result.getResult())) {
-                if (respBody != null)
-                    respBody = result.getBodyBytes();
+                if (respPack != null)
+                    respPack.setRespbody(result.getBodyBytes());
                 return true;
             } else
                 error = result.getMsg();
@@ -92,6 +93,6 @@ public class NettyMsgService {
         } catch (InterruptedException e) {
             log.error("", e);
         }
-        return sendSyncMsgWithCount(builder, client, tryCount, waiteSecond, respBody);
+        return sendSyncMsgWithCount(builder, client, tryCount, waiteSecond, respPack);
     }
 }

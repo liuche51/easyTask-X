@@ -11,6 +11,7 @@ import com.github.liuche51.easyTaskX.util.exception.VotingException;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -50,13 +51,13 @@ public class CheckFollowsAliveTask extends TimerTask {
                 public void run() {
                     //分片leader节点失效,且有follows。选新leader
                     if (DateUtils.isGreaterThanLoseTime(regNode.getLastHeartbeat())) {
-                        if (regNode.getNode().getFollows().size() > 0) {//如果有follows
+                        //如果有follows。则选出新分片leader，并通知它们。没有则直接移出注册表
+                        if (regNode.getNode().getFollows().size() > 0) {
                             Node newleader = VoteSliceLeader.voteNewLeader(regNode.getNode().getFollows());
                             VoteSliceLeader.notifySliceFollowsNewLeader(regNode.getNode().getFollows(), newleader.getAddress(), regNode.getNode().getAddress());
-                            VoteSliceLeader.updateRegedit(regNode.getNode().getAddress());
-                        } else {
-                            items.remove();//如果没有follows则直接移除
                         }
+                        //失效节点直接移出注册表
+                        VoteSliceLeader.updateRegedit(regNode.getNode().getAddress());
 
                     }
                     //分片leader没失效，但是follow失效了
@@ -65,7 +66,8 @@ public class CheckFollowsAliveTask extends TimerTask {
                         //初始化，还没有一个follow时
                         if (follows.size() == 0) {
                             try {
-                                VoteSliceFollows.initVoteFollows(regNode);
+                                List<Node> newFollows= VoteSliceFollows.initVoteFollows(regNode);
+                                ClusterLeaderService.notifyNodeUpdateRegedit(newFollows);
                             } catch (VotingException e) {
                                 log.info("normally exception!{}", e.getMessage());
                             } catch (Exception e) {

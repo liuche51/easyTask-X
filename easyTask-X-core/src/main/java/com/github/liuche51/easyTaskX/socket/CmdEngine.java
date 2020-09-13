@@ -13,6 +13,7 @@ public class CmdEngine {
             {
                 put("brokerRegisterInfo","");
                 put("clinetRegisterInfo","");
+                put("currentNodeInfo","");
 
             }
         };

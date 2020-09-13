@@ -103,6 +103,6 @@ public class ClusterTest {
     private void printinfo() {
         //log.info("集群节点信息：" + ClusterMonitor.getCurrentNodeInfo());
         //log.info("数据库连接池信息：" + ClusterMonitor.getSqlitePoolInfo());
-        log.info("Broker注册表:"+JSONObject.toJSONString(ClusterMonitor.getBrokerRegisterInfo()));
+        //log.info("Broker注册表:"+JSONObject.toJSONString(ClusterMonitor.getBrokerRegisterInfo()));
     }
 }

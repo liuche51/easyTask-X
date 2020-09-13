@@ -39,7 +39,7 @@ public class VoteSliceFollows {
      *
      * @return
      */
-    public static void initVoteFollows(RegisterNode regNode) throws Exception {
+    public static List<Node> initVoteFollows(RegisterNode regNode) throws Exception {
         if (selecting) throw new VotingException(String.format("[%s] is voting a new follow",regNode.getNode().getAddress()));
         selecting = true;
         int count = ClusterService.getConfig().getBackupCount();
@@ -49,13 +49,14 @@ public class VoteSliceFollows {
             List<Node> follows = VoteSliceFollows.voteFollows(count, availableFollows);
             if (follows.size() < count) {
                 log.info("[{}] follows.size() < count,so retry to initVoteFollows()",regNode.getNode().getAddress());
-                initVoteFollows(regNode);//数量不够递归重新选VoteFollows.selectFollows中
+               return initVoteFollows(regNode);//数量不够递归重新选VoteFollows.selectFollows中
             } else {
                 ConcurrentHashMap<String, Node> follows2 = new ConcurrentHashMap<>(follows.size());
                 follows.forEach(x -> {
                     follows2.put(x.getAddress(), x);
                 });
                 updateRegedit(regNode, follows2);
+                return follows;
             }
         } finally {
             selecting = false;//复原选举状态

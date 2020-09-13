@@ -4,6 +4,7 @@ import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.Node;
 import com.github.liuche51.easyTaskX.cluster.task.CheckFollowsAliveTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
+import com.github.liuche51.easyTaskX.dto.ByteStringPack;
 import com.github.liuche51.easyTaskX.dto.RegisterNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
@@ -66,23 +67,30 @@ public class ClusterLeaderService {
     public static boolean requestUpdateRegedit() {
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.UPDATE_REGEDIT).setSource(ClusterService.getConfig().getAddress());
-            ByteString respbody = ByteString.EMPTY;
-            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, ClusterService.CURRENTNODE.getClusterLeader().getClient(), ClusterService.getConfig().getTryCount(), 5, respbody);
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.UPDATE_REGEDIT).setSource(ClusterService.getConfig().getAddress())
+            .setBody("broker");
+            ByteStringPack respPack =new ByteStringPack();
+            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, ClusterService.CURRENTNODE.getClusterLeader().getClient(), ClusterService.getConfig().getTryCount(), 5, respPack);
             if (ret) {
-                NodeDto.Node node = NodeDto.Node.parseFrom(respbody);
+                NodeDto.Node node = NodeDto.Node.parseFrom(respPack.getRespbody());
                 NodeDto.NodeList clientNodes = node.getClients();
                 ConcurrentHashMap<String, Node> clients = new ConcurrentHashMap<>();
                 clientNodes.getNodesList().forEach(x -> {
                     clients.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
                 });
-                NodeDto.NodeList followNodes = node.getClients();
+                NodeDto.NodeList followNodes = node.getFollows();
                 ConcurrentHashMap<String, Node> follows = new ConcurrentHashMap<>();
                 followNodes.getNodesList().forEach(x -> {
                     follows.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
                 });
+                NodeDto.NodeList leaderNodes = node.getLeaders();
+                ConcurrentHashMap<String, Node> leaders = new ConcurrentHashMap<>();
+                leaderNodes.getNodesList().forEach(x -> {
+                    leaders.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
+                });
                 ClusterService.CURRENTNODE.setFollows(follows);
                 ClusterService.CURRENTNODE.setClients(clients);
+                ClusterService.CURRENTNODE.setLeaders(leaders);
                 return true;
             }
         } catch (Exception e) {

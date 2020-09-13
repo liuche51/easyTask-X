@@ -21,12 +21,11 @@ public class CMDApp {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        String lastCommand = "";
-        String status = "";
+        String lastCommand = EXIT;
+        String status = CONNECT;
         String address = "";
         Scanner sc = new Scanner(System.in);
         System.out.print(CONNECT_HOST_ADDRESS);
-        status = CONNECT;//连接服务端状态
         while (true) {//反复保持与服务端通信
             try {
                 String te = sc.nextLine();
@@ -53,19 +52,21 @@ public class CMDApp {
                     System.out.print("[" + address + "]:");
             } catch (SocketException e) {
                 System.out.println("服务端已断开连接...");
-                dealException(status, lastCommand);
+                dealException();
+                status = CONNECT;
+                lastCommand = EXIT;
             } catch (Exception e) {
                 e.printStackTrace();
-                dealException(status, lastCommand);
+                dealException();
+                status = CONNECT;
+                lastCommand = EXIT;
             }
 
         }
     }
 
-    private static void dealException(String status, String lastCommand) {
+    private static void dealException() {
         Client.close();
         System.out.print(CONNECT_HOST_ADDRESS);
-        status = CONNECT;
-        lastCommand = EXIT;
     }
 }
