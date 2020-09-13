@@ -44,7 +44,7 @@ public class NettyInterfaceEnum {
     /**
      * Follow对Leader的心跳接口
      */
-    public static final String FOLLOW_TO_LEADER_HEARTBEAT="FollowToLeaderHeartbeat";
+    public static final String Heartbeat="Heartbeat";
     /**
      * 集群leader通知分片follows已经选出新leader
      */

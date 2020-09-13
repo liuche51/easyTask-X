@@ -2,25 +2,24 @@ package com.github.liuche51.easyTaskX.cluster.task;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.Node;
-import com.github.liuche51.easyTaskX.cluster.follow.VoteSliceLeader;
+import com.github.liuche51.easyTaskX.cluster.leader.VoteSliceLeader;
 import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteSliceFollows;
 import com.github.liuche51.easyTaskX.dto.RegisterNode;
 import com.github.liuche51.easyTaskX.util.DateUtils;
-import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 节点对zk的心跳。检查follows是否失效。
- * 失效则进入选举。选举后将原follow备份数据同步给新follow
+ * 集群leader检查follows存活状态
  */
 public class CheckFollowsAliveTask extends TimerTask {
+    //是否已经存在一个任务实例运行中
+    public static volatile boolean hasRuning=false;
     @Override
     public void run() {
         while (!isExit()) {

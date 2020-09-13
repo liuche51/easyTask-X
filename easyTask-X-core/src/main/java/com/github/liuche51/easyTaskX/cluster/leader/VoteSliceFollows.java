@@ -40,7 +40,7 @@ public class VoteSliceFollows {
      * @return
      */
     public static void initVoteFollows(RegisterNode regNode) throws Exception {
-        if (selecting) throw new VotingException("cluster is voting new follow,please retry later.");
+        if (selecting) throw new VotingException(String.format("[%s] is voting a new follow",regNode.getNode().getAddress()));
         selecting = true;
         int count = ClusterService.getConfig().getBackupCount();
         try {
@@ -48,7 +48,7 @@ public class VoteSliceFollows {
             List<String> availableFollows = VoteSliceFollows.getAvailableFollows(regNode);
             List<Node> follows = VoteSliceFollows.voteFollows(count, availableFollows);
             if (follows.size() < count) {
-                log.info("follows.size() < count,so start to initVoteFollows()");
+                log.info("[{}] follows.size() < count,so retry to initVoteFollows()",regNode.getNode().getAddress());
                 initVoteFollows(regNode);//数量不够递归重新选VoteFollows.selectFollows中
             } else {
                 ConcurrentHashMap<String, Node> follows2 = new ConcurrentHashMap<>(follows.size());
@@ -69,14 +69,14 @@ public class VoteSliceFollows {
      * @return
      */
     public static Node voteNewFollow(RegisterNode regNode, Node oldFollow) throws Exception {
-        if (selecting) throw new VotingException("cluster is voting new follow,please retry later.");
+        if (selecting) throw new VotingException(String.format("[%s] is voting a new follow",regNode.getNode().getAddress()));
         selecting = true;
         List<Node> follows = null;
         try {
             lock.lock();
             //多线程下，如果follows已经选好，则让客户端重新提交任务。以后可以优化为获取选举后的follow
             if (regNode.getNode().getFollows().size() >= ClusterService.getConfig().getBackupCount())
-                throw new VotedException("cluster is voted follow,please retry again.");
+                throw new VotedException(String.format("[%s] has voted a new follow.",regNode.getNode().getAddress()));
             List<String> availableFollows = getAvailableFollows(regNode);
             follows = voteFollows(1, availableFollows);
             if (follows.size() < 1)
@@ -91,7 +91,7 @@ public class VoteSliceFollows {
             lock.unlock();
         }
         if (follows == null || follows.size() == 0)
-            throw new Exception("cluster is vote follow failed,please retry later.");
+            throw new Exception(String.format("[%s] is vote follow failed",regNode.getNode().getAddress()));
         return follows.get(0);
     }
 
@@ -128,7 +128,7 @@ public class VoteSliceFollows {
         }
         if (availableFollows.size() < count - ClusterService.CURRENTNODE.getFollows().size())//如果可选备库节点数量不足，则等待1s，然后重新选。注意：等待会阻塞整个服务可用性
         {
-            log.info("availableFollows is not enough! only has {},current own {}", availableFollows.size(), ClusterService.CURRENTNODE.getFollows().size());
+            log.info("[{}] availableFollows is not enough! only has {},current own {}",regNode.getNode().getAddress(), availableFollows.size(), regNode.getNode().getFollows().size());
             Thread.sleep(1000);
             return getAvailableFollows(regNode);
         } else
@@ -193,7 +193,8 @@ public class VoteSliceFollows {
         while (items.hasNext()) {
             Map.Entry<String, Node> item = items.next();
             Node node = item.getValue();
-            node.getLeaders().put(node.getAddress(), node);
+            RegisterNode followRegnode=ClusterLeaderService.BROKER_REGISTER_CENTER.get(node.getAddress());
+            followRegnode.getNode().getLeaders().put(regNode.getNode().getAddress(), new Node(regNode.getNode().getAddress()));
         }
     }
 
@@ -207,6 +208,7 @@ public class VoteSliceFollows {
         regNode.getNode().getFollows().remove(oldFollow);
         newFollow.setDataStatus(NodeSyncDataStatusEnum.UNSYNC);//选举成功，将新follow数据同步状态标记为未同步
         regNode.getNode().getFollows().put(newFollow.getAddress(), newFollow);
-        ClusterLeaderService.BROKER_REGISTER_CENTER.remove(oldFollow);
-    }
+        RegisterNode newFollowRegNode=ClusterLeaderService.BROKER_REGISTER_CENTER.get(newFollow.getAddress());
+        newFollowRegNode.getNode().getLeaders().put(regNode.getNode().getAddress(),new Node(regNode.getNode().getAddress()));
+   }
 }

@@ -49,6 +49,12 @@ public class ClusterService {
         ClusterService.config = config;
     }
 
+    /**
+     * 启动节点。
+     * 线程互斥
+     * @param config
+     * @throws Exception
+     */
     public static synchronized void start(EasyTaskConfig config) throws Exception {
         //避免重复执行
         if (isStarted)
@@ -57,10 +63,10 @@ public class ClusterService {
             throw new Exception("config is null,please set a EasyTaskConfig!");
         EasyTaskConfig.validateNecessary(config);
         ClusterService.config = config;
-        DbInit.init();
+        DbInit.init();//初始化数据库
         NettyServer.getInstance().run();//启动组件的Netty服务端口
-        CmdServer.init();
-        initCurrentNode();
+        CmdServer.init();//启动命令服务的socket端口
+        initCurrentNode();//初始化本节点的集群服务
         isStarted=true;
     }
     /**

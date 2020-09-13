@@ -6,6 +6,7 @@ import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.github.liuche51.easyTaskX.util.StringConstant;
+import com.google.protobuf.ByteString;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
@@ -28,8 +29,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     public void channelRead0(ChannelHandlerContext ctx, Object msg) {
         // 收到消息直接打印输出
-		StringBuilder str=new StringBuilder("Received Client:");
-		str.append(ctx.channel().remoteAddress()).append( " send : ").append(msg);
+        StringBuilder str = new StringBuilder("Received Client:");
+        str.append(ctx.channel().remoteAddress()).append(" send : ").append(msg);
         log.debug(str.toString());
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
         ResultDto.Result.Builder result = ResultDto.Result.newBuilder();
@@ -39,9 +40,11 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
             Dto.Frame frame = (Dto.Frame) msg;
             builder.setInterfaceName(frame.getInterfaceName());
             builder.setIdentity(frame.getIdentity());
-            BaseHandler handler=BaseHandler.INSTANCES.get(frame.getInterfaceName());
-            if(handler==null) throw new Exception("unknown interface method!");
-            result.setBodyBytes(handler.process(frame));
+            BaseHandler handler = BaseHandler.INSTANCES.get(frame.getInterfaceName());
+            if (handler == null) throw new Exception("unknown interface method!");
+            ByteString bs = handler.process(frame);
+            if (bs != null)
+                result.setBodyBytes(bs);
         } catch (Exception e) {
             log.error("Deal client msg occured error！", e);
             result.setResult(StringConstant.FALSE);

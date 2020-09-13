@@ -36,7 +36,7 @@ public class ClusterTest {
         try {
             config.setTaskStorePath("C:/easyTaskX/node2");
             config.setServerPort(2022);
-            config.setCmdPort(3031);
+            config.setCmdPort(3032);
             initData(config,"Node2");
         } catch (Exception e) {
             e.printStackTrace();
@@ -49,7 +49,7 @@ public class ClusterTest {
         try {
             config.setTaskStorePath("C:/easyTaskX/node3");
             config.setServerPort(2023);
-            config.setCmdPort(3031);
+            config.setCmdPort(3033);
             initData(config,"Node3");
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,7 +62,7 @@ public class ClusterTest {
         try {
             config.setTaskStorePath("C:/easyTaskX/node4");
             config.setServerPort(2024);
-            config.setCmdPort(3031);
+            config.setCmdPort(3034);
             initData(config,"Node4");
         } catch (Exception e) {
             e.printStackTrace();
@@ -97,11 +97,12 @@ public class ClusterTest {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            // printinfo();
+             printinfo();
         }
     }
     private void printinfo() {
         //log.info("集群节点信息：" + ClusterMonitor.getCurrentNodeInfo());
-        log.info("数据库连接池信息：" + ClusterMonitor.getSqlitePoolInfo());
+        //log.info("数据库连接池信息：" + ClusterMonitor.getSqlitePoolInfo());
+        log.info("Broker注册表:"+JSONObject.toJSONString(ClusterMonitor.getBrokerRegisterInfo()));
     }
 }

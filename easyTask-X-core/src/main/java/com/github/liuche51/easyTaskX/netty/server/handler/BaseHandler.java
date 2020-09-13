@@ -26,7 +26,7 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.TRAN_TRYDELTASK,new TranTryDelTaskHandler());
                 put(NettyInterfaceEnum.LEADER_SYNC_DATA_TO_NEW_FOLLOW,new LeaderSyncDataToNewFollowHandler());
                 put(NettyInterfaceEnum.GET_DBINFO_BY_TASKID,new GetDBInfoByTaskIdHandler());
-                put(NettyInterfaceEnum.FOLLOW_TO_LEADER_HEARTBEAT,new HeartbeatHandler());
+                put(NettyInterfaceEnum.Heartbeat,new HeartbeatHandler());
                 put(NettyInterfaceEnum.UPDATE_REGEDIT,new UpdateRegeditHandler());
                 put(NettyInterfaceEnum.NOTIFY_NODE_UPDATE_REGEDIT,new NotifyNodeUpdateRegeditHandler());
                 put(NettyInterfaceEnum.NotifySliceLeaderVoteNewFollow,new NotifySliceLeaderVoteNewFollowHandler());

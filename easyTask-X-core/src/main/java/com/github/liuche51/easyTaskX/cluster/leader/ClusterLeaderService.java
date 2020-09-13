@@ -93,7 +93,7 @@ public class ClusterLeaderService {
     /**
      * 启动集群leader检查所有follows是否存活任务
      */
-    public static TimerTask checkFollowAlive() {
+    public static TimerTask startCheckFollowAliveTask() {
         CheckFollowsAliveTask task=new CheckFollowsAliveTask();
         task.start();
         return task;

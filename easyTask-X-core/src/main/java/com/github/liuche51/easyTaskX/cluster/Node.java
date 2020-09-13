@@ -1,5 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.client.NettyConnectionFactory;
@@ -107,12 +108,13 @@ public class Node implements Serializable {
         this.clusterLeader = clusterLeader;
     }
 
+    @JSONField(serialize = false)
     public String getAddress() {
         StringBuffer str = new StringBuffer(this.host);
         str.append(":").append(this.port);
         return str.toString();
     }
-
+    @JSONField(serialize = false)
     public NettyClient getClient() throws InterruptedException {
         return NettyConnectionFactory.getInstance().getConnection(host, port);
     }
@@ -123,6 +125,7 @@ public class Node implements Serializable {
      * @param tryCount
      * @return
      */
+    @JSONField(serialize = false)
     public NettyClient getClientWithCount(int tryCount) throws Exception {
         if (tryCount == 0) throw new Exception("getClientWithCount()-> exception!");
         try {

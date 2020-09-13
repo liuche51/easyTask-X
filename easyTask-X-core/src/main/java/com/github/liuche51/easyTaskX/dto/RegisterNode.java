@@ -1,5 +1,6 @@
 package com.github.liuche51.easyTaskX.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.github.liuche51.easyTaskX.cluster.Node;
 
 import java.time.ZonedDateTime;
@@ -10,7 +11,9 @@ public class RegisterNode {
     /**
      * 最近一次心跳时间
      */
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private ZonedDateTime lastHeartbeat;
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private ZonedDateTime createTime;
 
     public RegisterNode(Node node){
