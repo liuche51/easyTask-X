@@ -92,7 +92,7 @@ public class ClusterTest {
         //ClusterService.submitTask(schedule);
         //JUnit默认是非守护线程启动和Main方法不同。这里防止当前主线程退出导致子线程也退出了
         while (true) {
-            Thread.sleep(1000);
+            Thread.sleep(2000);
             try {
             } catch (Exception e) {
                 e.printStackTrace();

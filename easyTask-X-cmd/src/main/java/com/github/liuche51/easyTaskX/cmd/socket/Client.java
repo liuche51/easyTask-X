@@ -13,7 +13,16 @@ public class Client {
         if (server == null)
             server = new Socket(host, port);
     }
-
+    public static void close(){
+        if(server!=null){
+            try {
+                server.close();
+                server=null;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     public static String send(String msg) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(server.getInputStream()));
         PrintWriter out = new PrintWriter(server.getOutputStream());

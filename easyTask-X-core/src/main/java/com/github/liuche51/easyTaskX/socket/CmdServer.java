@@ -44,6 +44,12 @@ public class CmdServer {
                 PrintWriter out = new PrintWriter(client.getOutputStream());
                 while (true) {//循环监听当前客户端的发送消息
                     String cmd = in.readLine();
+                    //判断客户端是否已经关闭
+                    if(isClientClose(client))
+                    {
+                        client.close();
+                        break;
+                    }
                     log.info("received cmd client cmd:{}", cmd);
                     Command cm = CmdEngine.parse(cmd);
                     if (cm == null) {
@@ -63,5 +69,18 @@ public class CmdServer {
 
         }
 
+    }
+    /**
+     * 判断是否断开连接，断开返回true,没有返回false
+     * @param socket
+     * @return
+     */
+    public static boolean isClientClose(Socket socket){
+        try{
+            socket.sendUrgentData(0xFF);//发送1个字节的紧急数据，默认情况下，服务器端没有开启紧急数据处理，不影响正常通信
+            return false;
+        }catch(Exception se){
+            return true;
+        }
     }
 }

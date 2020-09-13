@@ -11,8 +11,8 @@ public class CmdEngine {
     static {
         getcmd=new HashMap<String,Object>(){
             {
-                put("getBrokerRegisterInfo","");
-                put("getClinetRegisterInfo","");
+                put("brokerRegisterInfo","");
+                put("clinetRegisterInfo","");
 
             }
         };
