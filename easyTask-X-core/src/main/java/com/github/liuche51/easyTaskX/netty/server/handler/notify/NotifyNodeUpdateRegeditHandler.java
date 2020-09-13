@@ -7,7 +7,7 @@ import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.google.protobuf.ByteString;
 
 /**
- * 集群leader通知当前节点更新注册表信息。
+ * Broker响应集群leader通知当前节点更新注册表信息。
  * 异步执行
  */
 public class NotifyNodeUpdateRegeditHandler extends BaseHandler {

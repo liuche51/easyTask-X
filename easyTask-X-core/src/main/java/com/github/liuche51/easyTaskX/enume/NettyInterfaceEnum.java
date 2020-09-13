@@ -46,14 +46,6 @@ public class NettyInterfaceEnum {
      */
     public static final String FOLLOW_TO_LEADER_HEARTBEAT="FollowToLeaderHeartbeat";
     /**
-     * 获取注册的服务短节点列表信息
-     */
-    public static final String GET_REGISTERED_BOKERS="GetRegisteredBokers";
-    /**
-     * 更新Broker注册表信息
-     */
-    public static final String UPDATE_CLUSTER_LEADER_BROKER_REGEDIT="UpdateClusterLeaderBrokerRegedit";
-    /**
      * 集群leader通知分片follows已经选出新leader
      */
     public static final String NOTIFY_SLICE_FOLLOW_NEW_LEADER="NotifySliceFollowNewLeader";

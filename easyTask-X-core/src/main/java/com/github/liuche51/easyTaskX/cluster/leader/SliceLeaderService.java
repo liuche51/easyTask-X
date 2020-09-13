@@ -59,14 +59,14 @@ public class SliceLeaderService {
     /**
      * 分片leader通知集群leader，已经完成对新follow的数据同步。请求更新数据同步状态
      */
-    public static void notifyClusterLeaderUpdateRegeditForDataStatus(){
+    public static void notifyClusterLeaderUpdateRegeditForDataStatus(String followAddress,String dataStatus){
         ClusterService.getConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 try {
                     Dto.Frame.Builder builder=Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setBody(NettyInterfaceEnum.NotifyClusterLeaderUpdateRegeditForDataStatus)
-                            .setSource(ClusterService.CURRENTNODE.getAddress()).setBody(String.valueOf(NodeSyncDataStatusEnum.SYNC));
+                            .setSource(ClusterService.CURRENTNODE.getAddress()).setBody(followAddress+"|"+dataStatus);
                     NettyMsgService.sendSyncMsgWithCount(builder,ClusterService.CURRENTNODE.getClusterLeader().getClient(),ClusterService.getConfig().getTryCount(),5,null);
                 }catch (Exception e){
                     log.error("notifyClusterLeaderUpdateRegeditForDataStatus()->exception!",e);

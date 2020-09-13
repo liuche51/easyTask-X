@@ -7,7 +7,7 @@ import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.google.protobuf.ByteString;
 
 /**
- * 集群leader通知分片leader已经选出新follow。通知接收处理
+ * 分片leader响应：集群leader通知分片leader已经选出新follow。通知接收处理
  */
 public class NotifySliceLeaderVoteNewFollowHandler extends BaseHandler {
     @Override

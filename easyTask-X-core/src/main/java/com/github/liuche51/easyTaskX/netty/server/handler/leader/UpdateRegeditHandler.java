@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 更新Broker注册表信息
+ * 集群leader响应Brokers更新注册表信息
  */
 public class UpdateRegeditHandler extends BaseHandler {
     @Override
@@ -47,6 +47,17 @@ public class UpdateRegeditHandler extends BaseHandler {
                     followsBuilder.addNodes(followBuilder.build());
                 }
                 nodeBuilder.setFollows(followsBuilder.build());
+                //leaders
+                NodeDto.NodeList.Builder leadersBuilder= NodeDto.NodeList.newBuilder();
+                Iterator<Map.Entry<String,Node>> items3=node.getNode().getLeaders().entrySet().iterator();
+                while (items3.hasNext()){
+                    Map.Entry<String,Node> item3=items3.next();
+                    Node itNode=item3.getValue();
+                    NodeDto.Node.Builder followBuilder3= NodeDto.Node.newBuilder();
+                    followBuilder3.setHost(itNode.getHost()).setPort(itNode.getPort());
+                    leadersBuilder.addNodes(followBuilder3.build());
+                }
+                nodeBuilder.setLeaders(leadersBuilder.build());
                 return nodeBuilder.build().toByteString();
             case "client":
                 RegisterNode node1=ClusterLeaderService.BROKER_REGISTER_CENTER.get(frame.getSource());

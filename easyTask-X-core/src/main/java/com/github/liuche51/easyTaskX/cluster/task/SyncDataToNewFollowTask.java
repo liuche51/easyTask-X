@@ -46,8 +46,8 @@ public class SyncDataToNewFollowTask extends OnceTask {
             while (!isExit()) {
                 //获取批次数据
                 List<ScheduleSync> list = ScheduleSyncDao.selectByFollowAndStatusWithCount(newFollow.getAddress(), ScheduleSyncStatusEnum.UNSYNC, 5);
-                if (list.size() == 0) {//如果已经同步完，标记状态并则跳出循环
-                    SliceLeaderService.notifyClusterLeaderUpdateRegeditForDataStatus();
+                if (list.size() == 0) {//如果已经同步完，通知集群leader更新注册表状态并则跳出循环
+                    SliceLeaderService.notifyClusterLeaderUpdateRegeditForDataStatus(newFollow.getAddress(),String.valueOf(NodeSyncDataStatusEnum.SYNC));
                     setExit(true);
                     break;
                 }
@@ -58,13 +58,6 @@ public class SyncDataToNewFollowTask extends OnceTask {
                 if (ret)
                     ScheduleSyncDao.updateStatusByFollowAndStatus(newFollow.getAddress(), ScheduleSyncStatusEnum.SYNCING, ScheduleSyncStatusEnum.SYNCED);
             }
-        } catch (VotingException e) {
-            //同步数据异常，进入选举新follow。但此时刚好有其他地方触发正在选举中。当前新follow可能又失效了。
-            //此时就没必要继续同步数据给当前新follow了。终止同步线程
-            log.error("normally exception error.can ignore."+e.getMessage());
-        } catch (VotedException e) {
-            //原因同上VotingException
-            log.error("normally exception error.can ignore."+e.getMessage());
         } catch (Exception e) {
             log.error("syncDataToNewFollow() exception!", e);
         }

@@ -8,7 +8,7 @@ import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.google.protobuf.ByteString;
 
 /**
- * 处理选举的新分片leader后续逻辑
+ * 分片follow响应：集群leader通知分片follows，已经选举了新分片leader
  */
 public class NotiyNewSliceLeaderHandler extends BaseHandler {
     @Override
