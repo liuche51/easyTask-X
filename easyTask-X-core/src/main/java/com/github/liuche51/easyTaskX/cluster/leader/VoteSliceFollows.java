@@ -172,6 +172,8 @@ public class VoteSliceFollows {
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NotifySliceLeaderVoteNewFollow)
                             .setSource(ClusterService.CURRENTNODE.getAddress()).setBody(newFollowAddress + "|" + oldFollowAddress);
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                    if(!ret)
+                        log.info("normally exception!notifySliceLeaderVoteNewFollow() failed.");
                 } catch (Exception e) {
                     log.error("", e);
                 }

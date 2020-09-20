@@ -66,7 +66,9 @@ public class SliceLeaderService {
                     Dto.Frame.Builder builder=Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setBody(NettyInterfaceEnum.NotifyClusterLeaderUpdateRegeditForDataStatus)
                             .setSource(ClusterService.CURRENTNODE.getAddress()).setBody(followAddress+"|"+dataStatus);
-                    NettyMsgService.sendSyncMsgWithCount(builder,ClusterService.CURRENTNODE.getClusterLeader().getClient(),ClusterService.getConfig().getAdvanceConfig().getTryCount(),5,null);
+                    boolean ret=NettyMsgService.sendSyncMsgWithCount(builder,ClusterService.CURRENTNODE.getClusterLeader().getClient(),ClusterService.getConfig().getAdvanceConfig().getTryCount(),5,null);
+                    if(!ret)
+                        log.info("normally exception!notifyClusterLeaderUpdateRegeditForDataStatus() failed.");
                 }catch (Exception e){
                     log.error("notifyClusterLeaderUpdateRegeditForDataStatus()->exception!",e);
                 }

@@ -45,6 +45,8 @@ public class ClusterLeaderService {
                         builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NOTIFY_NODE_UPDATE_REGEDIT)
                                 .setSource(ClusterService.CURRENTNODE.getAddress());
                         boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, x.getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5,null);
+                        if(!ret)
+                            log.info("normally exception!notifyNodeUpdateRegedit() failed.");
                     } catch (Exception e) {
                         log.error("", e);
                     }
@@ -88,6 +90,8 @@ public class ClusterLeaderService {
                 ClusterService.CURRENTNODE.setLeaders(leaders);
                 ClusterService.CURRENTNODE.setLastHeartbeat(ZonedDateTime.now());
                 return true;
+            }else {
+                log.info("normally exception!requestUpdateRegedit() failed.");
             }
         } catch (Exception e) {
             log.error("", e);
