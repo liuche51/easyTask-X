@@ -1,6 +1,5 @@
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.cluster.Node;
-import com.github.liuche51.easyTaskX.cluster.leader.SliceLeaderService;
+import com.github.liuche51.easyTaskX.dto.Node;
 
 import com.github.liuche51.easyTaskX.util.Util;
 import org.junit.Test;

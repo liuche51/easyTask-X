@@ -1,7 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.task;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.dto.Node;
 
 import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteClusterLeader;
@@ -42,7 +42,7 @@ public class HeartbeatsTask extends TimerTask {
                 log.error("", e);
             }
             try {
-                Thread.sleep(ClusterService.getConfig().getHeartBeat());
+                Thread.sleep(ClusterService.getConfig().getAdvanceConfig().getHeartBeat());
             } catch (InterruptedException e) {
                 log.error("", e);
             }

@@ -1,26 +1,21 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.task.CheckFollowsAliveTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.ByteStringPack;
 import com.github.liuche51.easyTaskX.dto.RegisterNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
-import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
-import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
-import com.google.protobuf.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ClusterLeaderService {
@@ -42,14 +37,14 @@ public class ClusterLeaderService {
     public static void notifyNodeUpdateRegedit(List<Node> nodes) {
 
         nodes.forEach(x -> {
-            ClusterService.getConfig().getClusterPool().submit(new Runnable() {
+            ClusterService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                         builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NOTIFY_NODE_UPDATE_REGEDIT)
                                 .setSource(ClusterService.CURRENTNODE.getAddress());
-                        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, x.getClient(), ClusterService.getConfig().getTryCount(), 5,null);
+                        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, x.getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5,null);
                     } catch (Exception e) {
                         log.error("", e);
                     }
@@ -70,7 +65,7 @@ public class ClusterLeaderService {
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.UPDATE_REGEDIT).setSource(ClusterService.getConfig().getAddress())
             .setBody("broker");
             ByteStringPack respPack =new ByteStringPack();
-            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, ClusterService.CURRENTNODE.getClusterLeader().getClient(), ClusterService.getConfig().getTryCount(), 5, respPack);
+            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, ClusterService.CURRENTNODE.getClusterLeader().getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
             if (ret) {
                 NodeDto.Node node = NodeDto.Node.parseFrom(respPack.getRespbody());
                 NodeDto.NodeList clientNodes = node.getClients();
@@ -91,6 +86,7 @@ public class ClusterLeaderService {
                 ClusterService.CURRENTNODE.setFollows(follows);
                 ClusterService.CURRENTNODE.setClients(clients);
                 ClusterService.CURRENTNODE.setLeaders(leaders);
+                ClusterService.CURRENTNODE.setLastHeartbeat(ZonedDateTime.now());
                 return true;
             }
         } catch (Exception e) {

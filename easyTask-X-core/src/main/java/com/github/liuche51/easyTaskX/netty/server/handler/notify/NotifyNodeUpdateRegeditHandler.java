@@ -14,7 +14,7 @@ public class NotifyNodeUpdateRegeditHandler extends BaseHandler {
 
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {
-        ClusterService.getConfig().getClusterPool().submit(new Runnable() {
+        ClusterService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 ClusterLeaderService.requestUpdateRegedit();

@@ -1,8 +1,6 @@
 package com.github.liuche51.easyTaskX.netty.server.handler.leader;
 
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
-import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
 import com.github.liuche51.easyTaskX.dto.RegisterNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
@@ -12,7 +10,6 @@ import com.google.protobuf.ByteString;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 集群leader响应Brokers更新注册表信息

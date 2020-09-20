@@ -1,6 +1,7 @@
-package com.github.liuche51.easyTaskX.cluster;
+package com.github.liuche51.easyTaskX.dto;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.client.NettyConnectionFactory;
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -37,6 +39,8 @@ public class Node implements Serializable {
      * 集群leader
      */
     private Node clusterLeader=null;
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
+    private ZonedDateTime lastHeartbeat;
     public Node(String host, int port,boolean simple) {
         this.host = host;
         this.port = port;
@@ -115,6 +119,14 @@ public class Node implements Serializable {
 
     public void setClusterLeader(Node clusterLeader) {
         this.clusterLeader = clusterLeader;
+    }
+
+    public ZonedDateTime getLastHeartbeat() {
+        return lastHeartbeat;
+    }
+
+    public void setLastHeartbeat(ZonedDateTime lastHeartbeat) {
+        this.lastHeartbeat = lastHeartbeat;
     }
 
     @JSONField(serialize = false)

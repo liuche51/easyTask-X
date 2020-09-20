@@ -1,13 +1,13 @@
 package com.github.liuche51.easyTaskX.cluster;
 
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.leader.DeleteTaskTCC;
-import com.github.liuche51.easyTaskX.cluster.leader.SliceLeaderService;
 import com.github.liuche51.easyTaskX.cluster.leader.SaveTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteSliceFollows;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
-import com.github.liuche51.easyTaskX.cluster.task.tran.*;
 import com.github.liuche51.easyTaskX.dao.*;
+import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.dto.Schedule;
 import com.github.liuche51.easyTaskX.netty.server.NettyServer;
 import com.github.liuche51.easyTaskX.socket.CmdServer;
@@ -80,13 +80,14 @@ public class ClusterService {
         clearThreadTask();
         deleteAllData();
         CURRENTNODE = new Node(Util.getLocalIP(), ClusterService.getConfig().getServerPort());
-        timerTasks.add(heartBeatToClusterLeader());
+        timerTasks.add(BrokerService.startHeartBeat());
         timerTasks.add(clearDataTask());
-        timerTasks.add(commitSaveTransactionTask());
-        timerTasks.add(commitDelTransactionTask());
-        timerTasks.add(cancelSaveTransactionTask());
-        timerTasks.add(retryCancelSaveTransactionTask());
-        timerTasks.add(retryDelTransactionTask());
+        timerTasks.add(BrokerService.startCommitSaveTransactionTask());
+        timerTasks.add(BrokerService.startCommitDelTransactionTask());
+        timerTasks.add(BrokerService.startCancelSaveTransactionTask());
+        timerTasks.add(BrokerService.startRetryCancelSaveTransactionTask());
+        timerTasks.add(BrokerService.startRetryDelTransactionTask());
+        timerTasks.add(BrokerService.startUpdateRegeditTask());
     }
     /**
      * 客户端提交任务。允许线程等待，直到easyTask组件启动完成
@@ -194,54 +195,6 @@ public class ClusterService {
             x.setExit(true);
         });
         onceTasks.clear();
-    }
-    /**
-     * 启动批量事务数据提交任务
-     */
-    public static TimerTask commitSaveTransactionTask() {
-        CommitSaveTransactionTask task=new CommitSaveTransactionTask();
-        task.start();
-        return task;
-    }
-    /**
-     * 启动批量事务数据删除任务
-     */
-    public static TimerTask commitDelTransactionTask() {
-        CommitDelTransactionTask task=new CommitDelTransactionTask();
-        task.start();
-        return task;
-    }
-    /**
-     * 启动批量事务数据取消提交任务
-     */
-    public static TimerTask cancelSaveTransactionTask() {
-        CancelSaveTransactionTask task=new CancelSaveTransactionTask();
-        task.start();
-        return task;
-    }
-    /**
-     * 启动重试取消保持任务
-     */
-    public static TimerTask retryCancelSaveTransactionTask() {
-        RetryCancelSaveTransactionTask task=new RetryCancelSaveTransactionTask();
-        task.start();
-        return task;
-    }
-    /**
-     * 启动重试删除任务
-     */
-    public static TimerTask retryDelTransactionTask() {
-        RetryDelTransactionTask task=new RetryDelTransactionTask();
-        task.start();
-        return task;
-    }
-    /**
-     * 节点对集群leader的心跳。2s一次
-     */
-    public static TimerTask heartBeatToClusterLeader() {
-        HeartbeatsTask task=new HeartbeatsTask();
-        task.start();
-        return task;
     }
 
 }

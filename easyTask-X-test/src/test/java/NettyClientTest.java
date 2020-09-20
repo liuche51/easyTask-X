@@ -1,8 +1,7 @@
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.cluster.ClusterUtil;
 import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
-import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
@@ -24,8 +23,8 @@ public class NettyClientTest {
     @Test
     public void sendSyncMsg() throws Exception {
         EasyTaskConfig config=new EasyTaskConfig();
-        config.setTimeOut(30);
-        config.setNettyPoolSize(2);
+        config.getAdvanceConfig().setTimeOut(30);
+        config.getAdvanceConfig().setNettyPoolSize(2);
         //ClusterService.setConfig(config);
         try {
             while (true){

@@ -3,7 +3,7 @@ package com.github.liuche51.easyTaskX.monitor;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.dto.Node;
 
 import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
 import com.github.liuche51.easyTaskX.dao.SQLliteMultiPool;
@@ -17,9 +17,7 @@ import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
-import com.github.liuche51.easyTaskX.zk.ZKService;
 
-import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,7 +55,7 @@ public class ClusterMonitor {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.GET_DBINFO_BY_TASKID).setSource(ClusterService.getConfig().getAddress())
                     .setBody(taskId);
-            NettyClient client = item.getClientWithCount(ClusterService.getConfig().getTryCount());
+            NettyClient client = item.getClientWithCount(ClusterService.getConfig().getAdvanceConfig().getTryCount());
             Object ret = NettyMsgService.sendSyncMsg(client,builder.build());
             Dto.Frame frame = (Dto.Frame) ret;
             ResultDto.Result result = ResultDto.Result.parseFrom(frame.getBodyBytes());

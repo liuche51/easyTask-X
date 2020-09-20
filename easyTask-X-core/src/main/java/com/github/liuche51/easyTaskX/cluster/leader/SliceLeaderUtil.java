@@ -1,23 +1,18 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
-import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
-import com.github.liuche51.easyTaskX.cluster.ClusterUtil;
-import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.dto.Schedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
-import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * leader类
@@ -42,7 +37,7 @@ public class SliceLeaderUtil {
         builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LEADER_SYNC_DATA_TO_NEW_FOLLOW).setSource(ClusterService.getConfig().getAddress())
                 .setBodyBytes(builder0.build().toByteString());
         NettyClient client = follow.getClientWithCount(1);
-        boolean ret =NettyMsgService.sendSyncMsgWithCount(builder,client,ClusterService.getConfig().getTryCount(),5,null);
+        boolean ret =NettyMsgService.sendSyncMsgWithCount(builder,client,ClusterService.getConfig().getAdvanceConfig().getTryCount(),5,null);
         return ret;
     }
 }

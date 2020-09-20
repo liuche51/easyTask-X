@@ -1,7 +1,6 @@
 package com.github.liuche51.easyTaskX.util;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.cluster.Node;
 
 import java.io.File;
 import java.io.IOException;

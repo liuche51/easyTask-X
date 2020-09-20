@@ -24,7 +24,7 @@ public class OnceTasksClearTask extends TimerTask {
                 log.error("", e);
             }
             try {
-                Thread.sleep(ClusterService.getConfig().getClearScheduleBakTime());
+                Thread.sleep(ClusterService.getConfig().getAdvanceConfig().getClearScheduleBakTime());
             } catch (InterruptedException e) {
                 log.error("", e);
             }

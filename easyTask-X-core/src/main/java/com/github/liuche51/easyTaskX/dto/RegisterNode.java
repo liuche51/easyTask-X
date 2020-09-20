@@ -1,10 +1,8 @@
 package com.github.liuche51.easyTaskX.dto;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.github.liuche51.easyTaskX.cluster.Node;
 
 import java.time.ZonedDateTime;
-import java.util.Date;
 
 public class RegisterNode {
     private Node node;

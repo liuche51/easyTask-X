@@ -1,14 +1,12 @@
 package com.github.liuche51.easyTaskX.netty.server.handler;
 
-import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
 import com.github.liuche51.easyTaskX.dto.RegisterNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
-import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.google.protobuf.ByteString;
 
 import java.time.ZonedDateTime;
-import java.util.Date;
 
 /**
  * 节点心跳信息处理

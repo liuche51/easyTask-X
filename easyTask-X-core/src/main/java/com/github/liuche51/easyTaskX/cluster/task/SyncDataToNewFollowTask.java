@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.task;
 
-import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.leader.SliceLeaderService;
 import com.github.liuche51.easyTaskX.cluster.leader.SliceLeaderUtil;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
@@ -9,8 +9,6 @@ import com.github.liuche51.easyTaskX.dto.Schedule;
 import com.github.liuche51.easyTaskX.dto.ScheduleSync;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 import com.github.liuche51.easyTaskX.enume.ScheduleSyncStatusEnum;
-import com.github.liuche51.easyTaskX.util.exception.VotedException;
-import com.github.liuche51.easyTaskX.util.exception.VotingException;
 
 import java.util.List;
 /**

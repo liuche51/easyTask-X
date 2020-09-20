@@ -1,15 +1,12 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.dto.Node;
 
 import com.github.liuche51.easyTaskX.dto.RegisterNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
-import com.github.liuche51.easyTaskX.netty.client.NettyConnectionFactory;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.util.exception.VotedException;
@@ -167,14 +164,14 @@ public class VoteSliceFollows {
      * @param newFollowAddress
      */
     public static void notifySliceLeaderVoteNewFollow(Node leader, String newFollowAddress, String oldFollowAddress) {
-        ClusterService.getConfig().getClusterPool().submit(new Runnable() {
+        ClusterService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NotifySliceLeaderVoteNewFollow)
                             .setSource(ClusterService.CURRENTNODE.getAddress()).setBody(newFollowAddress + "|" + oldFollowAddress);
-                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), ClusterService.getConfig().getTryCount(), 5, null);
+                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                 } catch (Exception e) {
                     log.error("", e);
                 }

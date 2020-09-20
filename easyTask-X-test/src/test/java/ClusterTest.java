@@ -69,7 +69,7 @@ public class ClusterTest {
         }
     }
     private void initData(EasyTaskConfig config,String name) throws Exception {
-        config.setSQLlitePoolSize(5);
+        config.getAdvanceConfig().setSQLlitePoolSize(5);
         config.setZkAddress("127.0.0.1:2181");
         ClusterService.start(config);
         Schedule schedule=new Schedule();

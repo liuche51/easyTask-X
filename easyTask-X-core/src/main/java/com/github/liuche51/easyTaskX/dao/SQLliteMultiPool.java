@@ -45,7 +45,7 @@ public class SQLliteMultiPool {
         pools.put(StringConstant.SCHEDULE_BAK, new ConcurrentLinkedQueue<Connection>());
         pools.put(StringConstant.SCHEDULE_SYNC, new ConcurrentLinkedQueue<Connection>());
         pools.put(StringConstant.TRANSACTION_LOG, new ConcurrentLinkedQueue<Connection>());
-        for (int i = 0; i < ClusterService.getConfig().getsQLlitePoolSize(); i++) {
+        for (int i = 0; i < ClusterService.getConfig().getAdvanceConfig().getsQLlitePoolSize(); i++) {
             Connection con1 = createConnection(StringConstant.SCHEDULE);
             Connection con2 = createConnection(StringConstant.SCHEDULE_BAK);
             Connection con3 = createConnection(StringConstant.SCHEDULE_SYNC);
@@ -103,7 +103,7 @@ public class SQLliteMultiPool {
      */
     public void freeConnection(Connection conn,String dbName) {
         ConcurrentLinkedQueue<Connection> pool = pools.get(dbName);
-        if (pool.size() < ClusterService.getConfig().getsQLlitePoolSize()) {
+        if (pool.size() < ClusterService.getConfig().getAdvanceConfig().getsQLlitePoolSize()) {
             pool.add(conn);
         } else {
             try {

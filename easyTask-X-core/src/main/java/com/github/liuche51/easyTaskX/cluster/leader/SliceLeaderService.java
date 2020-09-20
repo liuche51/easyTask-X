@@ -1,12 +1,11 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
-import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
@@ -60,14 +59,14 @@ public class SliceLeaderService {
      * 分片leader通知集群leader，已经完成对新follow的数据同步。请求更新数据同步状态
      */
     public static void notifyClusterLeaderUpdateRegeditForDataStatus(String followAddress,String dataStatus){
-        ClusterService.getConfig().getClusterPool().submit(new Runnable() {
+        ClusterService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 try {
                     Dto.Frame.Builder builder=Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setBody(NettyInterfaceEnum.NotifyClusterLeaderUpdateRegeditForDataStatus)
                             .setSource(ClusterService.CURRENTNODE.getAddress()).setBody(followAddress+"|"+dataStatus);
-                    NettyMsgService.sendSyncMsgWithCount(builder,ClusterService.CURRENTNODE.getClusterLeader().getClient(),ClusterService.getConfig().getTryCount(),5,null);
+                    NettyMsgService.sendSyncMsgWithCount(builder,ClusterService.CURRENTNODE.getClusterLeader().getClient(),ClusterService.getConfig().getAdvanceConfig().getTryCount(),5,null);
                 }catch (Exception e){
                     log.error("notifyClusterLeaderUpdateRegeditForDataStatus()->exception!",e);
                 }

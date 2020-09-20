@@ -1,7 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.task;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteSliceLeader;
 import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteSliceFollows;
@@ -30,7 +30,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                 log.error("CheckFollowsAliveTask()", e);
             }
             try {
-                Thread.sleep(ClusterService.getConfig().getHeartBeat());
+                Thread.sleep(ClusterService.getConfig().getAdvanceConfig().getHeartBeat());
             } catch (InterruptedException e) {
                 log.error("CheckFollowsAliveTask()", e);
             }
@@ -46,7 +46,7 @@ public class CheckFollowsAliveTask extends TimerTask {
         while (items.hasNext()) {
             Map.Entry<String, RegisterNode> item = items.next();
             RegisterNode regNode = item.getValue();
-            ClusterService.getConfig().getClusterPool().submit(new Runnable() {
+            ClusterService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
                 @Override
                 public void run() {
                     //分片leader节点失效,且有follows。选新leader

@@ -1,7 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.cluster.Node;
+import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
@@ -51,7 +51,7 @@ public class VoteSliceLeader {
             while (items.hasNext()) {
                 Map.Entry<String, Node> item = items.next();
                 Node node = item.getValue();
-                NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), ClusterService.getConfig().getTryCount(), 5, null);
+                NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
             }
             return true;
         } catch (Exception e) {

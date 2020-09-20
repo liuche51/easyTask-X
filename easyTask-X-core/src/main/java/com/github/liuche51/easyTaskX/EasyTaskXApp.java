@@ -70,15 +70,17 @@ public class EasyTaskXApp {
         String serverPort = properties.getProperty("serverPort");
         String cmdPort = properties.getProperty("cmdPort");
         String backupCount = properties.getProperty("backupCount");
-        String dbPoolSize = properties.getProperty("dbPoolSize");
-        String nettyPoolSize = properties.getProperty("nettyPoolSize");
-        String timeOut = properties.getProperty("timeOut");
-        String heartBeat = properties.getProperty("heartBeat");
-        String tryCount = properties.getProperty("tryCount");
-        String clearScheduleBakTime = properties.getProperty("clearScheduleBakTime");
-        String clusterPool_corePoolSize = properties.getProperty("clusterPool.corePoolSize");
-        String clusterPool_maximumPoolSize = properties.getProperty("clusterPool.maximumPoolSize");
-        String clusterPool_keepAliveTime = properties.getProperty("clusterPool.keepAliveTime");
+        //一下时高级配置项
+        String dbPoolSize = properties.getProperty("advanceConfig.dbPoolSize");
+        String nettyPoolSize = properties.getProperty("advanceConfig.nettyPoolSize");
+        String timeOut = properties.getProperty("advanceConfig.timeOut");
+        String heartBeat = properties.getProperty("advanceConfig.heartBeat");
+        String tryCount = properties.getProperty("advanceConfig.tryCount");
+        String updateRegeditTime = properties.getProperty("advanceConfig.updateRegeditTime");
+        String clearScheduleBakTime = properties.getProperty("advanceConfig.clearScheduleBakTime");
+        String clusterPool_corePoolSize = properties.getProperty("advanceConfig.clusterPool.corePoolSize");
+        String clusterPool_maximumPoolSize = properties.getProperty("advanceConfig.clusterPool.maximumPoolSize");
+        String clusterPool_keepAliveTime = properties.getProperty("advanceConfig.clusterPool.keepAliveTime");
         EasyTaskConfig config = new EasyTaskConfig();
         config.setZkAddress(zkAddress);
         config.setTaskStorePath(taskStorePath);
@@ -90,21 +92,23 @@ public class EasyTaskXApp {
         if (!StringUtils.isNullOrEmpty(backupCount))
             config.setBackupCount(Integer.parseInt(backupCount));
         if (!StringUtils.isNullOrEmpty(dbPoolSize))
-            config.setSQLlitePoolSize(Integer.parseInt(dbPoolSize));
+            config.getAdvanceConfig().setSQLlitePoolSize(Integer.parseInt(dbPoolSize));
         if (!StringUtils.isNullOrEmpty(nettyPoolSize))
-            config.setNettyPoolSize(Integer.parseInt(nettyPoolSize));
+            config.getAdvanceConfig().setNettyPoolSize(Integer.parseInt(nettyPoolSize));
         if (!StringUtils.isNullOrEmpty(timeOut))
-            config.setTimeOut(Integer.parseInt(timeOut));
+            config.getAdvanceConfig().setTimeOut(Integer.parseInt(timeOut));
         if (!StringUtils.isNullOrEmpty(heartBeat))
-            config.setHeartBeat(Integer.parseInt(heartBeat));
+            config.getAdvanceConfig().setHeartBeat(Integer.parseInt(heartBeat));
         if (!StringUtils.isNullOrEmpty(tryCount))
-            config.setTryCount(Integer.parseInt(tryCount));
+            config.getAdvanceConfig().setTryCount(Integer.parseInt(tryCount));
+        if (!StringUtils.isNullOrEmpty(updateRegeditTime))
+            config.getAdvanceConfig().setUpdateRegeditTime(Integer.parseInt(updateRegeditTime));
         if (!StringUtils.isNullOrEmpty(clearScheduleBakTime))
-            config.setClearScheduleBakTime(Integer.parseInt(clearScheduleBakTime));
+            config.getAdvanceConfig().setClearScheduleBakTime(Integer.parseInt(clearScheduleBakTime));
         if (!StringUtils.isNullOrEmpty(clusterPool_corePoolSize) && !StringUtils.isNullOrEmpty(clusterPool_maximumPoolSize) && !StringUtils.isNullOrEmpty(clusterPool_keepAliveTime)) {
             ThreadPoolExecutor cluster = new ThreadPoolExecutor(Integer.parseInt(clusterPool_corePoolSize), Integer.parseInt(clusterPool_maximumPoolSize), Integer.parseInt(clusterPool_keepAliveTime), TimeUnit.SECONDS,
                     new LinkedBlockingQueue<Runnable>());
-            config.setClusterPool(cluster);
+            config.getAdvanceConfig().setClusterPool(cluster);
         }
         return config;
     }

@@ -4,6 +4,7 @@ import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,14 +28,6 @@ public class EasyTaskConfig {
      */
     private String taskStorePath;
     /**
-     * sqlite连接池大小设置。默认3
-     */
-    private int dbPoolSize = 3;
-    /**
-     * Netty客户端连接池大小设置。默认3
-     */
-    private int nettyPoolSize = 3;
-    /**
      * 设置当前节点Netty服务端口号。默认2020
      */
     private int serverPort = 2020;
@@ -43,32 +36,9 @@ public class EasyTaskConfig {
      */
     private int cmdPort = 3030;
     /**
-     * 设置集群Netty通信调用超时时间。默认30秒
+     * 高级配置项
      */
-    private int timeOut = 30;
-    /**
-     * 集群节点失效判定时间。默认10s
-     */
-    private int loseTimeOut = 10;
-    /**
-     * 节点对zk的心跳频率。默认2s一次
-     */
-    private int heartBeat = 2;
-    /**
-     * 集群节点之间通信失败重试次数。默认2次
-     */
-    private int tryCount = 2;
-    /**
-     * 清理任务备份表中失效的leader备份。默认1小时一次。单位毫秒
-     */
-    private int clearScheduleBakTime = 36500000;
-    /**
-     * 集群公用程池
-     */
-    private ExecutorService clusterPool = null;
-    private String clusterPool_corePoolSize;
-    private String clusterPool_maximumPoolSize;
-    private String clusterPool_keepAliveTime;
+    private AdvanceConfig advanceConfig=new AdvanceConfig();
 
     public String getZkAddress() {
         return zkAddress;
@@ -102,31 +72,6 @@ public class EasyTaskConfig {
         this.taskStorePath = path;
     }
 
-    public int getsQLlitePoolSize() {
-        return dbPoolSize;
-    }
-
-    /**
-     * set SQLlitePool Size，default qty 3
-     *
-     * @param dbPoolSize
-     * @throws Exception
-     */
-    public void setSQLlitePoolSize(int dbPoolSize) throws Exception {
-        if (dbPoolSize < 1)
-            throw new Exception("sQLlitePoolSize must >1");
-        this.dbPoolSize = dbPoolSize;
-    }
-
-    public int getNettyPoolSize() {
-        return nettyPoolSize;
-    }
-
-    public void setNettyPoolSize(int nettyPoolSize) throws Exception {
-        if (nettyPoolSize < 1)
-            throw new Exception("nettyPoolSize must >1");
-        this.nettyPoolSize = nettyPoolSize;
-    }
 
     public String getAddress() throws Exception {
         StringBuffer buffer = new StringBuffer(Util.getLocalIP());
@@ -158,71 +103,26 @@ public class EasyTaskConfig {
         this.cmdPort = cmdPort;
     }
 
-    public int getTimeOut() {
-        return timeOut;
+    public AdvanceConfig getAdvanceConfig() {
+        return advanceConfig;
     }
 
-    public void setTimeOut(int timeOut) {
-        this.timeOut = timeOut;
-    }
-
-    public int getLoseTimeOut() {
-        return loseTimeOut;
-    }
-
-    public void setLoseTimeOut(int loseTimeOut) {
-        this.loseTimeOut = loseTimeOut;
-    }
-
-    public int getHeartBeat() {
-        return heartBeat * 1000;
-    }
-
-    public void setHeartBeat(int heartBeat) {
-        this.heartBeat = heartBeat;
-    }
-
-    public int getTryCount() {
-        return tryCount;
-    }
-
-    public void setTryCount(int tryCount) {
-        this.tryCount = tryCount;
-    }
-
-    public int getClearScheduleBakTime() {
-        return clearScheduleBakTime;
-    }
-
-    public void setClearScheduleBakTime(int clearScheduleBakTime) {
-        this.clearScheduleBakTime = clearScheduleBakTime;
-    }
-
-    public ExecutorService getClusterPool() {
-        return clusterPool;
-    }
-
-    /**
-     * 设置集群总线程池
-     *
-     * @param clusterPool
-     * @throws Exception
-     */
-    public void setClusterPool(ThreadPoolExecutor clusterPool) throws Exception {
-        this.clusterPool = clusterPool;
+    public void setAdvanceConfig(AdvanceConfig advanceConfig) {
+        this.advanceConfig = advanceConfig;
     }
 
     /**
      * 必填项验证
+     *
      * @param config
      * @throws Exception
      */
     public static void validateNecessary(EasyTaskConfig config) throws Exception {
-        if(StringUtils.isNullOrEmpty(config.zkAddress))
+        if (StringUtils.isNullOrEmpty(config.zkAddress))
             throw new Exception("zkAddress is necessary!");
-        if(StringUtils.isNullOrEmpty(config.taskStorePath))
+        if (StringUtils.isNullOrEmpty(config.taskStorePath))
             throw new Exception("taskStorePath is necessary!");
-        if(config.clusterPool==null)
-            config.clusterPool=Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
+        if (config.getAdvanceConfig().getClusterPool() == null)
+            config.getAdvanceConfig().setClusterPool(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2));
     }
 }
