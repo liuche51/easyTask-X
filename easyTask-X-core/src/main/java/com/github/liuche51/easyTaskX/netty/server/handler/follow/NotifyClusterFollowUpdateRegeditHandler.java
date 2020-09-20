@@ -1,10 +1,7 @@
 package com.github.liuche51.easyTaskX.netty.server.handler.follow;
 
 import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
-import com.github.liuche51.easyTaskX.dto.BaseNode;
-import com.github.liuche51.easyTaskX.dto.Node;
-import com.github.liuche51.easyTaskX.dto.RegBroker;
-import com.github.liuche51.easyTaskX.dto.RegNode;
+import com.github.liuche51.easyTaskX.dto.*;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
@@ -15,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 集群分片follow处理来自集群leader注册表的同步通知。
+ * 区分是Broker端还是Client端
  */
 public class NotifyClusterFollowUpdateRegeditHandler extends BaseHandler {
 
@@ -55,13 +53,22 @@ public class NotifyClusterFollowUpdateRegeditHandler extends BaseHandler {
                 ClusterLeaderService.BROKER_REGISTER_CENTER.put(regnode.getAddress(), regnode);
             }
         } else if ("Client".equalsIgnoreCase(exts[0])) {
+            RegClient regnode = new RegClient(node.getHost(), node.getPort());
             if ("Delete".equalsIgnoreCase(exts[1]))
-                ClusterLeaderService.CLIENT_REGISTER_CENTER.remove(new Node(node.getHost(), node.getPort()).getAddress());
+                ClusterLeaderService.CLIENT_REGISTER_CENTER.remove(regnode.getAddress());
             else if ("Update".equalsIgnoreCase(exts[1])) {
-
+                NodeDto.NodeList clientNodes = node.getBrokers();
+                ConcurrentHashMap<String, RegNode> brokers = new ConcurrentHashMap<>();
+                clientNodes.getNodesList().forEach(x -> {
+                    RegNode regNode = new RegNode(x.getHost(), x.getPort());
+                    brokers.put(regNode.getAddress(), regNode);
+                });
+                regnode.setBrokers(brokers);
+                regnode.setCreateTime(ZonedDateTime.now());
+                regnode.setLastHeartbeat(ZonedDateTime.now());
+                ClusterLeaderService.CLIENT_REGISTER_CENTER.put(regnode.getAddress(), regnode);
             }
         }
-
         return null;
     }
 }

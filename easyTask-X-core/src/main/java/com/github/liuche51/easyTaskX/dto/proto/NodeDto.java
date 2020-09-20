@@ -63,37 +63,51 @@ public final class NodeDto {
      */
     NodeListOrBuilder getClientsOrBuilder();
 
-    // optional .NodeList follows = 5;
+    // optional .NodeList brokers = 5;
     /**
-     * <code>optional .NodeList follows = 5;</code>
+     * <code>optional .NodeList brokers = 5;</code>
+     */
+    boolean hasBrokers();
+    /**
+     * <code>optional .NodeList brokers = 5;</code>
+     */
+    NodeList getBrokers();
+    /**
+     * <code>optional .NodeList brokers = 5;</code>
+     */
+    NodeListOrBuilder getBrokersOrBuilder();
+
+    // optional .NodeList follows = 6;
+    /**
+     * <code>optional .NodeList follows = 6;</code>
      */
     boolean hasFollows();
     /**
-     * <code>optional .NodeList follows = 5;</code>
+     * <code>optional .NodeList follows = 6;</code>
      */
     NodeList getFollows();
     /**
-     * <code>optional .NodeList follows = 5;</code>
+     * <code>optional .NodeList follows = 6;</code>
      */
     NodeListOrBuilder getFollowsOrBuilder();
 
-    // optional .NodeList leaders = 6;
+    // optional .NodeList leaders = 7;
     /**
-     * <code>optional .NodeList leaders = 6;</code>
+     * <code>optional .NodeList leaders = 7;</code>
      */
     boolean hasLeaders();
     /**
-     * <code>optional .NodeList leaders = 6;</code>
+     * <code>optional .NodeList leaders = 7;</code>
      */
     NodeList getLeaders();
     /**
-     * <code>optional .NodeList leaders = 6;</code>
+     * <code>optional .NodeList leaders = 7;</code>
      */
     NodeListOrBuilder getLeadersOrBuilder();
 
-    // optional string ext = 7;
+    // optional string ext = 8;
     /**
-     * <code>optional string ext = 7;</code>
+     * <code>optional string ext = 8;</code>
      *
      * <pre>
      *扩展字段。特殊标志用
@@ -101,7 +115,7 @@ public final class NodeDto {
      */
     boolean hasExt();
     /**
-     * <code>optional string ext = 7;</code>
+     * <code>optional string ext = 8;</code>
      *
      * <pre>
      *扩展字段。特殊标志用
@@ -109,7 +123,7 @@ public final class NodeDto {
      */
     String getExt();
     /**
-     * <code>optional string ext = 7;</code>
+     * <code>optional string ext = 8;</code>
      *
      * <pre>
      *扩展字段。特殊标志用
@@ -200,12 +214,12 @@ public final class NodeDto {
             case 42: {
               NodeList.Builder subBuilder = null;
               if (((bitField0_ & 0x00000010) == 0x00000010)) {
-                subBuilder = follows_.toBuilder();
+                subBuilder = brokers_.toBuilder();
               }
-              follows_ = input.readMessage(NodeList.PARSER, extensionRegistry);
+              brokers_ = input.readMessage(NodeList.PARSER, extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(follows_);
-                follows_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(brokers_);
+                brokers_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000010;
               break;
@@ -213,6 +227,19 @@ public final class NodeDto {
             case 50: {
               NodeList.Builder subBuilder = null;
               if (((bitField0_ & 0x00000020) == 0x00000020)) {
+                subBuilder = follows_.toBuilder();
+              }
+              follows_ = input.readMessage(NodeList.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(follows_);
+                follows_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000020;
+              break;
+            }
+            case 58: {
+              NodeList.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000040) == 0x00000040)) {
                 subBuilder = leaders_.toBuilder();
               }
               leaders_ = input.readMessage(NodeList.PARSER, extensionRegistry);
@@ -220,11 +247,11 @@ public final class NodeDto {
                 subBuilder.mergeFrom(leaders_);
                 leaders_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000020;
+              bitField0_ |= 0x00000040;
               break;
             }
-            case 58: {
-              bitField0_ |= 0x00000040;
+            case 66: {
+              bitField0_ |= 0x00000080;
               ext_ = input.readBytes();
               break;
             }
@@ -392,65 +419,87 @@ public final class NodeDto {
       return clients_;
     }
 
-    // optional .NodeList follows = 5;
-    public static final int FOLLOWS_FIELD_NUMBER = 5;
-    private NodeList follows_;
+    // optional .NodeList brokers = 5;
+    public static final int BROKERS_FIELD_NUMBER = 5;
+    private NodeList brokers_;
     /**
-     * <code>optional .NodeList follows = 5;</code>
+     * <code>optional .NodeList brokers = 5;</code>
      */
-    public boolean hasFollows() {
+    public boolean hasBrokers() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional .NodeList follows = 5;</code>
+     * <code>optional .NodeList brokers = 5;</code>
+     */
+    public NodeList getBrokers() {
+      return brokers_;
+    }
+    /**
+     * <code>optional .NodeList brokers = 5;</code>
+     */
+    public NodeListOrBuilder getBrokersOrBuilder() {
+      return brokers_;
+    }
+
+    // optional .NodeList follows = 6;
+    public static final int FOLLOWS_FIELD_NUMBER = 6;
+    private NodeList follows_;
+    /**
+     * <code>optional .NodeList follows = 6;</code>
+     */
+    public boolean hasFollows() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional .NodeList follows = 6;</code>
      */
     public NodeList getFollows() {
       return follows_;
     }
     /**
-     * <code>optional .NodeList follows = 5;</code>
+     * <code>optional .NodeList follows = 6;</code>
      */
     public NodeListOrBuilder getFollowsOrBuilder() {
       return follows_;
     }
 
-    // optional .NodeList leaders = 6;
-    public static final int LEADERS_FIELD_NUMBER = 6;
+    // optional .NodeList leaders = 7;
+    public static final int LEADERS_FIELD_NUMBER = 7;
     private NodeList leaders_;
     /**
-     * <code>optional .NodeList leaders = 6;</code>
+     * <code>optional .NodeList leaders = 7;</code>
      */
     public boolean hasLeaders() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
-     * <code>optional .NodeList leaders = 6;</code>
+     * <code>optional .NodeList leaders = 7;</code>
      */
     public NodeList getLeaders() {
       return leaders_;
     }
     /**
-     * <code>optional .NodeList leaders = 6;</code>
+     * <code>optional .NodeList leaders = 7;</code>
      */
     public NodeListOrBuilder getLeadersOrBuilder() {
       return leaders_;
     }
 
-    // optional string ext = 7;
-    public static final int EXT_FIELD_NUMBER = 7;
+    // optional string ext = 8;
+    public static final int EXT_FIELD_NUMBER = 8;
     private Object ext_;
     /**
-     * <code>optional string ext = 7;</code>
+     * <code>optional string ext = 8;</code>
      *
      * <pre>
      *扩展字段。特殊标志用
      * </pre>
      */
     public boolean hasExt() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
+      return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
-     * <code>optional string ext = 7;</code>
+     * <code>optional string ext = 8;</code>
      *
      * <pre>
      *扩展字段。特殊标志用
@@ -471,7 +520,7 @@ public final class NodeDto {
       }
     }
     /**
-     * <code>optional string ext = 7;</code>
+     * <code>optional string ext = 8;</code>
      *
      * <pre>
      *扩展字段。特殊标志用
@@ -496,6 +545,7 @@ public final class NodeDto {
       port_ = 0;
       dataStatus_ = "";
       clients_ = NodeList.getDefaultInstance();
+      brokers_ = NodeList.getDefaultInstance();
       follows_ = NodeList.getDefaultInstance();
       leaders_ = NodeList.getDefaultInstance();
       ext_ = "";
@@ -525,13 +575,16 @@ public final class NodeDto {
         output.writeMessage(4, clients_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeMessage(5, follows_);
+        output.writeMessage(5, brokers_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeMessage(6, leaders_);
+        output.writeMessage(6, follows_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeBytes(7, getExtBytes());
+        output.writeMessage(7, leaders_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeBytes(8, getExtBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -560,15 +613,19 @@ public final class NodeDto {
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, follows_);
+          .computeMessageSize(5, brokers_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(6, leaders_);
+          .computeMessageSize(6, follows_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(7, getExtBytes());
+          .computeMessageSize(7, leaders_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(8, getExtBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -679,6 +736,7 @@ public final class NodeDto {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getClientsFieldBuilder();
+          getBrokersFieldBuilder();
           getFollowsFieldBuilder();
           getLeadersFieldBuilder();
         }
@@ -701,20 +759,26 @@ public final class NodeDto {
           clientsBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000008);
+        if (brokersBuilder_ == null) {
+          brokers_ = NodeList.getDefaultInstance();
+        } else {
+          brokersBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000010);
         if (followsBuilder_ == null) {
           follows_ = NodeList.getDefaultInstance();
         } else {
           followsBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         if (leadersBuilder_ == null) {
           leaders_ = NodeList.getDefaultInstance();
         } else {
           leadersBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000020);
-        ext_ = "";
         bitField0_ = (bitField0_ & ~0x00000040);
+        ext_ = "";
+        bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
 
@@ -766,21 +830,29 @@ public final class NodeDto {
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000010;
         }
+        if (brokersBuilder_ == null) {
+          result.brokers_ = brokers_;
+        } else {
+          result.brokers_ = brokersBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
         if (followsBuilder_ == null) {
           result.follows_ = follows_;
         } else {
           result.follows_ = followsBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
-          to_bitField0_ |= 0x00000020;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
         }
         if (leadersBuilder_ == null) {
           result.leaders_ = leaders_;
         } else {
           result.leaders_ = leadersBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
-          to_bitField0_ |= 0x00000040;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
         }
         result.ext_ = ext_;
         result.bitField0_ = to_bitField0_;
@@ -815,6 +887,9 @@ public final class NodeDto {
         if (other.hasClients()) {
           mergeClients(other.getClients());
         }
+        if (other.hasBrokers()) {
+          mergeBrokers(other.getBrokers());
+        }
         if (other.hasFollows()) {
           mergeFollows(other.getFollows());
         }
@@ -822,7 +897,7 @@ public final class NodeDto {
           mergeLeaders(other.getLeaders());
         }
         if (other.hasExt()) {
-          bitField0_ |= 0x00000040;
+          bitField0_ |= 0x00000080;
           ext_ = other.ext_;
           onChanged();
         }
@@ -1151,18 +1226,135 @@ public final class NodeDto {
         return clientsBuilder_;
       }
 
-      // optional .NodeList follows = 5;
+      // optional .NodeList brokers = 5;
+      private NodeList brokers_ = NodeList.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          NodeList, NodeList.Builder, NodeListOrBuilder> brokersBuilder_;
+      /**
+       * <code>optional .NodeList brokers = 5;</code>
+       */
+      public boolean hasBrokers() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional .NodeList brokers = 5;</code>
+       */
+      public NodeList getBrokers() {
+        if (brokersBuilder_ == null) {
+          return brokers_;
+        } else {
+          return brokersBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .NodeList brokers = 5;</code>
+       */
+      public Builder setBrokers(NodeList value) {
+        if (brokersBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          brokers_ = value;
+          onChanged();
+        } else {
+          brokersBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000010;
+        return this;
+      }
+      /**
+       * <code>optional .NodeList brokers = 5;</code>
+       */
+      public Builder setBrokers(
+          NodeList.Builder builderForValue) {
+        if (brokersBuilder_ == null) {
+          brokers_ = builderForValue.build();
+          onChanged();
+        } else {
+          brokersBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000010;
+        return this;
+      }
+      /**
+       * <code>optional .NodeList brokers = 5;</code>
+       */
+      public Builder mergeBrokers(NodeList value) {
+        if (brokersBuilder_ == null) {
+          if (((bitField0_ & 0x00000010) == 0x00000010) &&
+              brokers_ != NodeList.getDefaultInstance()) {
+            brokers_ =
+              NodeList.newBuilder(brokers_).mergeFrom(value).buildPartial();
+          } else {
+            brokers_ = value;
+          }
+          onChanged();
+        } else {
+          brokersBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000010;
+        return this;
+      }
+      /**
+       * <code>optional .NodeList brokers = 5;</code>
+       */
+      public Builder clearBrokers() {
+        if (brokersBuilder_ == null) {
+          brokers_ = NodeList.getDefaultInstance();
+          onChanged();
+        } else {
+          brokersBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000010);
+        return this;
+      }
+      /**
+       * <code>optional .NodeList brokers = 5;</code>
+       */
+      public NodeList.Builder getBrokersBuilder() {
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return getBrokersFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .NodeList brokers = 5;</code>
+       */
+      public NodeListOrBuilder getBrokersOrBuilder() {
+        if (brokersBuilder_ != null) {
+          return brokersBuilder_.getMessageOrBuilder();
+        } else {
+          return brokers_;
+        }
+      }
+      /**
+       * <code>optional .NodeList brokers = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          NodeList, NodeList.Builder, NodeListOrBuilder>
+          getBrokersFieldBuilder() {
+        if (brokersBuilder_ == null) {
+          brokersBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              NodeList, NodeList.Builder, NodeListOrBuilder>(
+                  brokers_,
+                  getParentForChildren(),
+                  isClean());
+          brokers_ = null;
+        }
+        return brokersBuilder_;
+      }
+
+      // optional .NodeList follows = 6;
       private NodeList follows_ = NodeList.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           NodeList, NodeList.Builder, NodeListOrBuilder> followsBuilder_;
       /**
-       * <code>optional .NodeList follows = 5;</code>
+       * <code>optional .NodeList follows = 6;</code>
        */
       public boolean hasFollows() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional .NodeList follows = 5;</code>
+       * <code>optional .NodeList follows = 6;</code>
        */
       public NodeList getFollows() {
         if (followsBuilder_ == null) {
@@ -1172,7 +1364,7 @@ public final class NodeDto {
         }
       }
       /**
-       * <code>optional .NodeList follows = 5;</code>
+       * <code>optional .NodeList follows = 6;</code>
        */
       public Builder setFollows(NodeList value) {
         if (followsBuilder_ == null) {
@@ -1184,11 +1376,11 @@ public final class NodeDto {
         } else {
           followsBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         return this;
       }
       /**
-       * <code>optional .NodeList follows = 5;</code>
+       * <code>optional .NodeList follows = 6;</code>
        */
       public Builder setFollows(
           NodeList.Builder builderForValue) {
@@ -1198,15 +1390,15 @@ public final class NodeDto {
         } else {
           followsBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         return this;
       }
       /**
-       * <code>optional .NodeList follows = 5;</code>
+       * <code>optional .NodeList follows = 6;</code>
        */
       public Builder mergeFollows(NodeList value) {
         if (followsBuilder_ == null) {
-          if (((bitField0_ & 0x00000010) == 0x00000010) &&
+          if (((bitField0_ & 0x00000020) == 0x00000020) &&
               follows_ != NodeList.getDefaultInstance()) {
             follows_ =
               NodeList.newBuilder(follows_).mergeFrom(value).buildPartial();
@@ -1217,11 +1409,11 @@ public final class NodeDto {
         } else {
           followsBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         return this;
       }
       /**
-       * <code>optional .NodeList follows = 5;</code>
+       * <code>optional .NodeList follows = 6;</code>
        */
       public Builder clearFollows() {
         if (followsBuilder_ == null) {
@@ -1230,19 +1422,19 @@ public final class NodeDto {
         } else {
           followsBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
       /**
-       * <code>optional .NodeList follows = 5;</code>
+       * <code>optional .NodeList follows = 6;</code>
        */
       public NodeList.Builder getFollowsBuilder() {
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         onChanged();
         return getFollowsFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .NodeList follows = 5;</code>
+       * <code>optional .NodeList follows = 6;</code>
        */
       public NodeListOrBuilder getFollowsOrBuilder() {
         if (followsBuilder_ != null) {
@@ -1252,7 +1444,7 @@ public final class NodeDto {
         }
       }
       /**
-       * <code>optional .NodeList follows = 5;</code>
+       * <code>optional .NodeList follows = 6;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           NodeList, NodeList.Builder, NodeListOrBuilder>
@@ -1268,18 +1460,18 @@ public final class NodeDto {
         return followsBuilder_;
       }
 
-      // optional .NodeList leaders = 6;
+      // optional .NodeList leaders = 7;
       private NodeList leaders_ = NodeList.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           NodeList, NodeList.Builder, NodeListOrBuilder> leadersBuilder_;
       /**
-       * <code>optional .NodeList leaders = 6;</code>
+       * <code>optional .NodeList leaders = 7;</code>
        */
       public boolean hasLeaders() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
-       * <code>optional .NodeList leaders = 6;</code>
+       * <code>optional .NodeList leaders = 7;</code>
        */
       public NodeList getLeaders() {
         if (leadersBuilder_ == null) {
@@ -1289,7 +1481,7 @@ public final class NodeDto {
         }
       }
       /**
-       * <code>optional .NodeList leaders = 6;</code>
+       * <code>optional .NodeList leaders = 7;</code>
        */
       public Builder setLeaders(NodeList value) {
         if (leadersBuilder_ == null) {
@@ -1301,11 +1493,11 @@ public final class NodeDto {
         } else {
           leadersBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         return this;
       }
       /**
-       * <code>optional .NodeList leaders = 6;</code>
+       * <code>optional .NodeList leaders = 7;</code>
        */
       public Builder setLeaders(
           NodeList.Builder builderForValue) {
@@ -1315,15 +1507,15 @@ public final class NodeDto {
         } else {
           leadersBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         return this;
       }
       /**
-       * <code>optional .NodeList leaders = 6;</code>
+       * <code>optional .NodeList leaders = 7;</code>
        */
       public Builder mergeLeaders(NodeList value) {
         if (leadersBuilder_ == null) {
-          if (((bitField0_ & 0x00000020) == 0x00000020) &&
+          if (((bitField0_ & 0x00000040) == 0x00000040) &&
               leaders_ != NodeList.getDefaultInstance()) {
             leaders_ =
               NodeList.newBuilder(leaders_).mergeFrom(value).buildPartial();
@@ -1334,11 +1526,11 @@ public final class NodeDto {
         } else {
           leadersBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         return this;
       }
       /**
-       * <code>optional .NodeList leaders = 6;</code>
+       * <code>optional .NodeList leaders = 7;</code>
        */
       public Builder clearLeaders() {
         if (leadersBuilder_ == null) {
@@ -1347,19 +1539,19 @@ public final class NodeDto {
         } else {
           leadersBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
       /**
-       * <code>optional .NodeList leaders = 6;</code>
+       * <code>optional .NodeList leaders = 7;</code>
        */
       public NodeList.Builder getLeadersBuilder() {
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         onChanged();
         return getLeadersFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .NodeList leaders = 6;</code>
+       * <code>optional .NodeList leaders = 7;</code>
        */
       public NodeListOrBuilder getLeadersOrBuilder() {
         if (leadersBuilder_ != null) {
@@ -1369,7 +1561,7 @@ public final class NodeDto {
         }
       }
       /**
-       * <code>optional .NodeList leaders = 6;</code>
+       * <code>optional .NodeList leaders = 7;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           NodeList, NodeList.Builder, NodeListOrBuilder>
@@ -1385,20 +1577,20 @@ public final class NodeDto {
         return leadersBuilder_;
       }
 
-      // optional string ext = 7;
+      // optional string ext = 8;
       private Object ext_ = "";
       /**
-       * <code>optional string ext = 7;</code>
+       * <code>optional string ext = 8;</code>
        *
        * <pre>
        *扩展字段。特殊标志用
        * </pre>
        */
       public boolean hasExt() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
-       * <code>optional string ext = 7;</code>
+       * <code>optional string ext = 8;</code>
        *
        * <pre>
        *扩展字段。特殊标志用
@@ -1416,7 +1608,7 @@ public final class NodeDto {
         }
       }
       /**
-       * <code>optional string ext = 7;</code>
+       * <code>optional string ext = 8;</code>
        *
        * <pre>
        *扩展字段。特殊标志用
@@ -1436,7 +1628,7 @@ public final class NodeDto {
         }
       }
       /**
-       * <code>optional string ext = 7;</code>
+       * <code>optional string ext = 8;</code>
        *
        * <pre>
        *扩展字段。特殊标志用
@@ -1447,26 +1639,26 @@ public final class NodeDto {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000040;
+  bitField0_ |= 0x00000080;
         ext_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string ext = 7;</code>
+       * <code>optional string ext = 8;</code>
        *
        * <pre>
        *扩展字段。特殊标志用
        * </pre>
        */
       public Builder clearExt() {
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000080);
         ext_ = getDefaultInstance().getExt();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string ext = 7;</code>
+       * <code>optional string ext = 8;</code>
        *
        * <pre>
        *扩展字段。特殊标志用
@@ -1477,7 +1669,7 @@ public final class NodeDto {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000040;
+  bitField0_ |= 0x00000080;
         ext_ = value;
         onChanged();
         return this;
@@ -2187,12 +2379,13 @@ public final class NodeDto {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\rNodeDto.proto\"\227\001\n\004Node\022\014\n\004host\030\001 \001(\t\022\014" +
+      "\n\rNodeDto.proto\"\263\001\n\004Node\022\014\n\004host\030\001 \001(\t\022\014" +
       "\n\004port\030\002 \001(\005\022\022\n\ndataStatus\030\003 \001(\t\022\032\n\007clie" +
-      "nts\030\004 \001(\0132\t.NodeList\022\032\n\007follows\030\005 \001(\0132\t." +
-      "NodeList\022\032\n\007leaders\030\006 \001(\0132\t.NodeList\022\013\n\003" +
-      "ext\030\007 \001(\t\" \n\010NodeList\022\024\n\005nodes\030\001 \003(\0132\005.N" +
-      "odeB\tB\007NodeDto"
+      "nts\030\004 \001(\0132\t.NodeList\022\032\n\007brokers\030\005 \001(\0132\t." +
+      "NodeList\022\032\n\007follows\030\006 \001(\0132\t.NodeList\022\032\n\007" +
+      "leaders\030\007 \001(\0132\t.NodeList\022\013\n\003ext\030\010 \001(\t\" \n" +
+      "\010NodeList\022\024\n\005nodes\030\001 \003(\0132\005.NodeB\tB\007NodeD" +
+      "to"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2204,7 +2397,7 @@ public final class NodeDto {
           internal_static_Node_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_Node_descriptor,
-              new String[] { "Host", "Port", "DataStatus", "Clients", "Follows", "Leaders", "Ext", });
+              new String[] { "Host", "Port", "DataStatus", "Clients", "Brokers", "Follows", "Leaders", "Ext", });
           internal_static_NodeList_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_NodeList_fieldAccessorTable = new

@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.dto.Node;
+import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
@@ -65,13 +66,20 @@ public class VoteSliceLeader {
 
     /**
      * 新分片leader选举后，集群leader更新注册表
-     * 这种情况只需要将失效的旧leader从注册表中移除即可。至于这个节点可能是其他节点leader的follow
-     * 则不需要本次处理。待心跳存活检查任务分析那个leader的follow时处理掉即可
-     *
-     * @param oldLeader
-     * @return
+     * @param regBroker
      */
-    public static void updateRegedit(String oldLeader) {
-        ClusterLeaderService.BROKER_REGISTER_CENTER.remove(oldLeader);
+    public static void updateRegedit(RegBroker regBroker){
+        ClusterLeaderService.BROKER_REGISTER_CENTER.remove(regBroker.getAddress());
+        Map<String, RegNode> follows=regBroker.getFollows();
+        if(follows.size()>0){
+            Iterator<Map.Entry<String, RegNode>> items=follows.entrySet().iterator();
+            while (items.hasNext()){
+                RegNode regNode=items.next().getValue();
+                RegBroker follow=ClusterLeaderService.BROKER_REGISTER_CENTER.get(regNode.getAddress());
+                if(follow!=null){
+                    follow.getLeaders().remove(regBroker.getAddress());
+                }
+            }
+        }
     }
 }

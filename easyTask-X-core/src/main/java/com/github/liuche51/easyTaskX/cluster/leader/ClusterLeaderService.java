@@ -29,43 +29,40 @@ public class ClusterLeaderService {
     /**
      * 集群CLIENT注册表
      */
-    public static ConcurrentHashMap<String, RegBroker> CLIENT_REGISTER_CENTER = new ConcurrentHashMap<>(10);
+    public static ConcurrentHashMap<String, RegClient> CLIENT_REGISTER_CENTER = new ConcurrentHashMap<>(10);
 
     /**
      * 通知节点更新注册表信息
      *
      * @param nodes
      */
-    public static void notifyNodeUpdateRegedit(List<RegNode> nodes) {
+    public static void notifyNodesUpdateRegedit(List<RegNode> nodes) {
 
         nodes.forEach(x -> {
-            ClusterService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NOTIFY_NODE_UPDATE_REGEDIT)
-                                .setSource(ClusterService.CURRENTNODE.getAddress());
-                        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, x.getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
-                        if (!ret)
-                            log.info("normally exception!notifyNodeUpdateRegedit() failed.");
-                    } catch (Exception e) {
-                        log.error("", e);
-                    }
-                }
-            });
+            ClusterLeaderUtil.notifyNodeUpdateRegedit(x);
         });
     }
-
     /**
-     * 集群leader通知其服务端follow节点更新注册表信息
+     * 通知节点更新注册表信息
      *
      * @param nodes
      */
-    public static void notifyClusterFollowUpdateRegedit(Map<String, RegNode> nodes, RegBroker node) {
+    public static void notifyNodesUpdateRegedit(Map<String,RegNode> nodes) {
         Iterator<Map.Entry<String, RegNode>> items = nodes.entrySet().iterator();
         while (items.hasNext()) {
-            Map.Entry<String, RegNode> item = items.next();
+            ClusterLeaderUtil.notifyNodeUpdateRegedit(items.next().getValue());
+        }
+    }
+
+    /**
+     * 集群leader通知其分片Follow 更新Broker类型注册表信息
+     *
+     * @param nodes
+     */
+    public static void notifyClusterFollowUpdateRegedit(Map<String, Node> nodes, RegBroker node) {
+        Iterator<Map.Entry<String, Node>> items = nodes.entrySet().iterator();
+        while (items.hasNext()) {
+            Map.Entry<String, Node> item = items.next();
             ClusterService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
                 @Override
                 public void run() {
@@ -121,14 +118,14 @@ public class ClusterLeaderService {
         };
     }
     /**
-     * 集群leader通知其客户端follow节点更新注册表信息
+     * 集群leader通知其分片Follow 更新Client类型注册表信息
      *
      * @param nodes
      */
-    public static void notifyClusterFollowUpdateRegedit(Map<String, RegNode> nodes, RegClient node) {
-        Iterator<Map.Entry<String, RegNode>> items = nodes.entrySet().iterator();
+    public static void notifyClusterFollowUpdateRegedit(Map<String, Node> nodes, RegClient node) {
+        Iterator<Map.Entry<String, Node>> items = nodes.entrySet().iterator();
         while (items.hasNext()) {
-            Map.Entry<String, RegNode> item = items.next();
+            Map.Entry<String, Node> item = items.next();
             ClusterService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
                 @Override
                 public void run() {

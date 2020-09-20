@@ -4,9 +4,10 @@ message Node {
   optional int32 port = 2;
   optional string dataStatus = 3;
   optional NodeList clients=4;
-  optional NodeList follows=5;
-  optional NodeList leaders=6;
-  optional string ext = 7;//扩展字段。特殊标志用
+  optional NodeList brokers=5;
+  optional NodeList follows=6;
+  optional NodeList leaders=7;
+  optional string ext = 8;//扩展字段。特殊标志用
 
 }
 message NodeList {

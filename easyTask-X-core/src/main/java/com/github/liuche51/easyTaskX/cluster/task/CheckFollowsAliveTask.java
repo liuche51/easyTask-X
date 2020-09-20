@@ -57,8 +57,9 @@ public class CheckFollowsAliveTask extends TimerTask {
                             RegNode newleader = VoteSliceLeader.voteNewLeader(regNode.getFollows());
                             VoteSliceLeader.notifySliceFollowsNewLeader(regNode.getFollows(), newleader.getAddress(), regNode.getAddress());
                         }
-                        //失效节点直接移出注册表
-                        VoteSliceLeader.updateRegedit(regNode.getAddress());
+                        VoteSliceLeader.updateRegedit(regNode);
+                        ClusterLeaderService.notifyNodesUpdateRegedit(regNode.getFollows());
+                        ClusterLeaderService.notifyClusterFollowUpdateRegedit(ClusterService.CURRENTNODE.getFollows(),regNode);
 
                     }
                     //分片leader没失效，但是follow失效了
@@ -68,7 +69,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                         if (follows.size() == 0) {
                             try {
                                 List<RegNode> newFollows= VoteSliceFollows.initVoteFollows(regNode);
-                                ClusterLeaderService.notifyNodeUpdateRegedit(newFollows);
+                                ClusterLeaderService.notifyNodesUpdateRegedit(newFollows);
                             } catch (VotingException e) {
                                 log.info("normally exception!{}", e.getMessage());
                             } catch (Exception e) {
@@ -87,7 +88,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                                     try {
                                         RegNode newNode = VoteSliceFollows.voteNewFollow(regNode, node);
                                         VoteSliceFollows.notifySliceLeaderVoteNewFollow(regNode, newNode.getAddress(), node.getAddress());
-                                        ClusterLeaderService.notifyNodeUpdateRegedit(Collections.singletonList(newNode));
+                                        ClusterLeaderService.notifyNodesUpdateRegedit(Collections.singletonList(newNode));
                                     } catch (VotingException e) {
                                         log.info("normally exception!{}", e.getMessage());
                                     } catch (Exception e) {
