@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.dto.Node;
+import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
@@ -22,11 +23,11 @@ public class VoteSliceLeader {
      * @param follows
      * @return
      */
-    public static Node voteNewLeader(Map<String, Node> follows) {
-        Iterator<Map.Entry<String, Node>> items = follows.entrySet().iterator();
+    public static RegNode voteNewLeader(Map<String, RegNode> follows) {
+        Iterator<Map.Entry<String, RegNode>> items = follows.entrySet().iterator();
         while (items.hasNext()) {
-            Map.Entry<String, Node> item = items.next();
-            Node node = item.getValue();
+            Map.Entry<String, RegNode> item = items.next();
+            RegNode node = item.getValue();
             if (NodeSyncDataStatusEnum.SYNC == node.getDataStatus()) {
                 return node;
             }
@@ -42,15 +43,15 @@ public class VoteSliceLeader {
      * @param oldLeader
      * @return
      */
-    public static boolean notifySliceFollowsNewLeader(Map<String, Node> follows, String newLeader, String oldLeader) {
+    public static boolean notifySliceFollowsNewLeader(Map<String, RegNode> follows, String newLeader, String oldLeader) {
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
         try {
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum. NOTIFY_SLICE_FOLLOW_NEW_LEADER).setSource(ClusterService.getConfig().getAddress())
                     .setBody(oldLeader + "|" + newLeader);
-            Iterator<Map.Entry<String, Node>> items = follows.entrySet().iterator();
+            Iterator<Map.Entry<String, RegNode>> items = follows.entrySet().iterator();
             while (items.hasNext()) {
-                Map.Entry<String, Node> item = items.next();
-                Node node = item.getValue();
+                Map.Entry<String, RegNode> item = items.next();
+                RegNode node = item.getValue();
                 boolean ret=NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                 if(!ret)
                     log.info("normally exception!notifySliceFollowsNewLeader() failed.");

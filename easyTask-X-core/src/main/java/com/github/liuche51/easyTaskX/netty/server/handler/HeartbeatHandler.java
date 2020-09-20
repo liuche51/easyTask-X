@@ -2,7 +2,7 @@ package com.github.liuche51.easyTaskX.netty.server.handler;
 
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
-import com.github.liuche51.easyTaskX.dto.RegisterNode;
+import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.google.protobuf.ByteString;
 
@@ -18,20 +18,20 @@ public class HeartbeatHandler extends BaseHandler{
         String body=frame.getBody();
         switch (body){
             case "Broker":
-                RegisterNode registerNode=ClusterLeaderService.BROKER_REGISTER_CENTER.get(address);
+                RegBroker registerNode=ClusterLeaderService.BROKER_REGISTER_CENTER.get(address);
                 if(registerNode==null){
                     Node node=new Node(address);
-                    registerNode=new RegisterNode(node);
+                    registerNode=new RegBroker(node);
                     ClusterLeaderService.BROKER_REGISTER_CENTER.put(address,registerNode);
                 }else {
                     registerNode.setLastHeartbeat(ZonedDateTime.now());
                 }
                 break;
             case "Client":
-                RegisterNode clientNode=ClusterLeaderService.CLIENT_REGISTER_CENTER.get(address);
+                RegBroker clientNode=ClusterLeaderService.CLIENT_REGISTER_CENTER.get(address);
                 if(clientNode==null){
                     Node node=new Node(address);
-                    clientNode=new RegisterNode(node);
+                    clientNode=new RegBroker(node);
                     ClusterLeaderService.CLIENT_REGISTER_CENTER.put(address,clientNode);
                 }else {
                     clientNode.setLastHeartbeat(ZonedDateTime.now());

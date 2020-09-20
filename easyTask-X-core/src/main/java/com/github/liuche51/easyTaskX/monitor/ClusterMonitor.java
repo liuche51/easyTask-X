@@ -7,7 +7,7 @@ import com.github.liuche51.easyTaskX.dto.Node;
 
 import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
 import com.github.liuche51.easyTaskX.dao.SQLliteMultiPool;
-import com.github.liuche51.easyTaskX.dto.RegisterNode;
+import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
@@ -82,10 +82,10 @@ public class ClusterMonitor {
         }
         return map;
     }
-    public static ConcurrentHashMap<String, RegisterNode> getBrokerRegisterInfo(){
+    public static ConcurrentHashMap<String, RegBroker> getBrokerRegisterInfo(){
         return ClusterLeaderService.BROKER_REGISTER_CENTER;
     }
-    public static ConcurrentHashMap<String, RegisterNode> getClinetRegisterInfo(){
+    public static ConcurrentHashMap<String, RegBroker> getClinetRegisterInfo(){
         return ClusterLeaderService.CLIENT_REGISTER_CENTER;
     }
 }

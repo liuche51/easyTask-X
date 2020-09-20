@@ -3,9 +3,12 @@ package com.github.liuche51.easyTaskX.dto;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.time.ZonedDateTime;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class RegisterNode {
-    private Node node;
+/**
+ * 注册表用服务端节点对象
+ */
+public class RegClient extends BaseNode{
     /**
      * 最近一次心跳时间
      */
@@ -13,17 +16,18 @@ public class RegisterNode {
     private ZonedDateTime lastHeartbeat;
     @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private ZonedDateTime createTime;
-
-    public RegisterNode(Node node){
-        this.node=node;
-        this.createTime=ZonedDateTime.now();
+    /**
+     * 当前节点的所有follows
+     */
+    private ConcurrentHashMap<String, RegNode> brokers = new ConcurrentHashMap();
+    public RegClient(BaseNode baseNode){
+        super(baseNode.getHost(), baseNode.getPort());
     }
-    public Node getNode() {
-        return node;
+    public RegClient(String host, int port) {
+        super(host, port);
     }
-
-    public void setNode(Node node) {
-        this.node = node;
+    public RegClient(String address) {
+        super(address);
     }
 
     public ZonedDateTime getLastHeartbeat() {
@@ -40,5 +44,13 @@ public class RegisterNode {
 
     public void setCreateTime(ZonedDateTime createTime) {
         this.createTime = createTime;
+    }
+
+    public ConcurrentHashMap<String, RegNode> getBrokers() {
+        return brokers;
+    }
+
+    public void setBrokers(ConcurrentHashMap<String, RegNode> brokers) {
+        this.brokers = brokers;
     }
 }

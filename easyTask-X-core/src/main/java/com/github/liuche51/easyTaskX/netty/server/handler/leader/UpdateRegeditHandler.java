@@ -2,7 +2,8 @@ package com.github.liuche51.easyTaskX.netty.server.handler.leader;
 
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
-import com.github.liuche51.easyTaskX.dto.RegisterNode;
+import com.github.liuche51.easyTaskX.dto.RegBroker;
+import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
@@ -20,14 +21,14 @@ public class UpdateRegeditHandler extends BaseHandler {
         String body=frame.getBody();
         switch (body){
             case "broker":
-                RegisterNode node=ClusterLeaderService.BROKER_REGISTER_CENTER.get(frame.getSource());
+                RegBroker node=ClusterLeaderService.BROKER_REGISTER_CENTER.get(frame.getSource());
                 NodeDto.Node.Builder nodeBuilder=NodeDto.Node.newBuilder();
                 //clients
                 NodeDto.NodeList.Builder clientsBuilder= NodeDto.NodeList.newBuilder();
-                Iterator<Map.Entry<String,Node>> items=node.getNode().getClients().entrySet().iterator();
+                Iterator<Map.Entry<String,RegNode>> items=node.getClients().entrySet().iterator();
                 while (items.hasNext()){
-                    Map.Entry<String,Node> item=items.next();
-                    Node itNode=item.getValue();
+                    Map.Entry<String, RegNode> item=items.next();
+                    RegNode itNode=item.getValue();
                     NodeDto.Node.Builder clientBuilder= NodeDto.Node.newBuilder();
                     clientBuilder.setHost(itNode.getHost()).setPort(itNode.getPort());
                     clientsBuilder.addNodes(clientBuilder.build());
@@ -35,10 +36,10 @@ public class UpdateRegeditHandler extends BaseHandler {
                 nodeBuilder.setClients(clientsBuilder.build());
                 //follows
                 NodeDto.NodeList.Builder followsBuilder= NodeDto.NodeList.newBuilder();
-                Iterator<Map.Entry<String,Node>> items2=node.getNode().getFollows().entrySet().iterator();
+                Iterator<Map.Entry<String,RegNode>> items2=node.getFollows().entrySet().iterator();
                 while (items2.hasNext()){
-                    Map.Entry<String,Node> item2=items2.next();
-                    Node itNode=item2.getValue();
+                    Map.Entry<String,RegNode> item2=items2.next();
+                    RegNode itNode=item2.getValue();
                     NodeDto.Node.Builder followBuilder= NodeDto.Node.newBuilder();
                     followBuilder.setHost(itNode.getHost()).setPort(itNode.getPort());
                     followsBuilder.addNodes(followBuilder.build());
@@ -46,10 +47,10 @@ public class UpdateRegeditHandler extends BaseHandler {
                 nodeBuilder.setFollows(followsBuilder.build());
                 //leaders
                 NodeDto.NodeList.Builder leadersBuilder= NodeDto.NodeList.newBuilder();
-                Iterator<Map.Entry<String,Node>> items3=node.getNode().getLeaders().entrySet().iterator();
+                Iterator<Map.Entry<String,RegNode>> items3=node.getLeaders().entrySet().iterator();
                 while (items3.hasNext()){
-                    Map.Entry<String,Node> item3=items3.next();
-                    Node itNode=item3.getValue();
+                    Map.Entry<String,RegNode> item3=items3.next();
+                    RegNode itNode=item3.getValue();
                     NodeDto.Node.Builder followBuilder3= NodeDto.Node.newBuilder();
                     followBuilder3.setHost(itNode.getHost()).setPort(itNode.getPort());
                     leadersBuilder.addNodes(followBuilder3.build());
@@ -57,7 +58,7 @@ public class UpdateRegeditHandler extends BaseHandler {
                 nodeBuilder.setLeaders(leadersBuilder.build());
                 return nodeBuilder.build().toByteString();
             case "client":
-                RegisterNode node1=ClusterLeaderService.BROKER_REGISTER_CENTER.get(frame.getSource());
+                RegBroker node1=ClusterLeaderService.BROKER_REGISTER_CENTER.get(frame.getSource());
 
                 break;
 

@@ -1,8 +1,6 @@
 package com.github.liuche51.easyTaskX.socket;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.dto.RegisterNode;
-import jdk.nashorn.internal.ir.ReturnNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

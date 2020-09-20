@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.task;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
 
 /**
@@ -11,7 +12,7 @@ public class UpdateRegeditTask extends TimerTask {
     public void run() {
         while (!isExit()) {
             try {
-                ClusterLeaderService.requestUpdateRegedit();
+                BrokerService.requestUpdateRegedit();
             } catch (Exception e) {
                 log.error("UpdateRegeditTask()->exception!", e);
             }

@@ -31,6 +31,7 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.NOTIFY_NODE_UPDATE_REGEDIT,new NotifyNodeUpdateRegeditHandler());
                 put(NettyInterfaceEnum.NotifySliceLeaderVoteNewFollow,new NotifySliceLeaderVoteNewFollowHandler());
                 put(NettyInterfaceEnum.NotifyClusterLeaderUpdateRegeditForDataStatus,new NotifyClusterLeaderUpdateRegeditForDataStatusHandler());
+                put(NettyInterfaceEnum.NotifyClusterFollowUpdateRegedit,new NotifyClusterFollowUpdateRegeditHandler());
             }
         };
     }

@@ -15,14 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 节点对象
  */
-public class Node implements Serializable {
-    private static final Logger log = LoggerFactory.getLogger(Node.class);
-    private String host = "";
-    private int port = ClusterService.getConfig().getServerPort();
-    /**
-     * 数据一致性状态。
-     */
-    private Short dataStatus = NodeSyncDataStatusEnum.SYNC;
+public class Node extends BaseNode {
     /**
      * 当前节点的所有clients
      */
@@ -39,54 +32,15 @@ public class Node implements Serializable {
      * 集群leader
      */
     private Node clusterLeader=null;
-    @JSONField(format="yyyy-MM-dd HH:mm:ss")
-    private ZonedDateTime lastHeartbeat;
-    public Node(String host, int port,boolean simple) {
-        this.host = host;
-        this.port = port;
-        if(simple){
-            this.dataStatus=null;
-            this.clients=null;
-            this.follows=null;
-            this.leaders=null;
-        }
+    public Node(BaseNode baseNode){
+        super(baseNode.getHost(), baseNode.getPort());
     }
     public Node(String host, int port) {
-        this.host = host;
-        this.port = port;
+        super(host, port);
     }
-    public Node(String host, int port,Short dataStatus) {
-        this.host = host;
-        this.port = port;
-        this.dataStatus=dataStatus;
-    }
+
     public Node(String address) {
-        String[] ret=address.split(":");
-        this.host = ret[0];
-        this.port = Integer.parseInt(ret[1]);
-    }
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public Short getDataStatus() {
-        return dataStatus;
-    }
-
-    public void setDataStatus(Short dataStatus) {
-        this.dataStatus = dataStatus;
+        super(address);
     }
 
     public ConcurrentHashMap<String, Node> getClients() {
@@ -119,44 +73,5 @@ public class Node implements Serializable {
 
     public void setClusterLeader(Node clusterLeader) {
         this.clusterLeader = clusterLeader;
-    }
-
-    public ZonedDateTime getLastHeartbeat() {
-        return lastHeartbeat;
-    }
-
-    public void setLastHeartbeat(ZonedDateTime lastHeartbeat) {
-        this.lastHeartbeat = lastHeartbeat;
-    }
-
-    @JSONField(serialize = false)
-    public String getAddress() {
-        StringBuffer str = new StringBuffer(this.host);
-        str.append(":").append(this.port);
-        return str.toString();
-    }
-    @JSONField(serialize = false)
-    public NettyClient getClient() throws InterruptedException {
-        return NettyConnectionFactory.getInstance().getConnection(host, port);
-    }
-
-    /**
-     * 获取Netty客户端连接。带重试次数
-     * 目前一次通信，占用一个Netty连接。
-     * @param tryCount
-     * @return
-     */
-    @JSONField(serialize = false)
-    public NettyClient getClientWithCount(int tryCount) throws Exception {
-        if (tryCount == 0) throw new Exception("getClientWithCount()-> exception!");
-        try {
-            return getClient();
-        } catch (Exception e) {
-            log.info("getClientWithCount tryCount=" + tryCount + ",objectHost="+this.getAddress());
-            log.error("getClientWithCount()-> exception!", e);
-            return getClientWithCount(tryCount);
-        } finally {
-            tryCount--;
-        }
     }
 }

@@ -13,24 +13,5 @@ import java.util.Map;
  */
 public class ClientService {
     private static final Logger log = LoggerFactory.getLogger(ClientService.class);
-    /**
-     * 更新Broker位置信息
-     *
-     * @param client
-     * @return
-     */
-    public static boolean updateClientPosition(String client) {
-        try {
-            if (StringUtils.isNullOrEmpty(client)) return false;
-            String[] temp = client.split(":");
-            if (temp.length != 2) return false;
-            Map<String, Node> clients = ClusterService.CURRENTNODE.getClients();
-            Node newclient=new Node(temp[0], Integer.valueOf(temp[1]).intValue(),null);
-            clients.put(client, newclient);
-             return true;
-        } catch (Exception e) {
-            log.error("updateClientPosition", e);
-            return false;
-        }
-    }
+
 }

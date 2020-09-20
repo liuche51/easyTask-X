@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.netty.server.handler.notify;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
@@ -17,7 +18,7 @@ public class NotifyNodeUpdateRegeditHandler extends BaseHandler {
         ClusterService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
-                ClusterLeaderService.requestUpdateRegedit();
+                BrokerService.requestUpdateRegedit();
             }
         });
         return null;
