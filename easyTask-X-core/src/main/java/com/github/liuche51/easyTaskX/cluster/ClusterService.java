@@ -1,9 +1,9 @@
 package com.github.liuche51.easyTaskX.cluster;
 
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
-import com.github.liuche51.easyTaskX.cluster.leader.DeleteTaskTCC;
-import com.github.liuche51.easyTaskX.cluster.leader.SaveTaskTCC;
-import com.github.liuche51.easyTaskX.cluster.leader.VoteSliceFollows;
+import com.github.liuche51.easyTaskX.cluster.master.DeleteTaskTCC;
+import com.github.liuche51.easyTaskX.cluster.master.SaveTaskTCC;
+import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.*;
@@ -98,7 +98,7 @@ public class ClusterService {
      */
     public void submitTaskAllowWait(Schedule schedule) throws Exception {
         //集群未启动或正在选举follow中，则继续等待完成
-        while (!isStarted|| VoteSliceFollows.isSelecting()) {
+        while (!isStarted|| VoteSlave.isSelecting()) {
             Thread.sleep(1000l);
         }
         this.submitTask(schedule);
@@ -110,7 +110,7 @@ public class ClusterService {
      */
     public static void submitTask(Schedule schedule) throws Exception {
         if (!isStarted) throw new Exception("the easyTask has not started,please wait a moment!");
-        if (VoteSliceFollows.isSelecting())
+        if (VoteSlave.isSelecting())
             throw new VotingException("normally exception!save():cluster is voting,please wait a moment.");
         //防止多线程下，follow元素操作竞争问题。确保参与提交的follow不受集群选举影响
         List<Node> follows = new ArrayList<>(CURRENTNODE.getFollows().size());

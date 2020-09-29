@@ -1,7 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.follow;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.cluster.leader.VoteSliceFollows;
 import com.github.liuche51.easyTaskX.cluster.task.HeartbeatsTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.UpdateRegeditTask;
@@ -16,7 +15,6 @@ import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.ZonedDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -65,7 +63,7 @@ public class BrokerService {
         return task;
     }
     /**
-     * 节点对集群leader的心跳。2s一次
+     * 节点对leader的心跳。2s一次
      */
     public static TimerTask startHeartBeat() {
         HeartbeatsTask task=new HeartbeatsTask();
@@ -73,7 +71,7 @@ public class BrokerService {
         return task;
     }
     /**
-     * 启动点定时从集群leader获取注册表更新任务
+     * 启动点定时从leader获取注册表更新任务
      */
     public static TimerTask startUpdateRegeditTask() {
         UpdateRegeditTask task=new UpdateRegeditTask();
@@ -81,7 +79,7 @@ public class BrokerService {
         return task;
     }
     /**
-     * 集群follow请求集群leader获取当前节点最新注册表信息。
+     * 集群follow请求leader获取当前节点最新注册表信息。
      * 覆盖本地信息
      *
      * @return

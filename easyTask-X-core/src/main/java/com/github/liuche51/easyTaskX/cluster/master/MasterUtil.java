@@ -1,4 +1,4 @@
-package com.github.liuche51.easyTaskX.cluster.leader;
+package com.github.liuche51.easyTaskX.cluster.master;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
@@ -17,8 +17,8 @@ import java.util.List;
 /**
  * leader类
  */
-public class SliceLeaderUtil {
-    private static final Logger log = LoggerFactory.getLogger(SliceLeaderUtil.class);
+public class MasterUtil {
+    private static final Logger log = LoggerFactory.getLogger(MasterUtil.class);
     /**
      * 同步任务数据到follow，批量方式
      *用于将数据同步给新follow
@@ -34,7 +34,7 @@ public class SliceLeaderUtil {
             builder0.addSchedules(s);
         }
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LEADER_SYNC_DATA_TO_NEW_FOLLOW).setSource(ClusterService.getConfig().getAddress())
+        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.MasterSyncDataToNewSlave).setSource(ClusterService.getConfig().getAddress())
                 .setBodyBytes(builder0.build().toByteString());
         NettyClient client = follow.getClientWithCount(1);
         boolean ret =NettyMsgService.sendSyncMsgWithCount(builder,client,ClusterService.getConfig().getAdvanceConfig().getTryCount(),5,null);

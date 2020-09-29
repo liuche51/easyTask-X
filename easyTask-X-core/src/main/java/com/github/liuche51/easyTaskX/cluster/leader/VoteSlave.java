@@ -1,7 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.dto.Node;
 
 import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegNode;
@@ -20,11 +19,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * leader选举follow。
+ * leader选举slave。
  * 使用多线程互斥机制
  */
-public class VoteSliceFollows {
-    private static final Logger log = LoggerFactory.getLogger(VoteSliceFollows.class);
+public class VoteSlave {
+    private static final Logger log = LoggerFactory.getLogger(VoteSlave.class);
     private static volatile boolean selecting = false;//选举状态。多线程控制
     private static ReentrantLock lock = new ReentrantLock();//选举互斥锁
 
@@ -43,8 +42,8 @@ public class VoteSliceFollows {
         int count = ClusterService.getConfig().getBackupCount();
         try {
             lock.lock();
-            List<String> availableFollows = VoteSliceFollows.getAvailableFollows(regNode);
-            List<RegNode> follows = VoteSliceFollows.voteFollows(count, availableFollows);
+            List<String> availableFollows = VoteSlave.getAvailableFollows(regNode);
+            List<RegNode> follows = VoteSlave.voteFollows(count, availableFollows);
             if (follows.size() < count) {
                 log.info("[{}] follows.size() < count,so retry to initVoteFollows()",regNode.getAddress());
                return initVoteFollows(regNode);//数量不够递归重新选VoteFollows.selectFollows中
@@ -101,8 +100,8 @@ public class VoteSliceFollows {
      */
     private static List<String> getAvailableFollows(RegBroker regNode) throws Exception {
         int count = ClusterService.getConfig().getBackupCount();
-        Iterator<Map.Entry<String, RegBroker>> items = ClusterLeaderService.BROKER_REGISTER_CENTER.entrySet().iterator();
-        List<String> availableFollows = new ArrayList<>(ClusterLeaderService.BROKER_REGISTER_CENTER.size());
+        Iterator<Map.Entry<String, RegBroker>> items = LeaderService.BROKER_REGISTER_CENTER.entrySet().iterator();
+        List<String> availableFollows = new ArrayList<>(LeaderService.BROKER_REGISTER_CENTER.size());
         while (items.hasNext()) {
             availableFollows.add(items.next().getKey());
         }
@@ -147,7 +146,7 @@ public class VoteSliceFollows {
         for (int i = 0; i < size; i++) {
             int index = random.nextInt(availableFollows.size());//随机生成的随机数范围就变成[0,size)。注意这里size会动态变动。
             String ret = availableFollows.get(index);
-            RegBroker regNode2 = ClusterLeaderService.BROKER_REGISTER_CENTER.get(ret);
+            RegBroker regNode2 = LeaderService.BROKER_REGISTER_CENTER.get(ret);
             RegNode newFollow =new RegNode(regNode2);
             availableFollows.remove(index);
             if (follows.size() < count) {
@@ -159,7 +158,7 @@ public class VoteSliceFollows {
     }
 
     /**
-     * 集群leader通知分片leader，已经选出新follow。
+     * leader通知master，已经选出新follow。
      *
      * @param leader
      * @param newFollowAddress
@@ -170,7 +169,7 @@ public class VoteSliceFollows {
             public void run() {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NotifySliceLeaderVoteNewFollow)
+                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NotifyMasterVoteNewSlave)
                             .setSource(ClusterService.CURRENTNODE.getAddress()).setBody(newFollowAddress + "|" + oldFollowAddress);
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if(!ret)
@@ -194,7 +193,7 @@ public class VoteSliceFollows {
         while (items.hasNext()) {
             Map.Entry<String, RegNode> item = items.next();
             RegNode node = item.getValue();
-            RegBroker followRegnode=ClusterLeaderService.BROKER_REGISTER_CENTER.get(node.getAddress());
+            RegBroker followRegnode= LeaderService.BROKER_REGISTER_CENTER.get(node.getAddress());
             followRegnode.getLeaders().put(regNode.getAddress(), new RegNode(regNode));
         }
     }
@@ -209,7 +208,7 @@ public class VoteSliceFollows {
         regNode.getFollows().remove(oldFollow);
         newFollow.setDataStatus(NodeSyncDataStatusEnum.UNSYNC);//选举成功，将新follow数据同步状态标记为未同步
         regNode.getFollows().put(newFollow.getAddress(), newFollow);
-        RegBroker newFollowRegNode=ClusterLeaderService.BROKER_REGISTER_CENTER.get(newFollow.getAddress());
+        RegBroker newFollowRegNode= LeaderService.BROKER_REGISTER_CENTER.get(newFollow.getAddress());
         newFollowRegNode.getLeaders().put(regNode.getAddress(),new RegNode(regNode));
    }
 }

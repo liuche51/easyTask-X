@@ -1,7 +1,7 @@
-package com.github.liuche51.easyTaskX.cluster.follow;
+package com.github.liuche51.easyTaskX.cluster.slave;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.cluster.leader.SliceLeaderService;
+import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
 import com.github.liuche51.easyTaskX.dto.ScheduleBak;
 import com.github.liuche51.easyTaskX.dto.TransactionLog;
@@ -23,8 +23,8 @@ import java.util.List;
 /**
  * Follow服务入口
  */
-public class SliceFollowService {
-    private static final Logger log = LoggerFactory.getLogger(SliceLeaderService.class);
+public class SlaveService {
+    private static final Logger log = LoggerFactory.getLogger(MasterService.class);
 
     /**
      * 接受leader同步任务入备库

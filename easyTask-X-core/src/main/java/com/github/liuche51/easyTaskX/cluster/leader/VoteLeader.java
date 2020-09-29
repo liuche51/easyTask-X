@@ -12,18 +12,18 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 选举集群leader
+ * 选举leader
  * 采用分布式锁的方式实现
  */
-public class VoteClusterLeader {
-    private static Logger log = LoggerFactory.getLogger(VoteClusterLeader.class);
+public class VoteLeader {
+    private static Logger log = LoggerFactory.getLogger(VoteLeader.class);
     private static InterProcessMutex zkMutex = new InterProcessMutex( ZKUtil.getClient(),"/mutex");
     public static boolean competeLeader(){
         boolean hasLock=false;
         try {
             if(zkMutex.acquire(1, TimeUnit.SECONDS)){
                 hasLock=true;
-                LeaderData data=ZKService.getClusterLeaderData();
+                LeaderData data=ZKService.getLeaderData();
                 if(data==null|| StringUtils.isNullOrEmpty(data.getHost())){//leader节点为空时才需要选新leader
                     ZKService.registerLeader(new LeaderData(ClusterService.CURRENTNODE.getHost(),ClusterService.CURRENTNODE.getPort()));
                     return true;

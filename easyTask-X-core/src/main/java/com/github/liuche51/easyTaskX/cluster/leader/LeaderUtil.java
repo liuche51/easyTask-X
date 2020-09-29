@@ -9,8 +9,8 @@ import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ClusterLeaderUtil {
-    private static final Logger log = LoggerFactory.getLogger(VoteSliceFollows.class);
+public class LeaderUtil {
+    private static final Logger log = LoggerFactory.getLogger(VoteSlave.class);
 
     /**
      * 通知节点更新注册表信息
@@ -22,7 +22,7 @@ public class ClusterLeaderUtil {
             public void run() {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NOTIFY_NODE_UPDATE_REGEDIT)
+                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NotifyNodeUpdateRegedit)
                             .setSource(ClusterService.CURRENTNODE.getAddress());
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret)

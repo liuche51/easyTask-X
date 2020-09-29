@@ -68,7 +68,7 @@ public class NettyClientTest {
                 builder3.addSchedules(builder1.build());
                 Dto.Frame.Builder builder4=Dto.Frame.newBuilder();
                 builder4.setIdentity(StringConstant.EMPTY);
-                builder4.setInterfaceName(NettyInterfaceEnum.LEADER_SYNC_DATA_TO_NEW_FOLLOW).setBodyBytes(builder3.build().toByteString());
+                builder4.setInterfaceName(NettyInterfaceEnum.MasterSyncDataToNewSlave).setBodyBytes(builder3.build().toByteString());
                 System.out.println("发送任务:"+id);
                 NettyClient client=NettyConnectionFactory.getInstance().getConnection("127.0.0.1",2021);
                 Object msg= NettyMsgService.sendSyncMsg(client,builder4.build());

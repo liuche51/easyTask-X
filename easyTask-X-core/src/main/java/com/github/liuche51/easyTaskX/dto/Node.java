@@ -29,7 +29,7 @@ public class Node extends BaseNode {
      */
     private ConcurrentHashMap<String, Node> leaders = new ConcurrentHashMap<>();
     /**
-     * 集群leader
+     * leader
      */
     private Node clusterLeader=null;
     public Node(BaseNode baseNode){

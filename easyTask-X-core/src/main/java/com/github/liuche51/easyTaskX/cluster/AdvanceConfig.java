@@ -33,7 +33,7 @@ public class AdvanceConfig {
      */
     private int clearScheduleBakTime = 36500000;
     /**
-     * 节点从集群leader更新注册表信息间隔时间。单位秒。
+     * 节点从leader更新注册表信息间隔时间。单位秒。
      */
     private int updateRegeditTime=300;
     /**

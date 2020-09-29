@@ -1,7 +1,7 @@
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
 import com.github.liuche51.easyTaskX.dto.Node;
-import com.github.liuche51.easyTaskX.cluster.leader.VoteClusterLeader;
+import com.github.liuche51.easyTaskX.cluster.leader.VoteLeader;
 import com.github.liuche51.easyTaskX.zk.ZKService;
 import org.junit.Test;
 
@@ -51,7 +51,7 @@ public class ZKTest {
             Thread th=new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    VoteClusterLeader.competeLeader();
+                    VoteLeader.competeLeader();
                 }
             });
             th.start();

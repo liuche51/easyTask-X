@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.netty.server.handler.follow;
 
-import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
+import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.dto.*;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
@@ -11,10 +11,10 @@ import java.time.ZonedDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 集群分片follow处理来自集群leader注册表的同步通知。
+ * 集群slave处理来自leader注册表的同步通知。
  * 区分是Broker端还是Client端
  */
-public class NotifyClusterFollowUpdateRegeditHandler extends BaseHandler {
+public class NotifyFollowUpdateRegeditHandler extends BaseHandler {
 
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {
@@ -23,7 +23,7 @@ public class NotifyClusterFollowUpdateRegeditHandler extends BaseHandler {
         if ("Broker".equalsIgnoreCase(exts[0])) {
             RegBroker regnode = new RegBroker(node.getHost(), node.getPort());
             if ("Delete".equalsIgnoreCase(exts[1]))
-                ClusterLeaderService.BROKER_REGISTER_CENTER.remove(regnode.getAddress());
+                LeaderService.BROKER_REGISTER_CENTER.remove(regnode.getAddress());
             else if ("Update".equalsIgnoreCase(exts[1])) {
                 NodeDto.NodeList clientNodes = node.getClients();
                 ConcurrentHashMap<String, RegNode> clients = new ConcurrentHashMap<>();
@@ -50,12 +50,12 @@ public class NotifyClusterFollowUpdateRegeditHandler extends BaseHandler {
                 regnode.setLeaders(leaders);
                 regnode.setCreateTime(ZonedDateTime.now());
                 regnode.setLastHeartbeat(ZonedDateTime.now());
-                ClusterLeaderService.BROKER_REGISTER_CENTER.put(regnode.getAddress(), regnode);
+                LeaderService.BROKER_REGISTER_CENTER.put(regnode.getAddress(), regnode);
             }
         } else if ("Client".equalsIgnoreCase(exts[0])) {
             RegClient regnode = new RegClient(node.getHost(), node.getPort());
             if ("Delete".equalsIgnoreCase(exts[1]))
-                ClusterLeaderService.CLIENT_REGISTER_CENTER.remove(regnode.getAddress());
+                LeaderService.CLIENT_REGISTER_CENTER.remove(regnode.getAddress());
             else if ("Update".equalsIgnoreCase(exts[1])) {
                 NodeDto.NodeList clientNodes = node.getBrokers();
                 ConcurrentHashMap<String, RegNode> brokers = new ConcurrentHashMap<>();
@@ -66,7 +66,7 @@ public class NotifyClusterFollowUpdateRegeditHandler extends BaseHandler {
                 regnode.setBrokers(brokers);
                 regnode.setCreateTime(ZonedDateTime.now());
                 regnode.setLastHeartbeat(ZonedDateTime.now());
-                ClusterLeaderService.CLIENT_REGISTER_CENTER.put(regnode.getAddress(), regnode);
+                LeaderService.CLIENT_REGISTER_CENTER.put(regnode.getAddress(), regnode);
             }
         }
         return null;

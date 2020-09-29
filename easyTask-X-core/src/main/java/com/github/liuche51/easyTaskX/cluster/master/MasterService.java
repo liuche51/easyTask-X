@@ -1,4 +1,4 @@
-package com.github.liuche51.easyTaskX.cluster.leader;
+package com.github.liuche51.easyTaskX.cluster.master;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.dto.Node;
@@ -14,10 +14,10 @@ import org.slf4j.LoggerFactory;
 import java.sql.SQLException;
 
 /**
- * 分片Leader服务入口
+ * master服务入口
  */
-public class SliceLeaderService {
-    private static final Logger log = LoggerFactory.getLogger(SliceLeaderService.class);
+public class MasterService {
+    private static final Logger log = LoggerFactory.getLogger(MasterService.class);
 
     /**
      * 将失效的leader的备份任务数据删除掉
@@ -36,7 +36,7 @@ public class SliceLeaderService {
      * @param newFollow
      */
     public static OnceTask syncDataToNewFollow(Node oldFollow, Node newFollow) {
-        SyncDataToNewFollowTask task=new SyncDataToNewFollowTask(oldFollow,newFollow);
+        SyncDataToNewSlaveTask task=new SyncDataToNewSlaveTask(oldFollow,newFollow);
         task.start();
         ClusterService.onceTasks.add(task);
         return task;
@@ -49,14 +49,14 @@ public class SliceLeaderService {
      * @param oldLeaderAddress
      */
     public static OnceTask submitNewTaskByOldLeader(String oldLeaderAddress) {
-        NewLeaderSyncBakDataTask task=new NewLeaderSyncBakDataTask(oldLeaderAddress);
+        NewMasterSyncBakDataTask task=new NewMasterSyncBakDataTask(oldLeaderAddress);
         task.start();
         ClusterService.onceTasks.add(task);
         return task;
     }
 
     /**
-     * 分片leader通知集群leader，已经完成对新follow的数据同步。请求更新数据同步状态
+     * master通知leader，已经完成对新follow的数据同步。请求更新数据同步状态
      */
     public static void notifyClusterLeaderUpdateRegeditForDataStatus(String followAddress,String dataStatus){
         ClusterService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
@@ -64,7 +64,7 @@ public class SliceLeaderService {
             public void run() {
                 try {
                     Dto.Frame.Builder builder=Dto.Frame.newBuilder();
-                    builder.setIdentity(Util.generateIdentityId()).setBody(NettyInterfaceEnum.NotifyClusterLeaderUpdateRegeditForDataStatus)
+                    builder.setIdentity(Util.generateIdentityId()).setBody(NettyInterfaceEnum.NotifyLeaderUpdateRegeditForDataStatus)
                             .setSource(ClusterService.CURRENTNODE.getAddress()).setBody(followAddress+"|"+dataStatus);
                     boolean ret=NettyMsgService.sendSyncMsgWithCount(builder,ClusterService.CURRENTNODE.getClusterLeader().getClient(),ClusterService.getConfig().getAdvanceConfig().getTryCount(),5,null);
                     if(!ret)

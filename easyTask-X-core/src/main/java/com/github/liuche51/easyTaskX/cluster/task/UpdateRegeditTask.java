@@ -2,10 +2,9 @@ package com.github.liuche51.easyTaskX.cluster.task;
 
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
-import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
 
 /**
- * 节点定时从集群leader获取注册表更新
+ * 节点定时从leader获取注册表更新
  */
 public class UpdateRegeditTask extends TimerTask {
     @Override

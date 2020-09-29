@@ -1,7 +1,6 @@
 package com.github.liuche51.easyTaskX.netty.server.handler.leader;
 
-import com.github.liuche51.easyTaskX.dto.Node;
-import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
+import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
@@ -13,7 +12,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * 集群leader响应Brokers更新注册表信息
+ * leader响应Brokers更新注册表信息
  */
 public class UpdateRegeditHandler extends BaseHandler {
     @Override
@@ -21,7 +20,7 @@ public class UpdateRegeditHandler extends BaseHandler {
         String body=frame.getBody();
         switch (body){
             case "broker":
-                RegBroker node=ClusterLeaderService.BROKER_REGISTER_CENTER.get(frame.getSource());
+                RegBroker node= LeaderService.BROKER_REGISTER_CENTER.get(frame.getSource());
                 NodeDto.Node.Builder nodeBuilder=NodeDto.Node.newBuilder();
                 //clients
                 NodeDto.NodeList.Builder clientsBuilder= NodeDto.NodeList.newBuilder();
@@ -58,7 +57,7 @@ public class UpdateRegeditHandler extends BaseHandler {
                 nodeBuilder.setLeaders(leadersBuilder.build());
                 return nodeBuilder.build().toByteString();
             case "client":
-                RegBroker node1=ClusterLeaderService.BROKER_REGISTER_CENTER.get(frame.getSource());
+                RegBroker node1= LeaderService.BROKER_REGISTER_CENTER.get(frame.getSource());
 
                 break;
 

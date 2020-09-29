@@ -72,7 +72,7 @@ public class ZKService {
      *
      * @return
      */
-    public static LeaderData getClusterLeaderData() throws Exception {
+    public static LeaderData getLeaderData() throws Exception {
         String path = StringConstant.CHAR_SPRIT+ StringConstant.LEADER;
         return getDataByPath(path,LeaderData.class);
     }

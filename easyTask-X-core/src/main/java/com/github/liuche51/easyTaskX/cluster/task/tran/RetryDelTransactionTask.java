@@ -3,7 +3,7 @@ package com.github.liuche51.easyTaskX.cluster.task.tran;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.github.liuche51.easyTaskX.dto.Node;
-import com.github.liuche51.easyTaskX.cluster.leader.DeleteTaskTCC;
+import com.github.liuche51.easyTaskX.cluster.master.DeleteTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
 import com.github.liuche51.easyTaskX.dto.TransactionLog;

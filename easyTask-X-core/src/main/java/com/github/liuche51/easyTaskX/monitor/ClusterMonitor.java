@@ -5,9 +5,10 @@ import com.alibaba.fastjson.TypeReference;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.dto.Node;
 
-import com.github.liuche51.easyTaskX.cluster.leader.ClusterLeaderService;
+import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.dao.SQLliteMultiPool;
 import com.github.liuche51.easyTaskX.dto.RegBroker;
+import com.github.liuche51.easyTaskX.dto.RegClient;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
@@ -53,7 +54,7 @@ public class ClusterMonitor {
         while (items.hasNext()) {
             Node item = items.next().getValue();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.GET_DBINFO_BY_TASKID).setSource(ClusterService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.GetDBInfoByTaskId).setSource(ClusterService.getConfig().getAddress())
                     .setBody(taskId);
             NettyClient client = item.getClientWithCount(ClusterService.getConfig().getAdvanceConfig().getTryCount());
             Object ret = NettyMsgService.sendSyncMsg(client,builder.build());
@@ -83,9 +84,9 @@ public class ClusterMonitor {
         return map;
     }
     public static ConcurrentHashMap<String, RegBroker> getBrokerRegisterInfo(){
-        return ClusterLeaderService.BROKER_REGISTER_CENTER;
+        return LeaderService.BROKER_REGISTER_CENTER;
     }
-    public static ConcurrentHashMap<String, RegBroker> getClinetRegisterInfo(){
-        return ClusterLeaderService.CLIENT_REGISTER_CENTER;
+    public static ConcurrentHashMap<String, RegClient> getClinetRegisterInfo(){
+        return LeaderService.CLIENT_REGISTER_CENTER;
     }
 }

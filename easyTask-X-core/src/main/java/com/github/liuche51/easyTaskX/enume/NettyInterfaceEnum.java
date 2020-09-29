@@ -34,39 +34,39 @@ public class NettyInterfaceEnum {
      */
     public static final String TRAN_CANCELDELTASK="Tran_CancelDelTask";
     /**
-     * leader同步任务数据给新follow备份接口
+     * master同步任务数据给新slave备份接口
      */
-    public static final String LEADER_SYNC_DATA_TO_NEW_FOLLOW="LeaderSyncDataToNewFollow";
+    public static final String MasterSyncDataToNewSlave="MasterSyncDataToNewSlave";
     /**
      * 获取数据库表信息接口
      */
-    public static final String GET_DBINFO_BY_TASKID="GetDBInfoByTaskId";
+    public static final String GetDBInfoByTaskId="GetDBInfoByTaskId";
     /**
      * Follow对Leader的心跳接口
      */
     public static final String Heartbeat="Heartbeat";
     /**
-     * 集群leader通知分片follows已经选出新leader
+     * leader通知slaves已经选出新master
      */
-    public static final String NOTIFY_SLICE_FOLLOW_NEW_LEADER="NotifySliceFollowNewLeader";
+    public static final String NotifySlaveNewLeader="NotifySlaveNewLeader";
     /**
-     * 集群leader通知分片leader已经选出新follow
+     * leader通知master已经选出新Slave
      */
-    public static final String NotifySliceLeaderVoteNewFollow="NotifySliceLeaderVoteNewFollow";
+    public static final String NotifyMasterVoteNewSlave="NotifyMasterVoteNewSlave";
     /**
      * 通知集群节点获取最新注册表信息
      */
-    public static final String NOTIFY_NODE_UPDATE_REGEDIT="NotifyNodeUpdateRegedit";
+    public static final String NotifyNodeUpdateRegedit="NotifyNodeUpdateRegedit";
     /**
-     * 集群leader通知其follow节点更新注册表信息
+     * leader通知其follow节点更新注册表信息
      */
-    public static final String NotifyClusterFollowUpdateRegedit="NotifyClusterFollowUpdateRegedit";
+    public static final String NotifyFollowUpdateRegedit="NotifyFollowUpdateRegedit";
     /**
-     * 分片leader通知集群leader，已经完成对新follow的数据同步。请求更新数据同步状态
+     * master通知leader，已经完成对新follow的数据同步。请求更新数据同步状态
      */
-    public static final String NotifyClusterLeaderUpdateRegeditForDataStatus="notifyClusterLeaderUpdateRegeditForDataStatus";
+    public static final String NotifyLeaderUpdateRegeditForDataStatus="notifyLeaderUpdateRegeditForDataStatus";
     /**
-     * broker获取集群leader最新注册表信息
+     * broker获取leader最新注册表信息
      */
     public static final String UPDATE_REGEDIT="UpdateRegedit";
 }

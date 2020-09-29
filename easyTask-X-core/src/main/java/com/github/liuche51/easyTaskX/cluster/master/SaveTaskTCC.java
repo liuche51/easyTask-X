@@ -1,4 +1,4 @@
-package com.github.liuche51.easyTaskX.cluster.leader;
+package com.github.liuche51.easyTaskX.cluster.master;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;

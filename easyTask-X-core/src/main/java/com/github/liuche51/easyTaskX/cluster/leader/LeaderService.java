@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ClusterLeaderService {
-    private static final Logger log = LoggerFactory.getLogger(VoteSliceFollows.class);
+public class LeaderService {
+    private static final Logger log = LoggerFactory.getLogger(VoteSlave.class);
     /**
      * 集群BROKER注册表
      */
@@ -39,7 +39,7 @@ public class ClusterLeaderService {
     public static void notifyNodesUpdateRegedit(List<RegNode> nodes) {
 
         nodes.forEach(x -> {
-            ClusterLeaderUtil.notifyNodeUpdateRegedit(x);
+            LeaderUtil.notifyNodeUpdateRegedit(x);
         });
     }
     /**
@@ -50,12 +50,12 @@ public class ClusterLeaderService {
     public static void notifyNodesUpdateRegedit(Map<String,RegNode> nodes) {
         Iterator<Map.Entry<String, RegNode>> items = nodes.entrySet().iterator();
         while (items.hasNext()) {
-            ClusterLeaderUtil.notifyNodeUpdateRegedit(items.next().getValue());
+            LeaderUtil.notifyNodeUpdateRegedit(items.next().getValue());
         }
     }
 
     /**
-     * 集群leader通知其分片Follow 更新Broker类型注册表信息
+     * leader通知其slave 更新Broker类型注册表信息
      *
      * @param nodes
      */
@@ -68,7 +68,7 @@ public class ClusterLeaderService {
                 public void run() {
                     try {
                         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NotifyClusterFollowUpdateRegedit)
+                        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NotifyFollowUpdateRegedit)
                                 .setSource(ClusterService.CURRENTNODE.getAddress());
                         NodeDto.Node.Builder nodeBuilder=NodeDto.Node.newBuilder();
                         //clients
@@ -118,7 +118,7 @@ public class ClusterLeaderService {
         };
     }
     /**
-     * 集群leader通知其分片Follow 更新Client类型注册表信息
+     * leader通知其slave 更新Client类型注册表信息
      *
      * @param nodes
      */
@@ -131,7 +131,7 @@ public class ClusterLeaderService {
                 public void run() {
                     try {
                         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NotifyClusterFollowUpdateRegedit)
+                        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NotifyFollowUpdateRegedit)
                                 .setSource(ClusterService.CURRENTNODE.getAddress());
                         NodeDto.Node.Builder nodeBuilder=NodeDto.Node.newBuilder();
                         //Brokers
@@ -157,7 +157,7 @@ public class ClusterLeaderService {
         };
     }
     /**
-     * 启动集群leader检查所有follows是否存活任务
+     * 启动leader检查所有follows是否存活任务
      */
     public static TimerTask startCheckFollowAliveTask() {
         CheckFollowsAliveTask task = new CheckFollowsAliveTask();

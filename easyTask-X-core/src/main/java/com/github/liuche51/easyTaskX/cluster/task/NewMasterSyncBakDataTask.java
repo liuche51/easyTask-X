@@ -12,7 +12,7 @@ import java.util.List;
  * 新leader将旧leader的备份数据同步给自己的follow
  * 后期需要考虑数据一致性
  */
-public class NewLeaderSyncBakDataTask extends OnceTask {
+public class NewMasterSyncBakDataTask extends OnceTask {
     private String oldLeaderAddress;
 
     public String getOldLeaderAddress() {
@@ -23,7 +23,7 @@ public class NewLeaderSyncBakDataTask extends OnceTask {
         this.oldLeaderAddress = oldLeaderAddress;
     }
 
-    public NewLeaderSyncBakDataTask(String oldLeaderAddress) {
+    public NewMasterSyncBakDataTask(String oldLeaderAddress) {
         this.oldLeaderAddress = oldLeaderAddress;
     }
 

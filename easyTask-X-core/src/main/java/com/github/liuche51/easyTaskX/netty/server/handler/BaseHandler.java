@@ -5,9 +5,9 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.server.handler.follow.*;
 import com.github.liuche51.easyTaskX.netty.server.handler.leader.UpdateRegeditHandler;
-import com.github.liuche51.easyTaskX.netty.server.handler.notify.NotifyClusterLeaderUpdateRegeditForDataStatusHandler;
+import com.github.liuche51.easyTaskX.netty.server.handler.notify.NotifyLeaderUpdateRegeditForDataStatusHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.notify.NotifyNodeUpdateRegeditHandler;
-import com.github.liuche51.easyTaskX.netty.server.handler.notify.NotifySliceLeaderVoteNewFollowHandler;
+import com.github.liuche51.easyTaskX.netty.server.handler.notify.NotifyMasterVoteNewSlaveHandler;
 import com.google.protobuf.ByteString;
 
 import java.util.HashMap;
@@ -24,14 +24,14 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.TRAN_CONFIRMSAVETASK,new TranConfirmSaveTaskHandler());
                 put(NettyInterfaceEnum.TRAN_CANCELSAVETASK,new TranCancelSaveTaskHandler());
                 put(NettyInterfaceEnum.TRAN_TRYDELTASK,new TranTryDelTaskHandler());
-                put(NettyInterfaceEnum.LEADER_SYNC_DATA_TO_NEW_FOLLOW,new LeaderSyncDataToNewFollowHandler());
-                put(NettyInterfaceEnum.GET_DBINFO_BY_TASKID,new GetDBInfoByTaskIdHandler());
+                put(NettyInterfaceEnum.MasterSyncDataToNewSlave,new MasterSyncDataToNewSlaveHandler());
+                put(NettyInterfaceEnum.GetDBInfoByTaskId,new GetDBInfoByTaskIdHandler());
                 put(NettyInterfaceEnum.Heartbeat,new HeartbeatHandler());
                 put(NettyInterfaceEnum.UPDATE_REGEDIT,new UpdateRegeditHandler());
-                put(NettyInterfaceEnum.NOTIFY_NODE_UPDATE_REGEDIT,new NotifyNodeUpdateRegeditHandler());
-                put(NettyInterfaceEnum.NotifySliceLeaderVoteNewFollow,new NotifySliceLeaderVoteNewFollowHandler());
-                put(NettyInterfaceEnum.NotifyClusterLeaderUpdateRegeditForDataStatus,new NotifyClusterLeaderUpdateRegeditForDataStatusHandler());
-                put(NettyInterfaceEnum.NotifyClusterFollowUpdateRegedit,new NotifyClusterFollowUpdateRegeditHandler());
+                put(NettyInterfaceEnum.NotifyNodeUpdateRegedit,new NotifyNodeUpdateRegeditHandler());
+                put(NettyInterfaceEnum.NotifyMasterVoteNewSlave,new NotifyMasterVoteNewSlaveHandler());
+                put(NettyInterfaceEnum.NotifyLeaderUpdateRegeditForDataStatus,new NotifyLeaderUpdateRegeditForDataStatusHandler());
+                put(NettyInterfaceEnum.NotifyFollowUpdateRegedit,new NotifyFollowUpdateRegeditHandler());
             }
         };
     }

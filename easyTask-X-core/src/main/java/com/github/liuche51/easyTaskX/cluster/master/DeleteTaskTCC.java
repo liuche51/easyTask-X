@@ -1,4 +1,4 @@
-package com.github.liuche51.easyTaskX.cluster.leader;
+package com.github.liuche51.easyTaskX.cluster.master;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
@@ -62,7 +62,7 @@ public class DeleteTaskTCC {
                 throw new Exception("tryDel->sendSyncMsgWithCount():exception! ");
             }
         }
-        //删除操作，如果follow都被通知标记为TRIED了，就不走后面的第二阶段CONFIRM了，可以直接删除任务。只需要leader标记即可
+        //删除操作，如果slave都被通知标记为TRIED了，就不走后面的第二阶段CONFIRM了，可以直接删除任务。只需要master标记即可
         TransactionLogDao.updateStatusById(transactionId,TransactionStatusEnum.CONFIRM);
     }
     /**
