@@ -3,7 +3,7 @@ package com.github.liuche51.easyTaskX.cluster.follow;
 import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.task.HeartbeatsTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
-import com.github.liuche51.easyTaskX.cluster.task.UpdateRegeditTask;
+import com.github.liuche51.easyTaskX.cluster.task.FollowRequestUpdateRegeditTask;
 import com.github.liuche51.easyTaskX.cluster.task.tran.*;
 import com.github.liuche51.easyTaskX.dto.ByteStringPack;
 import com.github.liuche51.easyTaskX.dto.Node;
@@ -81,7 +81,7 @@ public class BrokerService {
      * 启动点定时从leader获取注册表更新任务
      */
     public static TimerTask startUpdateRegeditTask() {
-        UpdateRegeditTask task = new UpdateRegeditTask();
+        FollowRequestUpdateRegeditTask task = new FollowRequestUpdateRegeditTask();
         task.start();
         return task;
     }

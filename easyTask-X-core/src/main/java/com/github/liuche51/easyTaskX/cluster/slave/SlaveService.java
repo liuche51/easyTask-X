@@ -1,16 +1,26 @@
 package com.github.liuche51.easyTaskX.cluster.slave;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
+import com.github.liuche51.easyTaskX.cluster.task.CheckFollowsAliveTask;
+import com.github.liuche51.easyTaskX.cluster.task.ClusterSlaveRequestUpdateRegeditTask;
+import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
-import com.github.liuche51.easyTaskX.dto.ScheduleBak;
-import com.github.liuche51.easyTaskX.dto.TransactionLog;
+import com.github.liuche51.easyTaskX.dto.*;
+import com.github.liuche51.easyTaskX.dto.proto.Dto;
+import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
+import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionTableEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
+import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.StringConstant;
+import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sqlite.SQLiteException;
@@ -19,6 +29,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Follow服务入口
@@ -118,5 +130,38 @@ public class SlaveService {
             }
         }
     }
-
+    /**
+     * 集群Salve定时从leader获取注册表最新信息
+     * 覆盖本地信息
+     *
+     * @return
+     */
+    public static void requestUpdateClusterRegedit() {
+        try {
+            Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.SalveRequestUpdateClusterRegedit).setSource(ClusterService.getConfig().getAddress());
+            ByteStringPack respPack = new ByteStringPack();
+            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, ClusterService.CURRENTNODE.getClusterLeader().getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
+            if (ret) {
+                String body=respPack.getRespbody().toStringUtf8();
+                String[] items=body.split("|");
+                ConcurrentHashMap<String, RegBroker> broker= JSONObject.parseObject(items[0], new TypeReference<ConcurrentHashMap<String, RegBroker>>(){});
+                ConcurrentHashMap<String, RegClient> clinet= JSONObject.parseObject(items[1], new TypeReference<ConcurrentHashMap<String, RegClient>>(){});
+                LeaderService.BROKER_REGISTER_CENTER=broker;
+                LeaderService.CLIENT_REGISTER_CENTER=clinet;
+            } else {
+                log.info("normally exception!requestUpdateClusterRegedit() failed.");
+            }
+        } catch (Exception e) {
+            log.error("", e);
+        }
+    }
+    /**
+     * 启动集群slave主动通过定时任务从leader更新注册表
+     */
+    public static TimerTask startClusterSlaveRequestUpdateRegeditTask() {
+        ClusterSlaveRequestUpdateRegeditTask task = new ClusterSlaveRequestUpdateRegeditTask();
+        task.start();
+        return task;
+    }
 }

@@ -66,6 +66,10 @@ public class NettyInterfaceEnum {
      */
     public static final String LeaderNotifySalveUpdateRegedit="LeaderNotifySalveUpdateRegedit";
     /**
+     * 集群slave主动通过定时任务从leader更新注册表
+     */
+    public static final String SalveRequestUpdateClusterRegedit="SalveRequestUpdateClusterRegedit";
+    /**
      * master通知leader，已经完成对新follow的数据同步。请求更新数据同步状态
      */
     public static final String NotifyLeaderUpdateRegeditForDataStatus="notifyLeaderUpdateRegeditForDataStatus";
