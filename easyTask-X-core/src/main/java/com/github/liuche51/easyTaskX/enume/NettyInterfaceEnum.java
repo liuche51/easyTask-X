@@ -54,19 +54,23 @@ public class NettyInterfaceEnum {
      */
     public static final String NotifyMasterVoteNewSlave="NotifyMasterVoteNewSlave";
     /**
-     * 通知集群节点获取最新注册表信息
+     * leader通知client更新注册表信息
      */
-    public static final String NotifyNodeUpdateRegedit="NotifyNodeUpdateRegedit";
+    public static final String LeaderNotifyClientUpdateRegedit="LeaderNotifyClientUpdateRegedit";
     /**
-     * leader通知其follow节点更新注册表信息
+     * leader通知broker更新注册表信息
      */
-    public static final String NotifyFollowUpdateRegedit="NotifyFollowUpdateRegedit";
+    public static final String LeaderNotifyBrokerUpdateRegedit="LeaderNotifyBrokerUpdateRegedit";
+    /**
+     * leader通知其slave节点更新注册表信息
+     */
+    public static final String LeaderNotifySalveUpdateRegedit="LeaderNotifySalveUpdateRegedit";
     /**
      * master通知leader，已经完成对新follow的数据同步。请求更新数据同步状态
      */
     public static final String NotifyLeaderUpdateRegeditForDataStatus="notifyLeaderUpdateRegeditForDataStatus";
     /**
-     * broker获取leader最新注册表信息
+     * broker或client通过定时任务获取leader最新注册表信息
      */
-    public static final String UPDATE_REGEDIT="UpdateRegedit";
+    public static final String FollowRequestUpdateRegedit="FollowRequestUpdateRegedit";
 }

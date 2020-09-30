@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 集群slave处理来自leader注册表的同步通知。
  * 区分是Broker端还是Client端
  */
-public class NotifyFollowUpdateRegeditHandler extends BaseHandler {
+public class LeaderNotifySalveUpdateRegeditHandler extends BaseHandler {
 
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {
@@ -31,23 +31,23 @@ public class NotifyFollowUpdateRegeditHandler extends BaseHandler {
                     RegNode regNode = new RegNode(x.getHost(), x.getPort());
                     clients.put(regNode.getAddress(), regNode);
                 });
-                NodeDto.NodeList followNodes = node.getFollows();
+                NodeDto.NodeList slaveNodes = node.getSalves();
                 ConcurrentHashMap<String, RegNode> follows = new ConcurrentHashMap<>();
-                followNodes.getNodesList().forEach(x -> {
+                slaveNodes.getNodesList().forEach(x -> {
                     RegNode regNode = new RegNode(x.getHost(), x.getPort());
                     if (x.hasDataStatus())
                         regNode.setDataStatus(Short.valueOf(x.getDataStatus()));
                     follows.put(regNode.getAddress(), regNode);
                 });
-                NodeDto.NodeList leaderNodes = node.getLeaders();
+                NodeDto.NodeList masterNodes = node.getMasters();
                 ConcurrentHashMap<String, RegNode> leaders = new ConcurrentHashMap<>();
-                leaderNodes.getNodesList().forEach(x -> {
+                masterNodes.getNodesList().forEach(x -> {
                     RegNode regNode = new RegNode(x.getHost(), x.getPort());
                     leaders.put(regNode.getAddress(),regNode);
                 });
                 regnode.setClients(clients);
-                regnode.setFollows(follows);
-                regnode.setLeaders(leaders);
+                regnode.setSlaves(follows);
+                regnode.setMasters(leaders);
                 regnode.setCreateTime(ZonedDateTime.now());
                 regnode.setLastHeartbeat(ZonedDateTime.now());
                 LeaderService.BROKER_REGISTER_CENTER.put(regnode.getAddress(), regnode);

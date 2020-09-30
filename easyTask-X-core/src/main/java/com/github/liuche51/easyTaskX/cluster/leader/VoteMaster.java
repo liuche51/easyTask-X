@@ -69,14 +69,14 @@ public class VoteMaster {
      */
     public static void updateRegedit(RegBroker regBroker){
         LeaderService.BROKER_REGISTER_CENTER.remove(regBroker.getAddress());
-        Map<String, RegNode> follows=regBroker.getFollows();
+        Map<String, RegNode> follows=regBroker.getSlaves();
         if(follows.size()>0){
             Iterator<Map.Entry<String, RegNode>> items=follows.entrySet().iterator();
             while (items.hasNext()){
                 RegNode regNode=items.next().getValue();
                 RegBroker follow= LeaderService.BROKER_REGISTER_CENTER.get(regNode.getAddress());
                 if(follow!=null){
-                    follow.getLeaders().remove(regBroker.getAddress());
+                    follow.getMasters().remove(regBroker.getAddress());
                 }
             }
         }

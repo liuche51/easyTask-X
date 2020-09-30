@@ -16,7 +16,7 @@ public class NotifyLeaderUpdateRegeditForDataStatusHandler extends BaseHandler {
         String body=frame.getBody();
         String[] items=body.split("|");//地址|状态
         RegBroker regNode= LeaderService.BROKER_REGISTER_CENTER.get(frame.getSource());
-        RegNode follow=regNode.getFollows().get(items[0]);
+        RegNode follow=regNode.getSlaves().get(items[0]);
         follow.setDataStatus(new Short(items[1]));
         return null;
     }

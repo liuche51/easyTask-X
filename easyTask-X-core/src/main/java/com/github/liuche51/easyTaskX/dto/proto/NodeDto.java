@@ -77,33 +77,33 @@ public final class NodeDto {
      */
     NodeListOrBuilder getBrokersOrBuilder();
 
-    // optional .NodeList follows = 6;
+    // optional .NodeList salves = 6;
     /**
-     * <code>optional .NodeList follows = 6;</code>
+     * <code>optional .NodeList salves = 6;</code>
      */
-    boolean hasFollows();
+    boolean hasSalves();
     /**
-     * <code>optional .NodeList follows = 6;</code>
+     * <code>optional .NodeList salves = 6;</code>
      */
-    NodeList getFollows();
+    NodeList getSalves();
     /**
-     * <code>optional .NodeList follows = 6;</code>
+     * <code>optional .NodeList salves = 6;</code>
      */
-    NodeListOrBuilder getFollowsOrBuilder();
+    NodeListOrBuilder getSalvesOrBuilder();
 
-    // optional .NodeList leaders = 7;
+    // optional .NodeList masters = 7;
     /**
-     * <code>optional .NodeList leaders = 7;</code>
+     * <code>optional .NodeList masters = 7;</code>
      */
-    boolean hasLeaders();
+    boolean hasMasters();
     /**
-     * <code>optional .NodeList leaders = 7;</code>
+     * <code>optional .NodeList masters = 7;</code>
      */
-    NodeList getLeaders();
+    NodeList getMasters();
     /**
-     * <code>optional .NodeList leaders = 7;</code>
+     * <code>optional .NodeList masters = 7;</code>
      */
-    NodeListOrBuilder getLeadersOrBuilder();
+    NodeListOrBuilder getMastersOrBuilder();
 
     // optional string ext = 8;
     /**
@@ -227,12 +227,12 @@ public final class NodeDto {
             case 50: {
               NodeList.Builder subBuilder = null;
               if (((bitField0_ & 0x00000020) == 0x00000020)) {
-                subBuilder = follows_.toBuilder();
+                subBuilder = salves_.toBuilder();
               }
-              follows_ = input.readMessage(NodeList.PARSER, extensionRegistry);
+              salves_ = input.readMessage(NodeList.PARSER, extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(follows_);
-                follows_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(salves_);
+                salves_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000020;
               break;
@@ -240,12 +240,12 @@ public final class NodeDto {
             case 58: {
               NodeList.Builder subBuilder = null;
               if (((bitField0_ & 0x00000040) == 0x00000040)) {
-                subBuilder = leaders_.toBuilder();
+                subBuilder = masters_.toBuilder();
               }
-              leaders_ = input.readMessage(NodeList.PARSER, extensionRegistry);
+              masters_ = input.readMessage(NodeList.PARSER, extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(leaders_);
-                leaders_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(masters_);
+                masters_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000040;
               break;
@@ -441,48 +441,48 @@ public final class NodeDto {
       return brokers_;
     }
 
-    // optional .NodeList follows = 6;
-    public static final int FOLLOWS_FIELD_NUMBER = 6;
-    private NodeList follows_;
+    // optional .NodeList salves = 6;
+    public static final int SALVES_FIELD_NUMBER = 6;
+    private NodeList salves_;
     /**
-     * <code>optional .NodeList follows = 6;</code>
+     * <code>optional .NodeList salves = 6;</code>
      */
-    public boolean hasFollows() {
+    public boolean hasSalves() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional .NodeList follows = 6;</code>
+     * <code>optional .NodeList salves = 6;</code>
      */
-    public NodeList getFollows() {
-      return follows_;
+    public NodeList getSalves() {
+      return salves_;
     }
     /**
-     * <code>optional .NodeList follows = 6;</code>
+     * <code>optional .NodeList salves = 6;</code>
      */
-    public NodeListOrBuilder getFollowsOrBuilder() {
-      return follows_;
+    public NodeListOrBuilder getSalvesOrBuilder() {
+      return salves_;
     }
 
-    // optional .NodeList leaders = 7;
-    public static final int LEADERS_FIELD_NUMBER = 7;
-    private NodeList leaders_;
+    // optional .NodeList masters = 7;
+    public static final int MASTERS_FIELD_NUMBER = 7;
+    private NodeList masters_;
     /**
-     * <code>optional .NodeList leaders = 7;</code>
+     * <code>optional .NodeList masters = 7;</code>
      */
-    public boolean hasLeaders() {
+    public boolean hasMasters() {
       return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
-     * <code>optional .NodeList leaders = 7;</code>
+     * <code>optional .NodeList masters = 7;</code>
      */
-    public NodeList getLeaders() {
-      return leaders_;
+    public NodeList getMasters() {
+      return masters_;
     }
     /**
-     * <code>optional .NodeList leaders = 7;</code>
+     * <code>optional .NodeList masters = 7;</code>
      */
-    public NodeListOrBuilder getLeadersOrBuilder() {
-      return leaders_;
+    public NodeListOrBuilder getMastersOrBuilder() {
+      return masters_;
     }
 
     // optional string ext = 8;
@@ -546,8 +546,8 @@ public final class NodeDto {
       dataStatus_ = "";
       clients_ = NodeList.getDefaultInstance();
       brokers_ = NodeList.getDefaultInstance();
-      follows_ = NodeList.getDefaultInstance();
-      leaders_ = NodeList.getDefaultInstance();
+      salves_ = NodeList.getDefaultInstance();
+      masters_ = NodeList.getDefaultInstance();
       ext_ = "";
     }
     private byte memoizedIsInitialized = -1;
@@ -578,10 +578,10 @@ public final class NodeDto {
         output.writeMessage(5, brokers_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeMessage(6, follows_);
+        output.writeMessage(6, salves_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeMessage(7, leaders_);
+        output.writeMessage(7, masters_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         output.writeBytes(8, getExtBytes());
@@ -617,11 +617,11 @@ public final class NodeDto {
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(6, follows_);
+          .computeMessageSize(6, salves_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(7, leaders_);
+          .computeMessageSize(7, masters_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
@@ -737,8 +737,8 @@ public final class NodeDto {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getClientsFieldBuilder();
           getBrokersFieldBuilder();
-          getFollowsFieldBuilder();
-          getLeadersFieldBuilder();
+          getSalvesFieldBuilder();
+          getMastersFieldBuilder();
         }
       }
       private static Builder create() {
@@ -765,16 +765,16 @@ public final class NodeDto {
           brokersBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000010);
-        if (followsBuilder_ == null) {
-          follows_ = NodeList.getDefaultInstance();
+        if (salvesBuilder_ == null) {
+          salves_ = NodeList.getDefaultInstance();
         } else {
-          followsBuilder_.clear();
+          salvesBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000020);
-        if (leadersBuilder_ == null) {
-          leaders_ = NodeList.getDefaultInstance();
+        if (mastersBuilder_ == null) {
+          masters_ = NodeList.getDefaultInstance();
         } else {
-          leadersBuilder_.clear();
+          mastersBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000040);
         ext_ = "";
@@ -838,18 +838,18 @@ public final class NodeDto {
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
         }
-        if (followsBuilder_ == null) {
-          result.follows_ = follows_;
+        if (salvesBuilder_ == null) {
+          result.salves_ = salves_;
         } else {
-          result.follows_ = followsBuilder_.build();
+          result.salves_ = salvesBuilder_.build();
         }
         if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
           to_bitField0_ |= 0x00000040;
         }
-        if (leadersBuilder_ == null) {
-          result.leaders_ = leaders_;
+        if (mastersBuilder_ == null) {
+          result.masters_ = masters_;
         } else {
-          result.leaders_ = leadersBuilder_.build();
+          result.masters_ = mastersBuilder_.build();
         }
         if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
           to_bitField0_ |= 0x00000080;
@@ -890,11 +890,11 @@ public final class NodeDto {
         if (other.hasBrokers()) {
           mergeBrokers(other.getBrokers());
         }
-        if (other.hasFollows()) {
-          mergeFollows(other.getFollows());
+        if (other.hasSalves()) {
+          mergeSalves(other.getSalves());
         }
-        if (other.hasLeaders()) {
-          mergeLeaders(other.getLeaders());
+        if (other.hasMasters()) {
+          mergeMasters(other.getMasters());
         }
         if (other.hasExt()) {
           bitField0_ |= 0x00000080;
@@ -1343,238 +1343,238 @@ public final class NodeDto {
         return brokersBuilder_;
       }
 
-      // optional .NodeList follows = 6;
-      private NodeList follows_ = NodeList.getDefaultInstance();
+      // optional .NodeList salves = 6;
+      private NodeList salves_ = NodeList.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
-          NodeList, NodeList.Builder, NodeListOrBuilder> followsBuilder_;
+          NodeList, NodeList.Builder, NodeListOrBuilder> salvesBuilder_;
       /**
-       * <code>optional .NodeList follows = 6;</code>
+       * <code>optional .NodeList salves = 6;</code>
        */
-      public boolean hasFollows() {
+      public boolean hasSalves() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional .NodeList follows = 6;</code>
+       * <code>optional .NodeList salves = 6;</code>
        */
-      public NodeList getFollows() {
-        if (followsBuilder_ == null) {
-          return follows_;
+      public NodeList getSalves() {
+        if (salvesBuilder_ == null) {
+          return salves_;
         } else {
-          return followsBuilder_.getMessage();
+          return salvesBuilder_.getMessage();
         }
       }
       /**
-       * <code>optional .NodeList follows = 6;</code>
+       * <code>optional .NodeList salves = 6;</code>
        */
-      public Builder setFollows(NodeList value) {
-        if (followsBuilder_ == null) {
+      public Builder setSalves(NodeList value) {
+        if (salvesBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          follows_ = value;
+          salves_ = value;
           onChanged();
         } else {
-          followsBuilder_.setMessage(value);
+          salvesBuilder_.setMessage(value);
         }
         bitField0_ |= 0x00000020;
         return this;
       }
       /**
-       * <code>optional .NodeList follows = 6;</code>
+       * <code>optional .NodeList salves = 6;</code>
        */
-      public Builder setFollows(
+      public Builder setSalves(
           NodeList.Builder builderForValue) {
-        if (followsBuilder_ == null) {
-          follows_ = builderForValue.build();
+        if (salvesBuilder_ == null) {
+          salves_ = builderForValue.build();
           onChanged();
         } else {
-          followsBuilder_.setMessage(builderForValue.build());
+          salvesBuilder_.setMessage(builderForValue.build());
         }
         bitField0_ |= 0x00000020;
         return this;
       }
       /**
-       * <code>optional .NodeList follows = 6;</code>
+       * <code>optional .NodeList salves = 6;</code>
        */
-      public Builder mergeFollows(NodeList value) {
-        if (followsBuilder_ == null) {
+      public Builder mergeSalves(NodeList value) {
+        if (salvesBuilder_ == null) {
           if (((bitField0_ & 0x00000020) == 0x00000020) &&
-              follows_ != NodeList.getDefaultInstance()) {
-            follows_ =
-              NodeList.newBuilder(follows_).mergeFrom(value).buildPartial();
+              salves_ != NodeList.getDefaultInstance()) {
+            salves_ =
+              NodeList.newBuilder(salves_).mergeFrom(value).buildPartial();
           } else {
-            follows_ = value;
+            salves_ = value;
           }
           onChanged();
         } else {
-          followsBuilder_.mergeFrom(value);
+          salvesBuilder_.mergeFrom(value);
         }
         bitField0_ |= 0x00000020;
         return this;
       }
       /**
-       * <code>optional .NodeList follows = 6;</code>
+       * <code>optional .NodeList salves = 6;</code>
        */
-      public Builder clearFollows() {
-        if (followsBuilder_ == null) {
-          follows_ = NodeList.getDefaultInstance();
+      public Builder clearSalves() {
+        if (salvesBuilder_ == null) {
+          salves_ = NodeList.getDefaultInstance();
           onChanged();
         } else {
-          followsBuilder_.clear();
+          salvesBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
       /**
-       * <code>optional .NodeList follows = 6;</code>
+       * <code>optional .NodeList salves = 6;</code>
        */
-      public NodeList.Builder getFollowsBuilder() {
+      public NodeList.Builder getSalvesBuilder() {
         bitField0_ |= 0x00000020;
         onChanged();
-        return getFollowsFieldBuilder().getBuilder();
+        return getSalvesFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .NodeList follows = 6;</code>
+       * <code>optional .NodeList salves = 6;</code>
        */
-      public NodeListOrBuilder getFollowsOrBuilder() {
-        if (followsBuilder_ != null) {
-          return followsBuilder_.getMessageOrBuilder();
+      public NodeListOrBuilder getSalvesOrBuilder() {
+        if (salvesBuilder_ != null) {
+          return salvesBuilder_.getMessageOrBuilder();
         } else {
-          return follows_;
+          return salves_;
         }
       }
       /**
-       * <code>optional .NodeList follows = 6;</code>
+       * <code>optional .NodeList salves = 6;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           NodeList, NodeList.Builder, NodeListOrBuilder>
-          getFollowsFieldBuilder() {
-        if (followsBuilder_ == null) {
-          followsBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          getSalvesFieldBuilder() {
+        if (salvesBuilder_ == null) {
+          salvesBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               NodeList, NodeList.Builder, NodeListOrBuilder>(
-                  follows_,
+                  salves_,
                   getParentForChildren(),
                   isClean());
-          follows_ = null;
+          salves_ = null;
         }
-        return followsBuilder_;
+        return salvesBuilder_;
       }
 
-      // optional .NodeList leaders = 7;
-      private NodeList leaders_ = NodeList.getDefaultInstance();
+      // optional .NodeList masters = 7;
+      private NodeList masters_ = NodeList.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
-          NodeList, NodeList.Builder, NodeListOrBuilder> leadersBuilder_;
+          NodeList, NodeList.Builder, NodeListOrBuilder> mastersBuilder_;
       /**
-       * <code>optional .NodeList leaders = 7;</code>
+       * <code>optional .NodeList masters = 7;</code>
        */
-      public boolean hasLeaders() {
+      public boolean hasMasters() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
-       * <code>optional .NodeList leaders = 7;</code>
+       * <code>optional .NodeList masters = 7;</code>
        */
-      public NodeList getLeaders() {
-        if (leadersBuilder_ == null) {
-          return leaders_;
+      public NodeList getMasters() {
+        if (mastersBuilder_ == null) {
+          return masters_;
         } else {
-          return leadersBuilder_.getMessage();
+          return mastersBuilder_.getMessage();
         }
       }
       /**
-       * <code>optional .NodeList leaders = 7;</code>
+       * <code>optional .NodeList masters = 7;</code>
        */
-      public Builder setLeaders(NodeList value) {
-        if (leadersBuilder_ == null) {
+      public Builder setMasters(NodeList value) {
+        if (mastersBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          leaders_ = value;
+          masters_ = value;
           onChanged();
         } else {
-          leadersBuilder_.setMessage(value);
+          mastersBuilder_.setMessage(value);
         }
         bitField0_ |= 0x00000040;
         return this;
       }
       /**
-       * <code>optional .NodeList leaders = 7;</code>
+       * <code>optional .NodeList masters = 7;</code>
        */
-      public Builder setLeaders(
+      public Builder setMasters(
           NodeList.Builder builderForValue) {
-        if (leadersBuilder_ == null) {
-          leaders_ = builderForValue.build();
+        if (mastersBuilder_ == null) {
+          masters_ = builderForValue.build();
           onChanged();
         } else {
-          leadersBuilder_.setMessage(builderForValue.build());
+          mastersBuilder_.setMessage(builderForValue.build());
         }
         bitField0_ |= 0x00000040;
         return this;
       }
       /**
-       * <code>optional .NodeList leaders = 7;</code>
+       * <code>optional .NodeList masters = 7;</code>
        */
-      public Builder mergeLeaders(NodeList value) {
-        if (leadersBuilder_ == null) {
+      public Builder mergeMasters(NodeList value) {
+        if (mastersBuilder_ == null) {
           if (((bitField0_ & 0x00000040) == 0x00000040) &&
-              leaders_ != NodeList.getDefaultInstance()) {
-            leaders_ =
-              NodeList.newBuilder(leaders_).mergeFrom(value).buildPartial();
+              masters_ != NodeList.getDefaultInstance()) {
+            masters_ =
+              NodeList.newBuilder(masters_).mergeFrom(value).buildPartial();
           } else {
-            leaders_ = value;
+            masters_ = value;
           }
           onChanged();
         } else {
-          leadersBuilder_.mergeFrom(value);
+          mastersBuilder_.mergeFrom(value);
         }
         bitField0_ |= 0x00000040;
         return this;
       }
       /**
-       * <code>optional .NodeList leaders = 7;</code>
+       * <code>optional .NodeList masters = 7;</code>
        */
-      public Builder clearLeaders() {
-        if (leadersBuilder_ == null) {
-          leaders_ = NodeList.getDefaultInstance();
+      public Builder clearMasters() {
+        if (mastersBuilder_ == null) {
+          masters_ = NodeList.getDefaultInstance();
           onChanged();
         } else {
-          leadersBuilder_.clear();
+          mastersBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
       /**
-       * <code>optional .NodeList leaders = 7;</code>
+       * <code>optional .NodeList masters = 7;</code>
        */
-      public NodeList.Builder getLeadersBuilder() {
+      public NodeList.Builder getMastersBuilder() {
         bitField0_ |= 0x00000040;
         onChanged();
-        return getLeadersFieldBuilder().getBuilder();
+        return getMastersFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .NodeList leaders = 7;</code>
+       * <code>optional .NodeList masters = 7;</code>
        */
-      public NodeListOrBuilder getLeadersOrBuilder() {
-        if (leadersBuilder_ != null) {
-          return leadersBuilder_.getMessageOrBuilder();
+      public NodeListOrBuilder getMastersOrBuilder() {
+        if (mastersBuilder_ != null) {
+          return mastersBuilder_.getMessageOrBuilder();
         } else {
-          return leaders_;
+          return masters_;
         }
       }
       /**
-       * <code>optional .NodeList leaders = 7;</code>
+       * <code>optional .NodeList masters = 7;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           NodeList, NodeList.Builder, NodeListOrBuilder>
-          getLeadersFieldBuilder() {
-        if (leadersBuilder_ == null) {
-          leadersBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          getMastersFieldBuilder() {
+        if (mastersBuilder_ == null) {
+          mastersBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               NodeList, NodeList.Builder, NodeListOrBuilder>(
-                  leaders_,
+                  masters_,
                   getParentForChildren(),
                   isClean());
-          leaders_ = null;
+          masters_ = null;
         }
-        return leadersBuilder_;
+        return mastersBuilder_;
       }
 
       // optional string ext = 8;
@@ -2379,13 +2379,13 @@ public final class NodeDto {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\rNodeDto.proto\"\263\001\n\004Node\022\014\n\004host\030\001 \001(\t\022\014" +
+      "\n\rNodeDto.proto\"\262\001\n\004Node\022\014\n\004host\030\001 \001(\t\022\014" +
       "\n\004port\030\002 \001(\005\022\022\n\ndataStatus\030\003 \001(\t\022\032\n\007clie" +
       "nts\030\004 \001(\0132\t.NodeList\022\032\n\007brokers\030\005 \001(\0132\t." +
-      "NodeList\022\032\n\007follows\030\006 \001(\0132\t.NodeList\022\032\n\007" +
-      "leaders\030\007 \001(\0132\t.NodeList\022\013\n\003ext\030\010 \001(\t\" \n" +
-      "\010NodeList\022\024\n\005nodes\030\001 \003(\0132\005.NodeB\tB\007NodeD" +
-      "to"
+      "NodeList\022\031\n\006salves\030\006 \001(\0132\t.NodeList\022\032\n\007m" +
+      "asters\030\007 \001(\0132\t.NodeList\022\013\n\003ext\030\010 \001(\t\" \n\010" +
+      "NodeList\022\024\n\005nodes\030\001 \003(\0132\005.NodeB\tB\007NodeDt" +
+      "o"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2397,7 +2397,7 @@ public final class NodeDto {
           internal_static_Node_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_Node_descriptor,
-              new String[] { "Host", "Port", "DataStatus", "Clients", "Brokers", "Follows", "Leaders", "Ext", });
+              new String[] { "Host", "Port", "DataStatus", "Clients", "Brokers", "Salves", "Masters", "Ext", });
           internal_static_NodeList_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_NodeList_fieldAccessorTable = new

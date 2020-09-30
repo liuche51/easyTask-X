@@ -15,7 +15,6 @@ public class NotiyNewMasterHandler extends BaseHandler {
     public ByteString process(Dto.Frame frame) throws Exception {
         String body=frame.getBody();
         String[] items=body.split("|");
-        BrokerService.requestUpdateRegedit();
         //如果自己就是新leader。就重新提交旧leader的任务给自己
         if(ClusterService.CURRENTNODE.getAddress().equals(items[1])){
             MasterService.submitNewTaskByOldLeader(items[0]);

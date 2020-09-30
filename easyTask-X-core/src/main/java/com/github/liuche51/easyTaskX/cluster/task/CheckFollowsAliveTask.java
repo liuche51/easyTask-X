@@ -52,23 +52,23 @@ public class CheckFollowsAliveTask extends TimerTask {
                     //master节点失效,且有follows。选新leader
                     if (DateUtils.isGreaterThanLoseTime(regNode.getLastHeartbeat())) {
                         //如果有follows。则选出新master，并通知它们。没有则直接移出注册表
-                        if (regNode.getFollows().size() > 0) {
-                            RegNode newleader = VoteMaster.voteNewLeader(regNode.getFollows());
-                            VoteMaster.notifySliceFollowsNewLeader(regNode.getFollows(), newleader.getAddress(), regNode.getAddress());
+                        if (regNode.getSlaves().size() > 0) {
+                            RegNode newleader = VoteMaster.voteNewLeader(regNode.getSlaves());
+                            VoteMaster.notifySliceFollowsNewLeader(regNode.getSlaves(), newleader.getAddress(), regNode.getAddress());
                         }
                         VoteMaster.updateRegedit(regNode);
-                        LeaderService.notifyNodesUpdateRegedit(regNode.getFollows());
-                        LeaderService.notifyClusterFollowUpdateRegedit(ClusterService.CURRENTNODE.getFollows(),regNode);
+                        LeaderService.notifyFollowsUpdateRegedit(regNode.getSlaves(),"broker");
+                        LeaderService.notifySalveUpdateRegedit(ClusterService.CURRENTNODE.getFollows(),regNode);
 
                     }
                     //master没失效，但是follow失效了
                     else {
-                        ConcurrentHashMap<String, RegNode> follows = regNode.getFollows();
+                        ConcurrentHashMap<String, RegNode> follows = regNode.getSlaves();
                         //初始化，还没有一个follow时
                         if (follows.size() == 0) {
                             try {
-                                List<RegNode> newFollows= VoteSlave.initVoteFollows(regNode);
-                                LeaderService.notifyNodesUpdateRegedit(newFollows);
+                                List<RegNode> newSlaves= VoteSlave.initVoteSlaves(regNode);
+                                LeaderService.notifyFollowsUpdateRegedit(newSlaves,"broker");
                             } catch (VotingException e) {
                                 log.info("normally exception!{}", e.getMessage());
                             } catch (Exception e) {
@@ -85,13 +85,13 @@ public class CheckFollowsAliveTask extends TimerTask {
                                 //follow没有注册信息或者心跳超时了。（没有注册信息，可能是因为上面判断过程中已经将其移除注册表了）
                                 if (regNodeFollow == null || DateUtils.isGreaterThanLoseTime(regNodeFollow.getLastHeartbeat())) {
                                     try {
-                                        RegNode newNode = VoteSlave.voteNewFollow(regNode, node);
-                                        VoteSlave.notifySliceLeaderVoteNewFollow(regNode, newNode.getAddress(), node.getAddress());
-                                        LeaderService.notifyNodesUpdateRegedit(Collections.singletonList(newNode));
+                                        RegNode newSlave = VoteSlave.voteNewSlave(regNode, node);
+                                        VoteSlave.notifySliceLeaderVoteNewFollow(regNode, newSlave.getAddress(), node.getAddress());
+                                        LeaderService.notifyFollowsUpdateRegedit(Collections.singletonList(newSlave),"broker");
                                     } catch (VotingException e) {
                                         log.info("normally exception!{}", e.getMessage());
                                     } catch (Exception e) {
-                                        log.error("voteNewFollow()->exception!", e);
+                                        log.error("voteNewSlave()->exception!", e);
                                     }
                                     //items.remove();这里不需要了。因为在voteNewFollow中已经移除了
                                 }

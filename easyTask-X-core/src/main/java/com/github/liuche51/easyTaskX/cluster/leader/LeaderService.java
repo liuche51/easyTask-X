@@ -36,21 +36,21 @@ public class LeaderService {
      *
      * @param nodes
      */
-    public static void notifyNodesUpdateRegedit(List<RegNode> nodes) {
+    public static void notifyFollowsUpdateRegedit(List<RegNode> nodes,String type) {
 
         nodes.forEach(x -> {
-            LeaderUtil.notifyNodeUpdateRegedit(x);
+            LeaderUtil.notifyFollowUpdateRegedit(x.getAddress(),type);
         });
     }
     /**
-     * 通知节点更新注册表信息
+     * 通知follows更新注册表信息
      *
      * @param nodes
      */
-    public static void notifyNodesUpdateRegedit(Map<String,RegNode> nodes) {
+    public static void notifyFollowsUpdateRegedit(Map<String,RegNode> nodes,String type) {
         Iterator<Map.Entry<String, RegNode>> items = nodes.entrySet().iterator();
         while (items.hasNext()) {
-            LeaderUtil.notifyNodeUpdateRegedit(items.next().getValue());
+            LeaderUtil.notifyFollowUpdateRegedit(items.next().getValue().getAddress(),type);
         }
     }
 
@@ -59,7 +59,7 @@ public class LeaderService {
      *
      * @param nodes
      */
-    public static void notifyClusterFollowUpdateRegedit(Map<String, Node> nodes, RegBroker node) {
+    public static void notifySalveUpdateRegedit(Map<String, Node> nodes, RegBroker node) {
         Iterator<Map.Entry<String, Node>> items = nodes.entrySet().iterator();
         while (items.hasNext()) {
             Map.Entry<String, Node> item = items.next();
@@ -68,7 +68,7 @@ public class LeaderService {
                 public void run() {
                     try {
                         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NotifyFollowUpdateRegedit)
+                        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifySalveUpdateRegedit)
                                 .setSource(ClusterService.CURRENTNODE.getAddress());
                         NodeDto.Node.Builder nodeBuilder=NodeDto.Node.newBuilder();
                         //clients
@@ -84,7 +84,7 @@ public class LeaderService {
                         nodeBuilder.setClients(clientsBuilder.build());
                         //follows
                         NodeDto.NodeList.Builder followsBuilder= NodeDto.NodeList.newBuilder();
-                        Iterator<Map.Entry<String,RegNode>> items2=node.getFollows().entrySet().iterator();
+                        Iterator<Map.Entry<String,RegNode>> items2=node.getSlaves().entrySet().iterator();
                         while (items2.hasNext()){
                             Map.Entry<String,RegNode> item2=items2.next();
                             RegNode itNode=item2.getValue();
@@ -94,10 +94,10 @@ public class LeaderService {
                                 followBuilder.setDataStatus(itNode.getDataStatus().toString());
                             followsBuilder.addNodes(followBuilder.build());
                         }
-                        nodeBuilder.setFollows(followsBuilder.build());
+                        nodeBuilder.setSalves(followsBuilder.build());
                         //leaders
                         NodeDto.NodeList.Builder leadersBuilder= NodeDto.NodeList.newBuilder();
-                        Iterator<Map.Entry<String,RegNode>> items3=node.getLeaders().entrySet().iterator();
+                        Iterator<Map.Entry<String,RegNode>> items3=node.getMasters().entrySet().iterator();
                         while (items3.hasNext()){
                             Map.Entry<String,RegNode> item3=items3.next();
                             RegNode itNode=item3.getValue();
@@ -105,11 +105,11 @@ public class LeaderService {
                             followBuilder3.setHost(itNode.getHost()).setPort(itNode.getPort());
                             leadersBuilder.addNodes(followBuilder3.build());
                         }
-                        nodeBuilder.setLeaders(leadersBuilder.build());
+                        nodeBuilder.setMasters(leadersBuilder.build());
                         builder.setBodyBytes(nodeBuilder.build().toByteString());
                         boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, item.getValue().getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                         if (!ret)
-                            log.info("normally exception!notifyClusterFollowUpdateRegedit() failed.");
+                            log.info("normally exception!notifySalveUpdateRegedit() failed.");
                     } catch (Exception e) {
                         log.error("", e);
                     }
@@ -117,12 +117,13 @@ public class LeaderService {
             });
         };
     }
+
     /**
      * leader通知其slave 更新Client类型注册表信息
      *
      * @param nodes
      */
-    public static void notifyClusterFollowUpdateRegedit(Map<String, Node> nodes, RegClient node) {
+    public static void notifySalveUpdateRegedit(Map<String, Node> nodes, RegClient node) {
         Iterator<Map.Entry<String, Node>> items = nodes.entrySet().iterator();
         while (items.hasNext()) {
             Map.Entry<String, Node> item = items.next();
@@ -131,7 +132,7 @@ public class LeaderService {
                 public void run() {
                     try {
                         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NotifyFollowUpdateRegedit)
+                        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifySalveUpdateRegedit)
                                 .setSource(ClusterService.CURRENTNODE.getAddress());
                         NodeDto.Node.Builder nodeBuilder=NodeDto.Node.newBuilder();
                         //Brokers
@@ -148,7 +149,7 @@ public class LeaderService {
                         builder.setBodyBytes(nodeBuilder.build().toByteString());
                         boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, item.getValue().getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                         if (!ret)
-                            log.info("normally exception!notifyClusterFollowUpdateRegedit() failed.");
+                            log.info("normally exception!notifySalveUpdateRegedit() failed.");
                     } catch (Exception e) {
                         log.error("", e);
                     }

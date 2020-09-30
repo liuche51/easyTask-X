@@ -24,11 +24,11 @@ public class RegBroker extends BaseNode{
     /**
      * 当前节点的所有follows
      */
-    private ConcurrentHashMap<String, RegNode> follows = new ConcurrentHashMap();
+    private ConcurrentHashMap<String, RegNode> slaves = new ConcurrentHashMap();
     /**
      * 当前节点的所有leader
      */
-    private ConcurrentHashMap<String, RegNode> leaders = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, RegNode> masters = new ConcurrentHashMap<>();
     public RegBroker(BaseNode baseNode){
         super(baseNode.getHost(), baseNode.getPort());
     }
@@ -63,19 +63,19 @@ public class RegBroker extends BaseNode{
         this.clients = clients;
     }
 
-    public ConcurrentHashMap<String, RegNode> getFollows() {
-        return follows;
+    public ConcurrentHashMap<String, RegNode> getSlaves() {
+        return slaves;
     }
 
-    public void setFollows(ConcurrentHashMap<String, RegNode> follows) {
-        this.follows = follows;
+    public void setSlaves(ConcurrentHashMap<String, RegNode> slaves) {
+        this.slaves = slaves;
     }
 
-    public ConcurrentHashMap<String, RegNode> getLeaders() {
-        return leaders;
+    public ConcurrentHashMap<String, RegNode> getMasters() {
+        return masters;
     }
 
-    public void setLeaders(ConcurrentHashMap<String, RegNode> leaders) {
-        this.leaders = leaders;
+    public void setMasters(ConcurrentHashMap<String, RegNode> masters) {
+        this.masters = masters;
     }
 }

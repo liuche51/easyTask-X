@@ -22,64 +22,72 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class BrokerService {
     private static final Logger log = LoggerFactory.getLogger(BrokerService.class);
+
     /**
      * 启动批量事务数据提交任务
      */
     public static TimerTask startCommitSaveTransactionTask() {
-        CommitSaveTransactionTask task=new CommitSaveTransactionTask();
+        CommitSaveTransactionTask task = new CommitSaveTransactionTask();
         task.start();
         return task;
     }
+
     /**
      * 启动批量事务数据删除任务
      */
     public static TimerTask startCommitDelTransactionTask() {
-        CommitDelTransactionTask task=new CommitDelTransactionTask();
+        CommitDelTransactionTask task = new CommitDelTransactionTask();
         task.start();
         return task;
     }
+
     /**
      * 启动批量事务数据取消提交任务
      */
     public static TimerTask startCancelSaveTransactionTask() {
-        CancelSaveTransactionTask task=new CancelSaveTransactionTask();
+        CancelSaveTransactionTask task = new CancelSaveTransactionTask();
         task.start();
         return task;
     }
+
     /**
      * 启动重试取消保持任务
      */
     public static TimerTask startRetryCancelSaveTransactionTask() {
-        RetryCancelSaveTransactionTask task=new RetryCancelSaveTransactionTask();
+        RetryCancelSaveTransactionTask task = new RetryCancelSaveTransactionTask();
         task.start();
         return task;
     }
+
     /**
      * 启动重试删除任务
      */
     public static TimerTask startRetryDelTransactionTask() {
-        RetryDelTransactionTask task=new RetryDelTransactionTask();
+        RetryDelTransactionTask task = new RetryDelTransactionTask();
         task.start();
         return task;
     }
+
     /**
      * 节点对leader的心跳。2s一次
      */
     public static TimerTask startHeartBeat() {
-        HeartbeatsTask task=new HeartbeatsTask();
+        HeartbeatsTask task = new HeartbeatsTask();
         task.start();
         return task;
     }
+
     /**
      * 启动点定时从leader获取注册表更新任务
      */
     public static TimerTask startUpdateRegeditTask() {
-        UpdateRegeditTask task=new UpdateRegeditTask();
+        UpdateRegeditTask task = new UpdateRegeditTask();
         task.start();
         return task;
     }
+
     /**
-     * 集群follow请求leader获取当前节点最新注册表信息。
+     * Broker定时从leader获取注册表最新信息
      * 覆盖本地信息
      *
      * @return
@@ -87,37 +95,45 @@ public class BrokerService {
     public static boolean requestUpdateRegedit() {
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.UPDATE_REGEDIT).setSource(ClusterService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestUpdateRegedit).setSource(ClusterService.getConfig().getAddress())
                     .setBody("broker");
-            ByteStringPack respPack =new ByteStringPack();
+            ByteStringPack respPack = new ByteStringPack();
             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, ClusterService.CURRENTNODE.getClusterLeader().getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
             if (ret) {
                 NodeDto.Node node = NodeDto.Node.parseFrom(respPack.getRespbody());
-                NodeDto.NodeList clientNodes = node.getClients();
-                ConcurrentHashMap<String, Node> clients = new ConcurrentHashMap<>();
-                clientNodes.getNodesList().forEach(x -> {
-                    clients.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
-                });
-                NodeDto.NodeList followNodes = node.getFollows();
-                ConcurrentHashMap<String, Node> follows = new ConcurrentHashMap<>();
-                followNodes.getNodesList().forEach(x -> {
-                    follows.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
-                });
-                NodeDto.NodeList leaderNodes = node.getLeaders();
-                ConcurrentHashMap<String, Node> leaders = new ConcurrentHashMap<>();
-                leaderNodes.getNodesList().forEach(x -> {
-                    leaders.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
-                });
-                ClusterService.CURRENTNODE.setFollows(follows);
-                ClusterService.CURRENTNODE.setClients(clients);
-                ClusterService.CURRENTNODE.setLeaders(leaders);
+                dealUpdate(node);
                 return true;
-            }else {
+            } else {
                 log.info("normally exception!requestUpdateRegedit() failed.");
             }
         } catch (Exception e) {
             log.error("", e);
         }
         return false;
+    }
+
+    /**
+     * 处理注册表更新
+     * @param node
+     */
+    public static void dealUpdate(NodeDto.Node node) {
+        NodeDto.NodeList clientNodes = node.getClients();
+        ConcurrentHashMap<String, Node> clients = new ConcurrentHashMap<>();
+        clientNodes.getNodesList().forEach(x -> {
+            clients.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
+        });
+        NodeDto.NodeList slaveNodes = node.getSalves();
+        ConcurrentHashMap<String, Node> follows = new ConcurrentHashMap<>();
+        slaveNodes.getNodesList().forEach(x -> {
+            follows.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
+        });
+        NodeDto.NodeList masterNodes = node.getMasters();
+        ConcurrentHashMap<String, Node> leaders = new ConcurrentHashMap<>();
+        masterNodes.getNodesList().forEach(x -> {
+            leaders.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
+        });
+        ClusterService.CURRENTNODE.setFollows(follows);
+        ClusterService.CURRENTNODE.setClients(clients);
+        ClusterService.CURRENTNODE.setLeaders(leaders);
     }
 }
