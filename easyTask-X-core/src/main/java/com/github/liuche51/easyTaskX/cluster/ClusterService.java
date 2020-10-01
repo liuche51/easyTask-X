@@ -4,6 +4,7 @@ import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.master.DeleteTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.master.SaveTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
+import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.*;
@@ -88,6 +89,7 @@ public class ClusterService {
         timerTasks.add(BrokerService.startRetryCancelSaveTransactionTask());
         timerTasks.add(BrokerService.startRetryDelTransactionTask());
         timerTasks.add(BrokerService.startUpdateRegeditTask());
+        timerTasks.add(SlaveService.startClusterSlaveRequestUpdateRegeditTask());
     }
     /**
      * 客户端提交任务。允许线程等待，直到easyTask组件启动完成

@@ -76,7 +76,8 @@ public class EasyTaskXApp {
         String timeOut = properties.getProperty("advanceConfig.timeOut");
         String heartBeat = properties.getProperty("advanceConfig.heartBeat");
         String tryCount = properties.getProperty("advanceConfig.tryCount");
-        String updateRegeditTime = properties.getProperty("advanceConfig.updateRegeditTime");
+        String followUpdateRegeditTime = properties.getProperty("advanceConfig.followUpdateRegeditTime");
+        String slaveUpdateRegeditTime = properties.getProperty("advanceConfig.slaveUpdateRegeditTime");
         String clearScheduleBakTime = properties.getProperty("advanceConfig.clearScheduleBakTime");
         String clusterPool_corePoolSize = properties.getProperty("advanceConfig.clusterPool.corePoolSize");
         String clusterPool_maximumPoolSize = properties.getProperty("advanceConfig.clusterPool.maximumPoolSize");
@@ -101,8 +102,10 @@ public class EasyTaskXApp {
             config.getAdvanceConfig().setHeartBeat(Integer.parseInt(heartBeat));
         if (!StringUtils.isNullOrEmpty(tryCount))
             config.getAdvanceConfig().setTryCount(Integer.parseInt(tryCount));
-        if (!StringUtils.isNullOrEmpty(updateRegeditTime))
-            config.getAdvanceConfig().setUpdateRegeditTime(Integer.parseInt(updateRegeditTime));
+        if (!StringUtils.isNullOrEmpty(followUpdateRegeditTime))
+            config.getAdvanceConfig().setFollowUpdateRegeditTime(Integer.parseInt(followUpdateRegeditTime));
+        if (!StringUtils.isNullOrEmpty(slaveUpdateRegeditTime))
+            config.getAdvanceConfig().setSlaveUpdateRegeditTime(Integer.parseInt(slaveUpdateRegeditTime));
         if (!StringUtils.isNullOrEmpty(clearScheduleBakTime))
             config.getAdvanceConfig().setClearScheduleBakTime(Integer.parseInt(clearScheduleBakTime));
         if (!StringUtils.isNullOrEmpty(clusterPool_corePoolSize) && !StringUtils.isNullOrEmpty(clusterPool_maximumPoolSize) && !StringUtils.isNullOrEmpty(clusterPool_keepAliveTime)) {

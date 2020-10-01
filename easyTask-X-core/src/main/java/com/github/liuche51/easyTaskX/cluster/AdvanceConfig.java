@@ -17,13 +17,13 @@ public class AdvanceConfig {
      */
     private int timeOut = 30;
     /**
-     * 集群节点失效判定时间。默认10s
+     * 集群节点失效判定时间。默认30s
      */
-    private int loseTimeOut = 10;
+    private int loseTimeOut = 30;
     /**
-     * 节点对zk的心跳频率。默认3s一次
+     * 节点对zk的心跳频率。默认5s一次
      */
-    private int heartBeat = 3;
+    private int heartBeat = 5;
     /**
      * 集群节点之间通信失败重试次数。默认2次
      */
@@ -33,9 +33,13 @@ public class AdvanceConfig {
      */
     private int clearScheduleBakTime = 36500000;
     /**
-     * 节点从leader更新注册表信息间隔时间。单位秒。
+     * Folow节点从leader更新注册表信息间隔时间。单位秒。
      */
-    private int updateRegeditTime=300;
+    private int followUpdateRegeditTime=300;
+    /**
+     * 集群Slave节点从leader更新注册表信息间隔时间。单位秒。
+     */
+    private int slaveUpdateRegeditTime=600;
     /**
      * 集群公用程池
      */
@@ -107,12 +111,20 @@ public class AdvanceConfig {
         this.clearScheduleBakTime = clearScheduleBakTime;
     }
 
-    public int getUpdateRegeditTime() {
-        return updateRegeditTime;
+    public int getFollowUpdateRegeditTime() {
+        return followUpdateRegeditTime;
     }
 
-    public void setUpdateRegeditTime(int updateRegeditTime) {
-        this.updateRegeditTime = updateRegeditTime;
+    public void setFollowUpdateRegeditTime(int followUpdateRegeditTime) {
+        this.followUpdateRegeditTime = followUpdateRegeditTime;
+    }
+
+    public int getSlaveUpdateRegeditTime() {
+        return slaveUpdateRegeditTime;
+    }
+
+    public void setSlaveUpdateRegeditTime(int slaveUpdateRegeditTime) {
+        this.slaveUpdateRegeditTime = slaveUpdateRegeditTime;
     }
 
     public ExecutorService getClusterPool() {
