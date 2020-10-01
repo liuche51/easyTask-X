@@ -2,6 +2,7 @@ import com.github.liuche51.easyTaskX.cluster.ClusterService;
 import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteLeader;
+import com.github.liuche51.easyTaskX.dto.zk.LeaderData;
 import com.github.liuche51.easyTaskX.zk.ZKService;
 import org.junit.Test;
 
@@ -32,10 +33,10 @@ public class ZKTest {
            EasyTaskConfig config=new EasyTaskConfig();
            config.setZkAddress("127.0.0.1:2181");
            ClusterService.setConfig(config);
-           List<String> list = ZKService.getChildrenByPath("/Server");
+           /*List<String> list = ZKService.getChildrenByPath("/Server");
            list.forEach(x -> {
                System.out.println(x);
-           });
+           });*/
        } catch (Exception e) {
            e.printStackTrace();
        }
@@ -55,6 +56,45 @@ public class ZKTest {
                 }
             });
             th.start();
+        }
+        while (true){
+            try {
+                Thread.sleep(1000l);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    @Test
+    public void watcherTest(){
+        EasyTaskConfig config=new EasyTaskConfig();
+        config.setZkAddress("127.0.0.1:2181");
+        ClusterService.setConfig(config);
+        try {
+            LeaderData d=ZKService.getLeaderData(true);
+            int y=0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        while (true){
+            try {
+                Thread.sleep(1000l);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    @Test
+    public void watcherTest2(){
+        EasyTaskConfig config=new EasyTaskConfig();
+        config.setZkAddress("127.0.0.1:2181");
+        ClusterService.setConfig(config);
+        ClusterService.CURRENTNODE=new Node("127.0.0.1",2121);
+        try {
+            ZKService.listenLeaderDataNode();
+            int y=0;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         while (true){
             try {

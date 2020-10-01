@@ -119,7 +119,7 @@ public class NettyClientTest {
         EasyTaskConfig config=new EasyTaskConfig();
         ClusterService.setConfig(config);
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.UPDATE_REGEDIT).setSource("127.0.0.1:2021")
+        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestUpdateRegedit).setSource("127.0.0.1:2021")
         .setBody("broker");
         Dto.Frame frame = NettyMsgService.sendSyncMsg(new Node("127.0.0.1",2021).getClient(), builder.build());
         ResultDto.Result result = ResultDto.Result.parseFrom(frame.getBodyBytes());

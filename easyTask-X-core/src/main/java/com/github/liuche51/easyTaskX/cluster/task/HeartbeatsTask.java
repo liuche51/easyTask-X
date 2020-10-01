@@ -24,7 +24,7 @@ public class HeartbeatsTask extends TimerTask {
             try {
                 Node leader = ClusterService.CURRENTNODE.getClusterLeader();
                 if (leader == null) {//启动时还没获取leader信息，所以需要去zk获取
-                    LeaderData node = ZKService.getLeaderData();
+                    LeaderData node = ZKService.getLeaderData(false);
                     if (node != null && !StringUtils.isNullOrEmpty(node.getHost())) {//获取leader信息成功
                         leader = new Node(node.getHost(), node.getPort());
                         ClusterService.CURRENTNODE.setClusterLeader(leader);
