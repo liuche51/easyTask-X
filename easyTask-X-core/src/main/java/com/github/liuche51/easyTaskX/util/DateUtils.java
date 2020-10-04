@@ -30,4 +30,17 @@ public class DateUtils {
             return true;
         else return false;
     }
+
+    /**
+     * 当前时间与目标时间比较，是否超时XX秒了
+     * @param compareTime 目标比较时间
+     * @param second 超时时间。单位秒
+     * @return
+     */
+    public static boolean isGreaterThanSomeTime(ZonedDateTime compareTime,int second){
+        if(ZonedDateTime.now().minusSeconds(second)
+                .compareTo(compareTime) > 0)
+            return true;
+        else return false;
+    }
 }

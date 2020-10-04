@@ -28,7 +28,11 @@ public class HeartbeatsTask extends TimerTask {
                     if (node != null && !StringUtils.isNullOrEmpty(node.getHost())) {//获取leader信息成功
                         leader = new Node(node.getHost(), node.getPort());
                         NodeService.CURRENTNODE.setClusterLeader(leader);
-                    } else {//否则就进入选举
+                    }
+                    //如果当前备用leader信息是空的，说明是集群首次运行。则每个节点都可以进入选举.
+                    //或者自身是备用leader，则有权去竞选新leader
+                    else if(StringUtils.isNullOrEmpty(NodeService.CURRENTNODE.getBakLeader())
+                            ||NodeService.CURRENTNODE.getBakLeader().contains(NodeService.CURRENTNODE.getAddress())){
                         VoteLeader.competeLeader();
                     }
                 } else {

@@ -105,6 +105,22 @@ public class TransactionLogDao {
         }
         return list;
     }
+    public static List<TransactionLog> selectByStatus(short status) throws SQLException, ClassNotFoundException {
+        List<TransactionLog> list = new LinkedList<>();
+        SqliteHelper helper = new SqliteHelper(dbName);
+        try {
+            ResultSet resultSet = helper.executeQuery("SELECT * FROM transaction_log where status = " + status + ";");
+            while (resultSet.next()) {
+                TransactionLog transactionLog = getTransaction(resultSet);
+                list.add(transactionLog);
+            }
+        }catch (SQLiteException e){
+            SqliteHelper.writeDatabaseLockedExceptionLog(e,"TransactionLogDao->selectByStatus");
+        } finally {
+            helper.destroyed();
+        }
+        return list;
+    }
     public static List<TransactionLog> selectByTaskId(String taskId) throws SQLException {
         List<TransactionLog> list = new LinkedList<>();
         SqliteHelper helper = new SqliteHelper(dbName);
@@ -122,12 +138,19 @@ public class TransactionLogDao {
         return list;
     }
     public static void deleteByTypes(short[] types) throws SQLException, ClassNotFoundException {
+        if(types==null||types.length==0) return;
         String instr=SqliteHelper.getInConditionStr(types);
         String sql = "delete FROM transaction_log where type in "+instr+";";
         SqliteHelper.executeUpdateForSync(sql,dbName,lock);
     }
     public static void deleteByStatus(short status) throws SQLException, ClassNotFoundException {
         String sql = "delete FROM transaction_log where status = " + status+";";
+        SqliteHelper.executeUpdateForSync(sql,dbName,lock);
+    }
+    public static void deleteByIds(String[] ids) throws SQLException, ClassNotFoundException {
+        if(ids==null||ids.length==0) return;
+        String instr=SqliteHelper.getInConditionStr(ids);
+        String sql = "delete FROM transaction_log where id in " + instr+";";
         SqliteHelper.executeUpdateForSync(sql,dbName,lock);
     }
     public static boolean isExistById(String id) throws SQLException, ClassNotFoundException {

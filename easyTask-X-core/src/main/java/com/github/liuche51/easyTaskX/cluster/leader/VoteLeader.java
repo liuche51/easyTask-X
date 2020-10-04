@@ -19,6 +19,7 @@ public class VoteLeader {
     private static Logger log = LoggerFactory.getLogger(VoteLeader.class);
     private static InterProcessMutex zkMutex = new InterProcessMutex( ZKUtil.getClient(),"/mutex");
     public static boolean competeLeader(){
+        log.info("leader 竞选开始!");
         boolean hasLock=false;
         try {
             if(zkMutex.acquire(1, TimeUnit.SECONDS)){
