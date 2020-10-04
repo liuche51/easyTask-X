@@ -5,6 +5,7 @@ import com.github.liuche51.easyTaskX.cluster.task.HeartbeatsTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.FollowRequestUpdateRegeditTask;
 import com.github.liuche51.easyTaskX.cluster.task.tran.*;
+import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.ByteStringPack;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
@@ -69,7 +70,7 @@ public class BrokerService {
     }
 
     /**
-     * 节点对leader的心跳。2s一次
+     * 节点对leader的心跳。
      */
     public static TimerTask startHeartBeat() {
         HeartbeatsTask task = new HeartbeatsTask();
@@ -119,17 +120,17 @@ public class BrokerService {
      */
     public static void dealUpdate(NodeDto.Node node) {
         NodeDto.NodeList clientNodes = node.getClients();
-        ConcurrentHashMap<String, Node> clients = new ConcurrentHashMap<>();
+        ConcurrentHashMap<String, BaseNode> clients = new ConcurrentHashMap<>();
         clientNodes.getNodesList().forEach(x -> {
             clients.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
         });
         NodeDto.NodeList slaveNodes = node.getSalves();
-        ConcurrentHashMap<String, Node> follows = new ConcurrentHashMap<>();
+        ConcurrentHashMap<String, BaseNode> follows = new ConcurrentHashMap<>();
         slaveNodes.getNodesList().forEach(x -> {
             follows.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
         });
         NodeDto.NodeList masterNodes = node.getMasters();
-        ConcurrentHashMap<String, Node> leaders = new ConcurrentHashMap<>();
+        ConcurrentHashMap<String, BaseNode> leaders = new ConcurrentHashMap<>();
         masterNodes.getNodesList().forEach(x -> {
             leaders.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
         });

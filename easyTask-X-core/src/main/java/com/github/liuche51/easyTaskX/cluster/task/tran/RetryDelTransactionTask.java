@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.cluster.task.tran;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.master.DeleteTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
@@ -47,7 +48,7 @@ public class RetryDelTransactionTask extends TimerTask {
                             }
                             List<String> cancelFollowsHost = JSONObject.parseObject(x.getFollows(), new TypeReference<List<String>>() {
                             });
-                            List<Node> cancelFollows = new ArrayList<>(cancelFollowsHost.size());
+                            List<BaseNode> cancelFollows = new ArrayList<>(cancelFollowsHost.size());
                             if (cancelFollowsHost != null) {
                                 cancelFollowsHost.forEach(y -> {
                                     String[] hp = y.split(":");

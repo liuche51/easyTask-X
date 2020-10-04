@@ -10,7 +10,7 @@ import com.google.protobuf.ByteString;
 import java.time.ZonedDateTime;
 
 /**
- * 节点心跳信息处理
+ * 节点注册/心跳信息处理
  */
 public class HeartbeatHandler extends BaseHandler{
     @Override

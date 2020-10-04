@@ -2,15 +2,12 @@ package com.github.liuche51.easyTaskX.cluster.master;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
-import com.github.liuche51.easyTaskX.dto.Node;
+import com.github.liuche51.easyTaskX.dto.*;
 
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
 import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
-import com.github.liuche51.easyTaskX.dto.Schedule;
-import com.github.liuche51.easyTaskX.dto.ScheduleSync;
-import com.github.liuche51.easyTaskX.dto.TransactionLog;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.*;
@@ -29,8 +26,8 @@ public class SaveTaskTCC {
      * @param follows
      * @throws Exception
      */
-    public static void trySave(String transactionId,Schedule schedule, List<Node> follows) throws Exception {
-        List<String> cancelHost=follows.stream().map(Node::getAddress).collect(Collectors.toList());
+    public static void trySave(String transactionId,Schedule schedule, List<BaseNode> follows) throws Exception {
+        List<String> cancelHost=follows.stream().map(BaseNode::getAddress).collect(Collectors.toList());
         schedule.setTransactionId(transactionId);
         schedule.setSource(Util.getSource(schedule.getSource()));
         TransactionLog transactionLog = new TransactionLog();
@@ -41,9 +38,9 @@ public class SaveTaskTCC {
         transactionLog.setType(TransactionTypeEnum.SAVE);
         transactionLog.setFollows(JSONObject.toJSONString(cancelHost));
         TransactionLogDao.saveBatch(Arrays.asList(transactionLog));
-        Iterator<Node> items = follows.iterator();
+        Iterator<BaseNode> items = follows.iterator();
         while (items.hasNext()) {
-            Node follow = items.next();
+            BaseNode follow = items.next();
             ScheduleSync scheduleSync = new ScheduleSync();
             scheduleSync.setTransactionId(transactionLog.getId());
             scheduleSync.setScheduleId(schedule.getId());
@@ -70,10 +67,10 @@ public class SaveTaskTCC {
      * @param follows
      * @throws Exception
      */
-    public static void confirm(String transactionId, String scheduleId, List<Node> follows) throws Exception {
-        Iterator<Node> items = follows.iterator();
+    public static void confirm(String transactionId, String scheduleId, List<BaseNode> follows) throws Exception {
+        Iterator<BaseNode> items = follows.iterator();
         while (items.hasNext()) {
-            Node follow = items.next();
+            BaseNode follow = items.next();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_CONFIRMSAVETASK).setSource(NodeService.getConfig().getAddress())
                     .setBody(transactionId);
@@ -93,14 +90,14 @@ public class SaveTaskTCC {
      * @param follows
      * @throws Exception
      */
-    public static void cancel(String transactionId,List<Node> follows) throws Exception {
+    public static void cancel(String transactionId,List<BaseNode> follows) throws Exception {
         TransactionLogDao.updateStatusById(transactionId,TransactionStatusEnum.CANCEL);//自己优先标记需回滚
         retryCancel( transactionId, follows);
     }
-    public static void retryCancel(String transactionId, List<Node> follows) throws Exception {
-        Iterator<Node> items = follows.iterator();
+    public static void retryCancel(String transactionId, List<BaseNode> follows) throws Exception {
+        Iterator<BaseNode> items = follows.iterator();
         while (items.hasNext()) {
-            Node follow = items.next();
+            BaseNode follow = items.next();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_CANCELSAVETASK).setSource(NodeService.getConfig().getAddress())
                     .setBody(transactionId);

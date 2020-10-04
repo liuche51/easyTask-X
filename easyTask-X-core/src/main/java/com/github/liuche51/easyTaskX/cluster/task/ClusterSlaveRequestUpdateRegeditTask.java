@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.cluster.task;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
+import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;
 
 /**
@@ -13,7 +14,7 @@ public class ClusterSlaveRequestUpdateRegeditTask extends TimerTask {
         while (!isExit()) {
             try {
                 String leader = NodeService.CURRENTNODE.getClusterLeader().getAddress();
-                Node node = NodeService.CURRENTNODE.getMasters().get(leader);
+                BaseNode node = NodeService.CURRENTNODE.getMasters().get(leader);
                 //如果当前的leader同时也是自己的master，则需要定时同步注册表信息
                 if (node != null)
                     SlaveService.requestUpdateClusterRegedit();

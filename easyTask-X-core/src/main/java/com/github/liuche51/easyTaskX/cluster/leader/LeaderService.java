@@ -2,12 +2,9 @@ package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
-import com.github.liuche51.easyTaskX.dto.Node;
+import com.github.liuche51.easyTaskX.dto.*;
 import com.github.liuche51.easyTaskX.cluster.task.CheckFollowsAliveTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
-import com.github.liuche51.easyTaskX.dto.RegBroker;
-import com.github.liuche51.easyTaskX.dto.RegClient;
-import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
@@ -20,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class LeaderService {
     private static final Logger log = LoggerFactory.getLogger(VoteSlave.class);
@@ -60,10 +58,10 @@ public class LeaderService {
      *
      * @param nodes
      */
-    public static void notifySalveUpdateRegedit(Map<String, Node> nodes, RegBroker node) {
-        Iterator<Map.Entry<String, Node>> items = nodes.entrySet().iterator();
+    public static void notifySalveUpdateRegedit(Map<String, BaseNode> nodes, RegBroker node) {
+        Iterator<Map.Entry<String, BaseNode>> items = nodes.entrySet().iterator();
         while (items.hasNext()) {
-            Map.Entry<String, Node> item = items.next();
+            Map.Entry<String, BaseNode> item = items.next();
             NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
                 @Override
                 public void run() {

@@ -8,21 +8,21 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Node extends BaseNode {
     /**
-     * 当前节点的所有clients
+     * 当前节点所有可用的clients
      */
-    private ConcurrentHashMap<String, Node> clients = new ConcurrentHashMap<String, Node>();
+    private ConcurrentHashMap<String, BaseNode> clients = new ConcurrentHashMap<String, BaseNode>();
     /**
-     * 当前节点的所有follows
+     * 当前节点的所有slaves
      */
-    private ConcurrentHashMap<String, Node> slaves = new ConcurrentHashMap<String, Node>();
+    private ConcurrentHashMap<String, BaseNode> slaves = new ConcurrentHashMap<String, BaseNode>();
     /**
-     * 当前节点的所有leader
+     * 当前节点的所有masters
      */
-    private ConcurrentHashMap<String, Node> masters = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, BaseNode> masters = new ConcurrentHashMap<>();
     /**
      * leader
      */
-    private Node clusterLeader=null;
+    private BaseNode clusterLeader=null;
     /**
      * 集群备用leader
      * 用来判断leader宕机后，是否参与竞选新leader。如果有值说明当前集群有备用leader，则自己不参与竞选
@@ -40,35 +40,35 @@ public class Node extends BaseNode {
         super(address);
     }
 
-    public ConcurrentHashMap<String, Node> getClients() {
+    public ConcurrentHashMap<String, BaseNode> getClients() {
         return clients;
     }
 
-    public void setClients(ConcurrentHashMap<String, Node> clients) {
+    public void setClients(ConcurrentHashMap<String, BaseNode> clients) {
         this.clients = clients;
     }
 
-    public ConcurrentHashMap<String, Node> getSlaves() {
+    public ConcurrentHashMap<String, BaseNode> getSlaves() {
         return slaves;
     }
 
-    public void setSlaves(ConcurrentHashMap<String, Node> slaves) {
+    public void setSlaves(ConcurrentHashMap<String, BaseNode> slaves) {
         this.slaves = slaves;
     }
 
-    public ConcurrentHashMap<String, Node> getMasters() {
+    public ConcurrentHashMap<String, BaseNode> getMasters() {
         return masters;
     }
 
-    public void setMasters(ConcurrentHashMap<String, Node> masters) {
+    public void setMasters(ConcurrentHashMap<String, BaseNode> masters) {
         this.masters = masters;
     }
 
-    public Node getClusterLeader() {
+    public BaseNode getClusterLeader() {
         return clusterLeader;
     }
 
-    public void setClusterLeader(Node clusterLeader) {
+    public void setClusterLeader(BaseNode clusterLeader) {
         this.clusterLeader = clusterLeader;
     }
 

@@ -3,6 +3,7 @@ package com.github.liuche51.easyTaskX.monitor;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;
 
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
@@ -50,9 +51,9 @@ public class ClusterMonitor {
         Map<String, Map<String, List>> map = new HashMap<>(3);
         Map<String, List> leaderInfo = DBMonitor.getInfoByTaskId(taskId);
         map.put(NodeService.getConfig().getAddress(), leaderInfo);
-        Iterator<Map.Entry<String,Node>> items = NodeService.CURRENTNODE.getSlaves().entrySet().iterator();
+        Iterator<Map.Entry<String, BaseNode>> items = NodeService.CURRENTNODE.getSlaves().entrySet().iterator();
         while (items.hasNext()) {
-            Node item = items.next().getValue();
+            BaseNode item = items.next().getValue();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.GetDBInfoByTaskId).setSource(NodeService.getConfig().getAddress())
                     .setBody(taskId);

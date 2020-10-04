@@ -3,6 +3,7 @@ package com.github.liuche51.easyTaskX.zk;
 import com.alibaba.fastjson.JSONObject;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.dto.zk.LeaderData;
 import com.github.liuche51.easyTaskX.util.StringConstant;
@@ -78,7 +79,7 @@ public class ZKService {
                     if (ld == null)
                         NodeService.CURRENTNODE.setClusterLeader(null);
                     else
-                        NodeService.CURRENTNODE.setClusterLeader(new Node(ld.getHost(), ld.getPort()));
+                        NodeService.CURRENTNODE.setClusterLeader(new BaseNode(ld.getHost(), ld.getPort()));
                 }
             }
         });

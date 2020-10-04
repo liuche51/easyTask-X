@@ -8,6 +8,7 @@ import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.*;
+import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.dto.Schedule;
 import com.github.liuche51.easyTaskX.netty.server.NettyServer;
@@ -117,8 +118,8 @@ public class NodeService {
         if (VoteSlave.isSelecting())
             throw new VotingException("normally exception!save():cluster is voting,please wait a moment.");
         //防止多线程下，follow元素操作竞争问题。确保参与提交的follow不受集群选举影响
-        List<Node> follows = new ArrayList<>(CURRENTNODE.getSlaves().size());
-        Iterator<Map.Entry<String,Node>> items = CURRENTNODE.getSlaves().entrySet().iterator();
+        List<BaseNode> follows = new ArrayList<>(CURRENTNODE.getSlaves().size());
+        Iterator<Map.Entry<String, BaseNode>> items = CURRENTNODE.getSlaves().entrySet().iterator();
         while (items.hasNext()) {
             follows.add(items.next().getValue());
         }
@@ -149,8 +150,8 @@ public class NodeService {
      */
     public static boolean deleteTask(String taskId) {
         //防止多线程下，follow元素操作竞争问题。确保参与提交的follow不受集群选举影响
-        List<Node> follows = new ArrayList<>(CURRENTNODE.getSlaves().size());
-        Iterator<Map.Entry<String,Node>> items = CURRENTNODE.getSlaves().entrySet().iterator();
+        List<BaseNode> follows = new ArrayList<>(CURRENTNODE.getSlaves().size());
+        Iterator<Map.Entry<String,BaseNode>> items = CURRENTNODE.getSlaves().entrySet().iterator();
         while (items.hasNext()) {
             follows.add(items.next().getValue());
         }

@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.cluster.master;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;
 
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
@@ -29,8 +30,8 @@ public class DeleteTaskTCC {
      * @param follows
      * @throws Exception
      */
-    public static void tryDel(String transactionId,String taskId, List<Node> follows) throws Exception {
-        List<String> cancelHost=follows.stream().map(Node::getAddress).collect(Collectors.toList());
+    public static void tryDel(String transactionId,String taskId, List<BaseNode> follows) throws Exception {
+        List<String> cancelHost=follows.stream().map(BaseNode::getAddress).collect(Collectors.toList());
         TransactionLog transactionLog = new TransactionLog();
         transactionLog.setId(transactionId);
         transactionLog.setContent(taskId);
@@ -47,12 +48,12 @@ public class DeleteTaskTCC {
         }
 
     }
-    public static void retryDel(String transactionId,String taskId, List<Node> follows) throws Exception {
+    public static void retryDel(String transactionId,String taskId, List<BaseNode> follows) throws Exception {
         //需要将同步记录表原来的提交已同步记录修改为删除中，并更新其事务ID
         ScheduleSyncDao.updateStatusAndTransactionIdByScheduleId(taskId,ScheduleSyncStatusEnum.DELETEING, transactionId);
-        Iterator<Node> items = follows.iterator();
+        Iterator<BaseNode> items = follows.iterator();
         while (items.hasNext()) {
-            Node follow = items.next();
+            BaseNode follow = items.next();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_TRYDELTASK).setSource(NodeService.getConfig().getAddress())
                     .setBody(transactionId+","+taskId);

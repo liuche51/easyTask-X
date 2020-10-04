@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.task;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;
 
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
@@ -22,7 +23,7 @@ public class HeartbeatsTask extends TimerTask {
     public void run() {
         while (!isExit()) {
             try {
-                Node leader = NodeService.CURRENTNODE.getClusterLeader();
+                BaseNode leader = NodeService.CURRENTNODE.getClusterLeader();
                 if (leader == null) {//启动时还没获取leader信息，所以需要去zk获取
                     LeaderData node = ZKService.getLeaderData(false);
                     if (node != null && !StringUtils.isNullOrEmpty(node.getHost())) {//获取leader信息成功
@@ -57,7 +58,7 @@ public class HeartbeatsTask extends TimerTask {
      * 处理leader，是否运行检查follows存活任务的逻辑
      * @param leader
      */
-    private static void dealClusterLeaderCheckFollowsAliveTask(Node leader) {
+    private static void dealClusterLeaderCheckFollowsAliveTask(BaseNode leader) {
         if (leader == null) return;
         //如果当前节点是leader，且没有运行follow存活检查任务，则启动一个任务/
         if (!CheckFollowsAliveTask.hasRuning && NodeService.CURRENTNODE.getAddress().equals(leader.getAddress())) {
