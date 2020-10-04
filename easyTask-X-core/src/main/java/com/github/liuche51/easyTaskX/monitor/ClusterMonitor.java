@@ -2,7 +2,7 @@ package com.github.liuche51.easyTaskX.monitor;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.Node;
 
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
@@ -34,7 +34,7 @@ public class ClusterMonitor {
      * @return
      */
     public static String getCurrentNodeInfo() {
-        return JSONObject.toJSONString(ClusterService.CURRENTNODE);
+        return JSONObject.toJSONString(NodeService.CURRENTNODE);
     }
 
     public static String getSqlitePoolInfo() {
@@ -49,14 +49,14 @@ public class ClusterMonitor {
     public static Map<String, Map<String, List>> getDBTraceInfoByTaskId(String taskId) throws Exception {
         Map<String, Map<String, List>> map = new HashMap<>(3);
         Map<String, List> leaderInfo = DBMonitor.getInfoByTaskId(taskId);
-        map.put(ClusterService.getConfig().getAddress(), leaderInfo);
-        Iterator<Map.Entry<String,Node>> items = ClusterService.CURRENTNODE.getFollows().entrySet().iterator();
+        map.put(NodeService.getConfig().getAddress(), leaderInfo);
+        Iterator<Map.Entry<String,Node>> items = NodeService.CURRENTNODE.getSlaves().entrySet().iterator();
         while (items.hasNext()) {
             Node item = items.next().getValue();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.GetDBInfoByTaskId).setSource(ClusterService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.GetDBInfoByTaskId).setSource(NodeService.getConfig().getAddress())
                     .setBody(taskId);
-            NettyClient client = item.getClientWithCount(ClusterService.getConfig().getAdvanceConfig().getTryCount());
+            NettyClient client = item.getClientWithCount(NodeService.getConfig().getAdvanceConfig().getTryCount());
             Object ret = NettyMsgService.sendSyncMsg(client,builder.build());
             Dto.Frame frame = (Dto.Frame) ret;
             ResultDto.Result result = ResultDto.Result.parseFrom(frame.getBodyBytes());
@@ -71,7 +71,7 @@ public class ClusterMonitor {
         return map;
     }
     public static Map<String, String> getNettyClientPoolInfo(){
-        Map<String, String> map=new HashMap<>(ClusterService.getConfig().getBackupCount());
+        Map<String, String> map=new HashMap<>(NodeService.getConfig().getBackupCount());
         Map<String, ConcurrentLinkedQueue<NettyClient>> pools=NettyConnectionFactory.getInstance().getPools();
         Iterator<Map.Entry<String, ConcurrentLinkedQueue<NettyClient>>> items=pools.entrySet().iterator();
         while (items.hasNext()){

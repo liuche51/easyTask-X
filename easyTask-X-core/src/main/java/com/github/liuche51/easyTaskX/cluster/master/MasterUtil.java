@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.master;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.dto.Schedule;
@@ -34,10 +34,10 @@ public class MasterUtil {
             builder0.addSchedules(s);
         }
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.MasterSyncDataToNewSlave).setSource(ClusterService.getConfig().getAddress())
+        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.MasterSyncDataToNewSlave).setSource(NodeService.getConfig().getAddress())
                 .setBodyBytes(builder0.build().toByteString());
         NettyClient client = follow.getClientWithCount(1);
-        boolean ret =NettyMsgService.sendSyncMsgWithCount(builder,client,ClusterService.getConfig().getAdvanceConfig().getTryCount(),5,null);
+        boolean ret =NettyMsgService.sendSyncMsgWithCount(builder,client, NodeService.getConfig().getAdvanceConfig().getTryCount(),5,null);
         return ret;
     }
 }

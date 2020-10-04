@@ -1,7 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.master;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.Node;
 
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
@@ -52,7 +52,7 @@ public class SaveTaskTCC {
             ScheduleSyncDao.save(scheduleSync);//记录同步状态表
             ScheduleDto.Schedule s = schedule.toScheduleDto();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_TRYSAVETASK).setSource(ClusterService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_TRYSAVETASK).setSource(NodeService.getConfig().getAddress())
                     .setBodyBytes(s.toByteString());
             NettyClient client = follow.getClientWithCount(1);
             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder,client,1,0,null);
@@ -75,7 +75,7 @@ public class SaveTaskTCC {
         while (items.hasNext()) {
             Node follow = items.next();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_CONFIRMSAVETASK).setSource(ClusterService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_CONFIRMSAVETASK).setSource(NodeService.getConfig().getAddress())
                     .setBody(transactionId);
             NettyClient client = follow.getClientWithCount(1);
             boolean ret =NettyMsgService.sendSyncMsgWithCount(builder,client,1,0,null);
@@ -102,7 +102,7 @@ public class SaveTaskTCC {
         while (items.hasNext()) {
             Node follow = items.next();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_CANCELSAVETASK).setSource(ClusterService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_CANCELSAVETASK).setSource(NodeService.getConfig().getAddress())
                     .setBody(transactionId);
             NettyClient client = follow.getClientWithCount(1);
             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder,client,1,0,null);

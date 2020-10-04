@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 
 import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegNode;
@@ -39,7 +39,7 @@ public class VoteSlave {
     public static List<RegNode> initVoteSlaves(RegBroker regNode) throws Exception {
         if (selecting) throw new VotingException(String.format("[%s] is voting a new follow",regNode.getAddress()));
         selecting = true;
-        int count = ClusterService.getConfig().getBackupCount();
+        int count = NodeService.getConfig().getBackupCount();
         try {
             lock.lock();
             List<String> availableFollows = VoteSlave.getAvailableFollows(regNode);
@@ -73,7 +73,7 @@ public class VoteSlave {
         try {
             lock.lock();
             //多线程下，如果follows已经选好，则让客户端重新提交任务。以后可以优化为获取选举后的follow
-            if (regNode.getSlaves().size() >= ClusterService.getConfig().getBackupCount())
+            if (regNode.getSlaves().size() >= NodeService.getConfig().getBackupCount())
                 throw new VotedException(String.format("[%s] has voted a new follow.",regNode.getAddress()));
             List<String> availableFollows = getAvailableFollows(regNode);
             follows = voteFollows(1, availableFollows);
@@ -99,7 +99,7 @@ public class VoteSlave {
      * @return
      */
     private static List<String> getAvailableFollows(RegBroker regNode) throws Exception {
-        int count = ClusterService.getConfig().getBackupCount();
+        int count = NodeService.getConfig().getBackupCount();
         Iterator<Map.Entry<String, RegBroker>> items = LeaderService.BROKER_REGISTER_CENTER.entrySet().iterator();
         List<String> availableFollows = new ArrayList<>(LeaderService.BROKER_REGISTER_CENTER.size());
         while (items.hasNext()) {
@@ -124,7 +124,7 @@ public class VoteSlave {
             if (temp1.isPresent())
                 availableFollows.remove(temp1.get());
         }
-        if (availableFollows.size() < count - ClusterService.CURRENTNODE.getFollows().size())//如果可选备库节点数量不足，则等待1s，然后重新选。注意：等待会阻塞整个服务可用性
+        if (availableFollows.size() < count - NodeService.CURRENTNODE.getSlaves().size())//如果可选备库节点数量不足，则等待1s，然后重新选。注意：等待会阻塞整个服务可用性
         {
             log.info("[{}] availableFollows is not enough! only has {},current own {}",regNode.getAddress(), availableFollows.size(), regNode.getSlaves().size());
             Thread.sleep(1000);
@@ -164,14 +164,14 @@ public class VoteSlave {
      * @param newFollowAddress
      */
     public static void notifySliceLeaderVoteNewFollow(RegBroker leader, String newFollowAddress, String oldFollowAddress) {
-        ClusterService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NotifyMasterVoteNewSlave)
-                            .setSource(ClusterService.CURRENTNODE.getAddress()).setBody(newFollowAddress + "|" + oldFollowAddress);
-                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(newFollowAddress + "|" + oldFollowAddress);
+                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if(!ret)
                         log.info("normally exception!notifySliceLeaderVoteNewFollow() failed.");
                 } catch (Exception e) {

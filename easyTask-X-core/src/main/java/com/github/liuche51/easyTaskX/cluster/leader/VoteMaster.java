@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
@@ -46,13 +46,13 @@ public class VoteMaster {
     public static boolean notifySliceFollowsNewLeader(Map<String, RegNode> follows, String newLeader, String oldLeader) {
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
         try {
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum. NotifySlaveNewLeader).setSource(ClusterService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum. NotifySlaveNewLeader).setSource(NodeService.getConfig().getAddress())
                     .setBody(oldLeader + "|" + newLeader);
             Iterator<Map.Entry<String, RegNode>> items = follows.entrySet().iterator();
             while (items.hasNext()) {
                 Map.Entry<String, RegNode> item = items.next();
                 RegNode node = item.getValue();
-                boolean ret=NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                boolean ret=NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                 if(!ret)
                     log.info("normally exception!notifySliceFollowsNewLeader() failed.");
             }

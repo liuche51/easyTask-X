@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.task;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteMaster;
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
@@ -30,7 +30,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                 log.error("CheckFollowsAliveTask()", e);
             }
             try {
-                Thread.sleep(ClusterService.getConfig().getAdvanceConfig().getHeartBeat());
+                Thread.sleep(NodeService.getConfig().getAdvanceConfig().getHeartBeat());
             } catch (InterruptedException e) {
                 log.error("CheckFollowsAliveTask()", e);
             }
@@ -46,36 +46,40 @@ public class CheckFollowsAliveTask extends TimerTask {
         while (items.hasNext()) {
             Map.Entry<String, RegBroker> item = items.next();
             RegBroker regNode = item.getValue();
-            ClusterService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+            NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
                 @Override
                 public void run() {
-                    //master节点失效,且有follows。选新leader
+                    //master节点失效,且有Slaves。选新master
                     if (DateUtils.isGreaterThanLoseTime(regNode.getLastHeartbeat())) {
-                        //如果有follows。则选出新master，并通知它们。没有则直接移出注册表
+                        //如果有Slaves。则选出新master，并通知它们。没有则直接移出注册表
                         if (regNode.getSlaves().size() > 0) {
                             RegNode newleader = VoteMaster.voteNewLeader(regNode.getSlaves());
                             VoteMaster.notifySliceFollowsNewLeader(regNode.getSlaves(), newleader.getAddress(), regNode.getAddress());
                         }
                         VoteMaster.updateRegedit(regNode);
                         LeaderService.notifyFollowsUpdateRegedit(regNode.getSlaves(),"broker");
-                        LeaderService.notifySalveUpdateRegedit(ClusterService.CURRENTNODE.getFollows(),regNode);
+                        LeaderService.notifySalveUpdateRegedit(NodeService.CURRENTNODE.getSlaves(),regNode);
 
                     }
-                    //master没失效，但是follow失效了
+                    //master没失效，但是Slave失效了
                     else {
                         ConcurrentHashMap<String, RegNode> follows = regNode.getSlaves();
-                        //初始化，还没有一个follow时
+                        //初始化，还没有一个Slave时
                         if (follows.size() == 0) {
                             try {
                                 List<RegNode> newSlaves= VoteSlave.initVoteSlaves(regNode);
                                 LeaderService.notifyFollowsUpdateRegedit(newSlaves,"broker");
+                                //如果是Leader当前节点自己变更slave，则需要通知其他Follows更新备用Leader信息
+                                if(regNode.getAddress().equals(NodeService.CURRENTNODE.getClusterLeader().getAddress())){
+                                    LeaderService.notifyFollowsBakLeaderChanged();
+                                }
                             } catch (VotingException e) {
                                 log.info("normally exception!{}", e.getMessage());
                             } catch (Exception e) {
                                 log.error("initVoteFollows()->exception!", e);
                             }
                         }
-                        //已经有follows时
+                        //已经有Slaves时
                         else {
                             Iterator<Map.Entry<String, RegNode>> items = follows.entrySet().iterator();
                             while (items.hasNext()) {
@@ -88,6 +92,10 @@ public class CheckFollowsAliveTask extends TimerTask {
                                         RegNode newSlave = VoteSlave.voteNewSlave(regNode, node);
                                         VoteSlave.notifySliceLeaderVoteNewFollow(regNode, newSlave.getAddress(), node.getAddress());
                                         LeaderService.notifyFollowsUpdateRegedit(Collections.singletonList(newSlave),"broker");
+                                        //如果是Leader当前节点自己变更slave，则需要通知其他Follows更新备用Leader信息
+                                        if(regNode.getAddress().equals(NodeService.CURRENTNODE.getClusterLeader().getAddress())){
+                                            LeaderService.notifyFollowsBakLeaderChanged();
+                                        }
                                     } catch (VotingException e) {
                                         log.info("normally exception!{}", e.getMessage());
                                     } catch (Exception e) {

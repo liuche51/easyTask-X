@@ -1,7 +1,7 @@
 package com.github.liuche51.easyTaskX.dao;
 
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ public class SQLliteMultiPool {
         pools.put(StringConstant.SCHEDULE_BAK, new ConcurrentLinkedQueue<Connection>());
         pools.put(StringConstant.SCHEDULE_SYNC, new ConcurrentLinkedQueue<Connection>());
         pools.put(StringConstant.TRANSACTION_LOG, new ConcurrentLinkedQueue<Connection>());
-        for (int i = 0; i < ClusterService.getConfig().getAdvanceConfig().getsQLlitePoolSize(); i++) {
+        for (int i = 0; i < NodeService.getConfig().getAdvanceConfig().getsQLlitePoolSize(); i++) {
             Connection con1 = createConnection(StringConstant.SCHEDULE);
             Connection con2 = createConnection(StringConstant.SCHEDULE_BAK);
             Connection con3 = createConnection(StringConstant.SCHEDULE_SYNC);
@@ -70,7 +70,7 @@ public class SQLliteMultiPool {
         Connection con = null;
         try {
             //注意“/”符号目前测试兼容Windows和Linux，不要改成“\”符号不兼容Linux
-            con = DriverManager.getConnection("jdbc:sqlite:" + ClusterService.getConfig().getTaskStorePath() + "/" + dbName + ".db");
+            con = DriverManager.getConnection("jdbc:sqlite:" + NodeService.getConfig().getTaskStorePath() + "/" + dbName + ".db");
             if (con == null) {
                 throw new Exception("数据库连接创建失败，返回null值");
             }
@@ -103,7 +103,7 @@ public class SQLliteMultiPool {
      */
     public void freeConnection(Connection conn,String dbName) {
         ConcurrentLinkedQueue<Connection> pool = pools.get(dbName);
-        if (pool.size() < ClusterService.getConfig().getAdvanceConfig().getsQLlitePoolSize()) {
+        if (pool.size() < NodeService.getConfig().getAdvanceConfig().getsQLlitePoolSize()) {
             pool.add(conn);
         } else {
             try {

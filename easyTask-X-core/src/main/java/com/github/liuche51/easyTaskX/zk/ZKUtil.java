@@ -1,12 +1,10 @@
 package com.github.liuche51.easyTaskX.zk;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.util.StringConstant;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.zookeeper.ZooKeeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +24,7 @@ public class ZKUtil {
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 10);
         //2 通过工厂创建连接
          client = CuratorFrameworkFactory.builder()
-                .connectString(ClusterService.getConfig().getZkAddress()).connectionTimeoutMs(CONNECTION_TIMEOUT)
+                .connectString(NodeService.getConfig().getZkAddress()).connectionTimeoutMs(CONNECTION_TIMEOUT)
                 .sessionTimeoutMs(SESSION_TIMEOUT)
                 .retryPolicy(retryPolicy)
                 .namespace("easyTask-X")//命名空间

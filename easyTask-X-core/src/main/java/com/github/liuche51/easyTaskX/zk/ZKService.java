@@ -2,7 +2,7 @@ package com.github.liuche51.easyTaskX.zk;
 
 import com.alibaba.fastjson.JSONObject;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.dto.zk.LeaderData;
 import com.github.liuche51.easyTaskX.util.StringConstant;
@@ -13,8 +13,6 @@ import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 public class ZKService {
     private static Logger log = LoggerFactory.getLogger(ZKService.class);
@@ -73,14 +71,14 @@ public class ZKService {
                 // 防止节点被删除时发生错误
                 if (nodeCache.getCurrentData() == null) {
                     log.error("listenLeaderDataNode()->exception!nodeCache.getCurrentData() == null，可能该节点已被删除");
-                    ClusterService.CURRENTNODE.setClusterLeader(null);
+                    NodeService.CURRENTNODE.setClusterLeader(null);
                 } else {
                     // 获取节点最新的数据
                     LeaderData ld = JSONObject.parseObject(nodeCache.getCurrentData().getData(), LeaderData.class);
                     if (ld == null)
-                        ClusterService.CURRENTNODE.setClusterLeader(null);
+                        NodeService.CURRENTNODE.setClusterLeader(null);
                     else
-                        ClusterService.CURRENTNODE.setClusterLeader(new Node(ld.getHost(), ld.getPort()));
+                        NodeService.CURRENTNODE.setClusterLeader(new Node(ld.getHost(), ld.getPort()));
                 }
             }
         });

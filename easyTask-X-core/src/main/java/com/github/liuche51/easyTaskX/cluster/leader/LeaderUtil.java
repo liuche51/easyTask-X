@@ -1,6 +1,8 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.alibaba.fastjson.JSONObject;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
@@ -21,18 +23,18 @@ public class LeaderUtil {
      * 通知节点更新注册表信息
      */
     public static void notifyFollowUpdateRegedit(String address, String type) {
-        ClusterService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 try {
                     switch (type) {
                         case "broker":
                             RegBroker node = LeaderService.BROKER_REGISTER_CENTER.get(address);
-                            NodeDto.Node.Builder nodeBuilder=packageBrokerRegeditInfo(node);
+                            NodeDto.Node.Builder nodeBuilder = packageBrokerRegeditInfo(node);
                             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyBrokerUpdateRegedit)
-                                    .setSource(ClusterService.CURRENTNODE.getAddress()).setBodyBytes(nodeBuilder.build().toByteString());
-                            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                                    .setSource(NodeService.CURRENTNODE.getAddress()).setBodyBytes(nodeBuilder.build().toByteString());
+                            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                             if (!ret)
                                 log.info("normally exception!notifyNodeUpdateRegedit() failed.");
                         case "client":
@@ -53,10 +55,13 @@ public class LeaderUtil {
 
     /**
      * 包装Broker注册信息
+     *
      * @param node
      */
-    public static NodeDto.Node.Builder packageBrokerRegeditInfo(RegBroker node){
+    public static NodeDto.Node.Builder packageBrokerRegeditInfo(RegBroker node) {
         NodeDto.Node.Builder nodeBuilder = NodeDto.Node.newBuilder();
+        //备用leader信息
+        nodeBuilder.setBakleader(JSONObject.toJSONString(NodeService.CURRENTNODE.getSlaves()));
         //clients
         NodeDto.NodeList.Builder clientsBuilder = NodeDto.NodeList.newBuilder();
         Iterator<Map.Entry<String, RegNode>> items = node.getClients().entrySet().iterator();
@@ -91,5 +96,28 @@ public class LeaderUtil {
         }
         nodeBuilder.setMasters(mastersBuilder.build());
         return nodeBuilder;
+    }
+
+    /**
+     * 通知Follow更新备用leader信息
+     * @param address
+     * @param bakLeader
+     */
+    public static void notifyFollowBakLeaderChanged(String address,String bakLeader) {
+        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyFollwUpdateBakLeaderInfo)
+                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(bakLeader);
+                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, new Node(address).getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                    if (!ret)
+                        log.info("normally exception!notifyFollowBakLeaderChanged() failed.");
+                } catch (Exception e) {
+                    log.error("notifyFollowBakLeaderChanged()->exception!", e);
+                }
+            }
+        });
     }
 }

@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.util;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 
 import java.io.File;
 import java.io.IOException;
@@ -89,9 +89,9 @@ public class Util {
     public static String getSource(String oldSource) throws Exception {
         String source=StringConstant.EMPTY;
         if(oldSource==null||oldSource== StringConstant.EMPTY)
-            source= ClusterService.getConfig().getAddress();
+            source= NodeService.getConfig().getAddress();
         else
-            source=ClusterService.getConfig().getAddress()+"<-"+oldSource;
+            source= NodeService.getConfig().getAddress()+"<-"+oldSource;
         return source;
     }
     public static boolean isDevEnvironment(String[] args){

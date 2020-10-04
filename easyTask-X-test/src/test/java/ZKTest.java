@@ -1,12 +1,10 @@
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteLeader;
 import com.github.liuche51.easyTaskX.dto.zk.LeaderData;
 import com.github.liuche51.easyTaskX.zk.ZKService;
 import org.junit.Test;
-
-import java.util.List;
 
 public class ZKTest {
     public ZKTest() {
@@ -21,7 +19,7 @@ public class ZKTest {
         try {
             EasyTaskConfig config=new EasyTaskConfig();
             config.setZkAddress("127.0.0.1:2181");
-            ClusterService.setConfig(config);
+            NodeService.setConfig(config);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -32,7 +30,7 @@ public class ZKTest {
        try {
            EasyTaskConfig config=new EasyTaskConfig();
            config.setZkAddress("127.0.0.1:2181");
-           ClusterService.setConfig(config);
+           NodeService.setConfig(config);
            /*List<String> list = ZKService.getChildrenByPath("/Server");
            list.forEach(x -> {
                System.out.println(x);
@@ -45,8 +43,8 @@ public class ZKTest {
     public void competeLeader() {
         EasyTaskConfig config=new EasyTaskConfig();
         config.setZkAddress("127.0.0.1:2181");
-        ClusterService.setConfig(config);
-        ClusterService.CURRENTNODE=new Node("127.0.0.1",2121);
+        NodeService.setConfig(config);
+        NodeService.CURRENTNODE=new Node("127.0.0.1",2121);
         for(int i=0;i<5;i++){
             int name=i;
             Thread th=new Thread(new Runnable() {
@@ -69,7 +67,7 @@ public class ZKTest {
     public void watcherTest(){
         EasyTaskConfig config=new EasyTaskConfig();
         config.setZkAddress("127.0.0.1:2181");
-        ClusterService.setConfig(config);
+        NodeService.setConfig(config);
         try {
             LeaderData d=ZKService.getLeaderData(true);
             int y=0;
@@ -88,8 +86,8 @@ public class ZKTest {
     public void watcherTest2(){
         EasyTaskConfig config=new EasyTaskConfig();
         config.setZkAddress("127.0.0.1:2181");
-        ClusterService.setConfig(config);
-        ClusterService.CURRENTNODE=new Node("127.0.0.1",2121);
+        NodeService.setConfig(config);
+        NodeService.CURRENTNODE=new Node("127.0.0.1",2121);
         try {
             ZKService.listenLeaderDataNode();
             int y=0;

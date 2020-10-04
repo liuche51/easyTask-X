@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.follow;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.task.HeartbeatsTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.FollowRequestUpdateRegeditTask;
@@ -95,12 +95,13 @@ public class BrokerService {
     public static boolean requestUpdateRegedit() {
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestUpdateRegedit).setSource(ClusterService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestUpdateRegedit).setSource(NodeService.getConfig().getAddress())
                     .setBody("broker");
             ByteStringPack respPack = new ByteStringPack();
-            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, ClusterService.CURRENTNODE.getClusterLeader().getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
+            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
             if (ret) {
                 NodeDto.Node node = NodeDto.Node.parseFrom(respPack.getRespbody());
+                NodeService.CURRENTNODE.setBakLeader(node.getBakleader());
                 dealUpdate(node);
                 return true;
             } else {
@@ -132,8 +133,8 @@ public class BrokerService {
         masterNodes.getNodesList().forEach(x -> {
             leaders.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
         });
-        ClusterService.CURRENTNODE.setFollows(follows);
-        ClusterService.CURRENTNODE.setClients(clients);
-        ClusterService.CURRENTNODE.setLeaders(leaders);
+        NodeService.CURRENTNODE.setSlaves(follows);
+        NodeService.CURRENTNODE.setClients(clients);
+        NodeService.CURRENTNODE.setMasters(leaders);
     }
 }

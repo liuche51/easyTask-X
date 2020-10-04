@@ -1,12 +1,10 @@
 package com.github.liuche51.easyTaskX.netty.server.handler;
 
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.Schedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
-import com.github.liuche51.easyTaskX.util.StringConstant;
-import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.google.protobuf.ByteString;
 
 /**
@@ -18,7 +16,7 @@ public class ClientSubmitTaskHandler extends BaseHandler{
     public ByteString process(Dto.Frame frame) throws Exception {
         ScheduleDto.Schedule dto = ScheduleDto.Schedule.parseFrom(frame.getBodyBytes());
         Schedule schedule=Schedule.valueOf(dto);
-        ClusterService.submitTask(schedule);
+        NodeService.submitTask(schedule);
         return null;
     }
 }

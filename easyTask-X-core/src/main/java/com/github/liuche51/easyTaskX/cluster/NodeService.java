@@ -16,13 +16,14 @@ import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
 import com.github.liuche51.easyTaskX.util.DateUtils;
+import com.github.liuche51.easyTaskX.zk.ZKService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class ClusterService {
-    private static Logger log = LoggerFactory.getLogger(ClusterService.class);
+public class NodeService {
+    private static Logger log = LoggerFactory.getLogger(NodeService.class);
     private static EasyTaskConfig config = null;
     private static volatile boolean isStarted = false;//是否已经启动
     /**
@@ -47,7 +48,7 @@ public class ClusterService {
 
 
     public static void setConfig(EasyTaskConfig config) {
-        ClusterService.config = config;
+        NodeService.config = config;
     }
 
     /**
@@ -63,7 +64,7 @@ public class ClusterService {
         if (config == null)
             throw new Exception("config is null,please set a EasyTaskConfig!");
         EasyTaskConfig.validateNecessary(config);
-        ClusterService.config = config;
+        NodeService.config = config;
         DbInit.init();//初始化数据库
         NettyServer.getInstance().run();//启动组件的Netty服务端口
         CmdServer.init();//启动命令服务的socket端口
@@ -80,7 +81,7 @@ public class ClusterService {
     public static void initCurrentNode() throws Exception {
         clearThreadTask();
         deleteAllData();
-        CURRENTNODE = new Node(Util.getLocalIP(), ClusterService.getConfig().getServerPort());
+        CURRENTNODE = new Node(Util.getLocalIP(), NodeService.getConfig().getServerPort());
         timerTasks.add(BrokerService.startHeartBeat());
         timerTasks.add(clearDataTask());
         timerTasks.add(BrokerService.startCommitSaveTransactionTask());
@@ -90,6 +91,7 @@ public class ClusterService {
         timerTasks.add(BrokerService.startRetryDelTransactionTask());
         timerTasks.add(BrokerService.startUpdateRegeditTask());
         timerTasks.add(SlaveService.startClusterSlaveRequestUpdateRegeditTask());
+        ZKService.listenLeaderDataNode();
     }
     /**
      * 客户端提交任务。允许线程等待，直到easyTask组件启动完成
@@ -115,12 +117,12 @@ public class ClusterService {
         if (VoteSlave.isSelecting())
             throw new VotingException("normally exception!save():cluster is voting,please wait a moment.");
         //防止多线程下，follow元素操作竞争问题。确保参与提交的follow不受集群选举影响
-        List<Node> follows = new ArrayList<>(CURRENTNODE.getFollows().size());
-        Iterator<Map.Entry<String,Node>> items = CURRENTNODE.getFollows().entrySet().iterator();
+        List<Node> follows = new ArrayList<>(CURRENTNODE.getSlaves().size());
+        Iterator<Map.Entry<String,Node>> items = CURRENTNODE.getSlaves().entrySet().iterator();
         while (items.hasNext()) {
             follows.add(items.next().getValue());
         }
-        if (follows.size() != ClusterService.getConfig().getBackupCount())
+        if (follows.size() != NodeService.getConfig().getBackupCount())
             throw new Exception("save() exception！follows.size()!=backupCount");
         String transactionId=Util.generateTransactionId();
         try {
@@ -147,8 +149,8 @@ public class ClusterService {
      */
     public static boolean deleteTask(String taskId) {
         //防止多线程下，follow元素操作竞争问题。确保参与提交的follow不受集群选举影响
-        List<Node> follows = new ArrayList<>(CURRENTNODE.getFollows().size());
-        Iterator<Map.Entry<String,Node>> items = CURRENTNODE.getFollows().entrySet().iterator();
+        List<Node> follows = new ArrayList<>(CURRENTNODE.getSlaves().size());
+        Iterator<Map.Entry<String,Node>> items = CURRENTNODE.getSlaves().entrySet().iterator();
         while (items.hasNext()) {
             follows.add(items.next().getValue());
         }

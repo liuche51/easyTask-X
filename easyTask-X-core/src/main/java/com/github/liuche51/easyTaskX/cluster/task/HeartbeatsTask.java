@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.task;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.Node;
 
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
@@ -22,19 +22,19 @@ public class HeartbeatsTask extends TimerTask {
     public void run() {
         while (!isExit()) {
             try {
-                Node leader = ClusterService.CURRENTNODE.getClusterLeader();
+                Node leader = NodeService.CURRENTNODE.getClusterLeader();
                 if (leader == null) {//启动时还没获取leader信息，所以需要去zk获取
                     LeaderData node = ZKService.getLeaderData(false);
                     if (node != null && !StringUtils.isNullOrEmpty(node.getHost())) {//获取leader信息成功
                         leader = new Node(node.getHost(), node.getPort());
-                        ClusterService.CURRENTNODE.setClusterLeader(leader);
+                        NodeService.CURRENTNODE.setClusterLeader(leader);
                     } else {//否则就进入选举
                         VoteLeader.competeLeader();
                     }
                 } else {
                     dealClusterLeaderCheckFollowsAliveTask(leader);
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.Heartbeat).setSource(ClusterService.getConfig().getAddress())
+                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.Heartbeat).setSource(NodeService.getConfig().getAddress())
                             .setBody("Broker");//服务端节点
                     ChannelFuture future = NettyMsgService.sendASyncMsg(leader.getClient(), builder.build());//这里使用异步即可。也不需要返回值
                 }
@@ -42,7 +42,7 @@ public class HeartbeatsTask extends TimerTask {
                 log.error("", e);
             }
             try {
-                Thread.sleep(ClusterService.getConfig().getAdvanceConfig().getHeartBeat());
+                Thread.sleep(NodeService.getConfig().getAdvanceConfig().getHeartBeat());
             } catch (InterruptedException e) {
                 log.error("", e);
             }
@@ -56,10 +56,10 @@ public class HeartbeatsTask extends TimerTask {
     private static void dealClusterLeaderCheckFollowsAliveTask(Node leader) {
         if (leader == null) return;
         //如果当前节点是leader，且没有运行follow存活检查任务，则启动一个任务/
-        if (!CheckFollowsAliveTask.hasRuning && ClusterService.CURRENTNODE.getAddress().equals(leader.getAddress())) {
-            ClusterService.timerTasks.add(LeaderService.startCheckFollowAliveTask());
+        if (!CheckFollowsAliveTask.hasRuning && NodeService.CURRENTNODE.getAddress().equals(leader.getAddress())) {
+            NodeService.timerTasks.add(LeaderService.startCheckFollowAliveTask());
         }
-        if (!ClusterService.CURRENTNODE.getAddress().equals(leader.getAddress()) && CheckFollowsAliveTask.hasRuning) {
+        if (!NodeService.CURRENTNODE.getAddress().equals(leader.getAddress()) && CheckFollowsAliveTask.hasRuning) {
             CheckFollowsAliveTask.hasRuning = false;
         }
     }

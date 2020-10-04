@@ -105,9 +105,24 @@ public final class NodeDto {
      */
     NodeListOrBuilder getMastersOrBuilder();
 
-    // optional string ext = 8;
+    // optional string bakleader = 8;
     /**
-     * <code>optional string ext = 8;</code>
+     * <code>optional string bakleader = 8;</code>
+     */
+    boolean hasBakleader();
+    /**
+     * <code>optional string bakleader = 8;</code>
+     */
+    String getBakleader();
+    /**
+     * <code>optional string bakleader = 8;</code>
+     */
+    com.google.protobuf.ByteString
+        getBakleaderBytes();
+
+    // optional string ext = 9;
+    /**
+     * <code>optional string ext = 9;</code>
      *
      * <pre>
      *扩展字段。特殊标志用
@@ -115,7 +130,7 @@ public final class NodeDto {
      */
     boolean hasExt();
     /**
-     * <code>optional string ext = 8;</code>
+     * <code>optional string ext = 9;</code>
      *
      * <pre>
      *扩展字段。特殊标志用
@@ -123,7 +138,7 @@ public final class NodeDto {
      */
     String getExt();
     /**
-     * <code>optional string ext = 8;</code>
+     * <code>optional string ext = 9;</code>
      *
      * <pre>
      *扩展字段。特殊标志用
@@ -252,6 +267,11 @@ public final class NodeDto {
             }
             case 66: {
               bitField0_ |= 0x00000080;
+              bakleader_ = input.readBytes();
+              break;
+            }
+            case 74: {
+              bitField0_ |= 0x00000100;
               ext_ = input.readBytes();
               break;
             }
@@ -485,21 +505,64 @@ public final class NodeDto {
       return masters_;
     }
 
-    // optional string ext = 8;
-    public static final int EXT_FIELD_NUMBER = 8;
+    // optional string bakleader = 8;
+    public static final int BAKLEADER_FIELD_NUMBER = 8;
+    private Object bakleader_;
+    /**
+     * <code>optional string bakleader = 8;</code>
+     */
+    public boolean hasBakleader() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional string bakleader = 8;</code>
+     */
+    public String getBakleader() {
+      Object ref = bakleader_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          bakleader_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string bakleader = 8;</code>
+     */
+    public com.google.protobuf.ByteString
+        getBakleaderBytes() {
+      Object ref = bakleader_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (String) ref);
+        bakleader_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional string ext = 9;
+    public static final int EXT_FIELD_NUMBER = 9;
     private Object ext_;
     /**
-     * <code>optional string ext = 8;</code>
+     * <code>optional string ext = 9;</code>
      *
      * <pre>
      *扩展字段。特殊标志用
      * </pre>
      */
     public boolean hasExt() {
-      return ((bitField0_ & 0x00000080) == 0x00000080);
+      return ((bitField0_ & 0x00000100) == 0x00000100);
     }
     /**
-     * <code>optional string ext = 8;</code>
+     * <code>optional string ext = 9;</code>
      *
      * <pre>
      *扩展字段。特殊标志用
@@ -520,7 +583,7 @@ public final class NodeDto {
       }
     }
     /**
-     * <code>optional string ext = 8;</code>
+     * <code>optional string ext = 9;</code>
      *
      * <pre>
      *扩展字段。特殊标志用
@@ -548,6 +611,7 @@ public final class NodeDto {
       brokers_ = NodeList.getDefaultInstance();
       salves_ = NodeList.getDefaultInstance();
       masters_ = NodeList.getDefaultInstance();
+      bakleader_ = "";
       ext_ = "";
     }
     private byte memoizedIsInitialized = -1;
@@ -584,7 +648,10 @@ public final class NodeDto {
         output.writeMessage(7, masters_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeBytes(8, getExtBytes());
+        output.writeBytes(8, getBakleaderBytes());
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeBytes(9, getExtBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -625,7 +692,11 @@ public final class NodeDto {
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(8, getExtBytes());
+          .computeBytesSize(8, getBakleaderBytes());
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(9, getExtBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -777,8 +848,10 @@ public final class NodeDto {
           mastersBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000040);
-        ext_ = "";
+        bakleader_ = "";
         bitField0_ = (bitField0_ & ~0x00000080);
+        ext_ = "";
+        bitField0_ = (bitField0_ & ~0x00000100);
         return this;
       }
 
@@ -854,6 +927,10 @@ public final class NodeDto {
         if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
           to_bitField0_ |= 0x00000080;
         }
+        result.bakleader_ = bakleader_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
+        }
         result.ext_ = ext_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -896,8 +973,13 @@ public final class NodeDto {
         if (other.hasMasters()) {
           mergeMasters(other.getMasters());
         }
-        if (other.hasExt()) {
+        if (other.hasBakleader()) {
           bitField0_ |= 0x00000080;
+          bakleader_ = other.bakleader_;
+          onChanged();
+        }
+        if (other.hasExt()) {
+          bitField0_ |= 0x00000100;
           ext_ = other.ext_;
           onChanged();
         }
@@ -1577,20 +1659,94 @@ public final class NodeDto {
         return mastersBuilder_;
       }
 
-      // optional string ext = 8;
+      // optional string bakleader = 8;
+      private Object bakleader_ = "";
+      /**
+       * <code>optional string bakleader = 8;</code>
+       */
+      public boolean hasBakleader() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional string bakleader = 8;</code>
+       */
+      public String getBakleader() {
+        Object ref = bakleader_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          bakleader_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      /**
+       * <code>optional string bakleader = 8;</code>
+       */
+      public com.google.protobuf.ByteString
+          getBakleaderBytes() {
+        Object ref = bakleader_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (String) ref);
+          bakleader_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string bakleader = 8;</code>
+       */
+      public Builder setBakleader(
+          String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000080;
+        bakleader_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string bakleader = 8;</code>
+       */
+      public Builder clearBakleader() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        bakleader_ = getDefaultInstance().getBakleader();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string bakleader = 8;</code>
+       */
+      public Builder setBakleaderBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000080;
+        bakleader_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string ext = 9;
       private Object ext_ = "";
       /**
-       * <code>optional string ext = 8;</code>
+       * <code>optional string ext = 9;</code>
        *
        * <pre>
        *扩展字段。特殊标志用
        * </pre>
        */
       public boolean hasExt() {
-        return ((bitField0_ & 0x00000080) == 0x00000080);
+        return ((bitField0_ & 0x00000100) == 0x00000100);
       }
       /**
-       * <code>optional string ext = 8;</code>
+       * <code>optional string ext = 9;</code>
        *
        * <pre>
        *扩展字段。特殊标志用
@@ -1608,7 +1764,7 @@ public final class NodeDto {
         }
       }
       /**
-       * <code>optional string ext = 8;</code>
+       * <code>optional string ext = 9;</code>
        *
        * <pre>
        *扩展字段。特殊标志用
@@ -1628,7 +1784,7 @@ public final class NodeDto {
         }
       }
       /**
-       * <code>optional string ext = 8;</code>
+       * <code>optional string ext = 9;</code>
        *
        * <pre>
        *扩展字段。特殊标志用
@@ -1639,26 +1795,26 @@ public final class NodeDto {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000080;
+  bitField0_ |= 0x00000100;
         ext_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string ext = 8;</code>
+       * <code>optional string ext = 9;</code>
        *
        * <pre>
        *扩展字段。特殊标志用
        * </pre>
        */
       public Builder clearExt() {
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000100);
         ext_ = getDefaultInstance().getExt();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string ext = 8;</code>
+       * <code>optional string ext = 9;</code>
        *
        * <pre>
        *扩展字段。特殊标志用
@@ -1669,7 +1825,7 @@ public final class NodeDto {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000080;
+  bitField0_ |= 0x00000100;
         ext_ = value;
         onChanged();
         return this;
@@ -2379,13 +2535,13 @@ public final class NodeDto {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\rNodeDto.proto\"\262\001\n\004Node\022\014\n\004host\030\001 \001(\t\022\014" +
+      "\n\rNodeDto.proto\"\305\001\n\004Node\022\014\n\004host\030\001 \001(\t\022\014" +
       "\n\004port\030\002 \001(\005\022\022\n\ndataStatus\030\003 \001(\t\022\032\n\007clie" +
       "nts\030\004 \001(\0132\t.NodeList\022\032\n\007brokers\030\005 \001(\0132\t." +
       "NodeList\022\031\n\006salves\030\006 \001(\0132\t.NodeList\022\032\n\007m" +
-      "asters\030\007 \001(\0132\t.NodeList\022\013\n\003ext\030\010 \001(\t\" \n\010" +
-      "NodeList\022\024\n\005nodes\030\001 \003(\0132\005.NodeB\tB\007NodeDt" +
-      "o"
+      "asters\030\007 \001(\0132\t.NodeList\022\021\n\tbakleader\030\010 \001" +
+      "(\t\022\013\n\003ext\030\t \001(\t\" \n\010NodeList\022\024\n\005nodes\030\001 \003" +
+      "(\0132\005.NodeB\tB\007NodeDto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2397,7 +2553,7 @@ public final class NodeDto {
           internal_static_Node_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_Node_descriptor,
-              new String[] { "Host", "Port", "DataStatus", "Clients", "Brokers", "Salves", "Masters", "Ext", });
+              new String[] { "Host", "Port", "DataStatus", "Clients", "Brokers", "Salves", "Masters", "Bakleader", "Ext", });
           internal_static_NodeList_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_NodeList_fieldAccessorTable = new

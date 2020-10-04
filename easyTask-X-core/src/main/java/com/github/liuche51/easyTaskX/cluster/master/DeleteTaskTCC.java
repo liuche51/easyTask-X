@@ -1,7 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.master;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.Node;
 
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
@@ -54,7 +54,7 @@ public class DeleteTaskTCC {
         while (items.hasNext()) {
             Node follow = items.next();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_TRYDELTASK).setSource(ClusterService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_TRYDELTASK).setSource(NodeService.getConfig().getAddress())
                     .setBody(transactionId+","+taskId);
             NettyClient client = follow.getClientWithCount(1);
             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder,client,1,0,null);

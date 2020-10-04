@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.dao;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,7 @@ public class DbInit {
             return true;
         try {
             //创建db存储文件夹
-            File file = new File(ClusterService.getConfig().getTaskStorePath());
+            File file = new File(NodeService.getConfig().getTaskStorePath());
             if (!file.exists()) {
                 file.mkdirs();
             }

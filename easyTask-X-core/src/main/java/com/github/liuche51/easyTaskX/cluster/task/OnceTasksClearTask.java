@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.task;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 
 
 import java.util.Iterator;
@@ -14,7 +14,7 @@ public class OnceTasksClearTask extends TimerTask {
     public void run() {
         while (!isExit()) {
             try {
-                Iterator<OnceTask> items=ClusterService.onceTasks.iterator();
+                Iterator<OnceTask> items= NodeService.onceTasks.iterator();
                 while (items.hasNext()){
                     OnceTask one=items.next();
                     if(one.isExit())
@@ -24,7 +24,7 @@ public class OnceTasksClearTask extends TimerTask {
                 log.error("", e);
             }
             try {
-                Thread.sleep(ClusterService.getConfig().getAdvanceConfig().getClearScheduleBakTime());
+                Thread.sleep(NodeService.getConfig().getAdvanceConfig().getClearScheduleBakTime());
             } catch (InterruptedException e) {
                 log.error("", e);
             }

@@ -2,16 +2,14 @@ package com.github.liuche51.easyTaskX.cluster.slave;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
-import com.github.liuche51.easyTaskX.cluster.task.CheckFollowsAliveTask;
 import com.github.liuche51.easyTaskX.cluster.task.ClusterSlaveRequestUpdateRegeditTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
 import com.github.liuche51.easyTaskX.dto.*;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
-import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
@@ -29,7 +27,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -139,9 +136,9 @@ public class SlaveService {
     public static void requestUpdateClusterRegedit() {
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.SalveRequestUpdateClusterRegedit).setSource(ClusterService.getConfig().getAddress());
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.SalveRequestUpdateClusterRegedit).setSource(NodeService.getConfig().getAddress());
             ByteStringPack respPack = new ByteStringPack();
-            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, ClusterService.CURRENTNODE.getClusterLeader().getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
+            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
             if (ret) {
                 String body=respPack.getRespbody().toStringUtf8();
                 String[] items=body.split("|");

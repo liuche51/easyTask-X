@@ -2,7 +2,7 @@ package com.github.liuche51.easyTaskX.util;
 
 
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -25,7 +25,7 @@ public class DateUtils {
      * @return
      */
     public static boolean isGreaterThanLoseTime(ZonedDateTime dateTime){
-        if(ZonedDateTime.now().minusSeconds(ClusterService.getConfig().getAdvanceConfig().getLoseTimeOut())
+        if(ZonedDateTime.now().minusSeconds(NodeService.getConfig().getAdvanceConfig().getLoseTimeOut())
                 .compareTo(dateTime) > 0)
             return true;
         else return false;

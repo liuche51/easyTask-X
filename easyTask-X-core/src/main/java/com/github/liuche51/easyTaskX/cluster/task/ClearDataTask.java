@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.task;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.Node;
 
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
@@ -22,7 +22,7 @@ public class ClearDataTask extends TimerTask {
     public void run() {
         while (!isExit()) {
             try {
-                Map<String, Node> leaders = ClusterService.CURRENTNODE.getLeaders();
+                Map<String, Node> leaders = NodeService.CURRENTNODE.getMasters();
                 Iterator<Map.Entry<String, Node>> items = leaders.entrySet().iterator();//使用遍历+移除操作安全的迭代器方式
                 List<String> sources = new ArrayList<>(leaders.size());
                 while (items.hasNext()) {
@@ -36,7 +36,7 @@ public class ClearDataTask extends TimerTask {
                 log.error("clearScheduleBak()", e);
             }
             try {
-                Thread.sleep(ClusterService.getConfig().getAdvanceConfig().getClearScheduleBakTime());
+                Thread.sleep(NodeService.getConfig().getAdvanceConfig().getClearScheduleBakTime());
             } catch (InterruptedException e) {
                 log.error("clearScheduleBak()", e);
             }

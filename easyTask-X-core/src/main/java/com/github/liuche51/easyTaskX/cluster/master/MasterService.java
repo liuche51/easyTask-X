@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.master;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
@@ -38,7 +38,7 @@ public class MasterService {
     public static OnceTask syncDataToNewFollow(Node oldFollow, Node newFollow) {
         SyncDataToNewSlaveTask task=new SyncDataToNewSlaveTask(oldFollow,newFollow);
         task.start();
-        ClusterService.onceTasks.add(task);
+        NodeService.onceTasks.add(task);
         return task;
     }
 
@@ -51,7 +51,7 @@ public class MasterService {
     public static OnceTask submitNewTaskByOldLeader(String oldLeaderAddress) {
         NewMasterSyncBakDataTask task=new NewMasterSyncBakDataTask(oldLeaderAddress);
         task.start();
-        ClusterService.onceTasks.add(task);
+        NodeService.onceTasks.add(task);
         return task;
     }
 
@@ -59,14 +59,14 @@ public class MasterService {
      * master通知leader，已经完成对新follow的数据同步。请求更新数据同步状态
      */
     public static void notifyClusterLeaderUpdateRegeditForDataStatus(String followAddress,String dataStatus){
-        ClusterService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 try {
                     Dto.Frame.Builder builder=Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setBody(NettyInterfaceEnum.NotifyLeaderUpdateRegeditForDataStatus)
-                            .setSource(ClusterService.CURRENTNODE.getAddress()).setBody(followAddress+"|"+dataStatus);
-                    boolean ret=NettyMsgService.sendSyncMsgWithCount(builder,ClusterService.CURRENTNODE.getClusterLeader().getClient(),ClusterService.getConfig().getAdvanceConfig().getTryCount(),5,null);
+                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(followAddress+"|"+dataStatus);
+                    boolean ret=NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(),5,null);
                     if(!ret)
                         log.info("normally exception!notifyClusterLeaderUpdateRegeditForDataStatus() failed.");
                 }catch (Exception e){

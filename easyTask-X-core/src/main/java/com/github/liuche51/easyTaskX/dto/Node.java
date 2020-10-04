@@ -1,15 +1,6 @@
 package com.github.liuche51.easyTaskX.dto;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
-import com.github.liuche51.easyTaskX.netty.client.NettyClient;
-import com.github.liuche51.easyTaskX.netty.client.NettyConnectionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -23,15 +14,21 @@ public class Node extends BaseNode {
     /**
      * 当前节点的所有follows
      */
-    private ConcurrentHashMap<String, Node> follows = new ConcurrentHashMap<String, Node>();
+    private ConcurrentHashMap<String, Node> slaves = new ConcurrentHashMap<String, Node>();
     /**
      * 当前节点的所有leader
      */
-    private ConcurrentHashMap<String, Node> leaders = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Node> masters = new ConcurrentHashMap<>();
     /**
      * leader
      */
     private Node clusterLeader=null;
+    /**
+     * 集群备用leader
+     * 用来判断leader宕机后，是否参与竞选新leader。如果有值说明当前集群有备用leader，则自己不参与竞选
+     * 让备用leader竞选
+     */
+    private String bakLeader;
     public Node(BaseNode baseNode){
         super(baseNode.getHost(), baseNode.getPort());
     }
@@ -51,20 +48,20 @@ public class Node extends BaseNode {
         this.clients = clients;
     }
 
-    public ConcurrentHashMap<String, Node> getFollows() {
-        return follows;
+    public ConcurrentHashMap<String, Node> getSlaves() {
+        return slaves;
     }
 
-    public void setFollows(ConcurrentHashMap<String, Node> follows) {
-        this.follows = follows;
+    public void setSlaves(ConcurrentHashMap<String, Node> slaves) {
+        this.slaves = slaves;
     }
 
-    public ConcurrentHashMap<String, Node> getLeaders() {
-        return leaders;
+    public ConcurrentHashMap<String, Node> getMasters() {
+        return masters;
     }
 
-    public void setLeaders(ConcurrentHashMap<String, Node> leaders) {
-        this.leaders = leaders;
+    public void setMasters(ConcurrentHashMap<String, Node> masters) {
+        this.masters = masters;
     }
 
     public Node getClusterLeader() {
@@ -73,5 +70,13 @@ public class Node extends BaseNode {
 
     public void setClusterLeader(Node clusterLeader) {
         this.clusterLeader = clusterLeader;
+    }
+
+    public String getBakLeader() {
+        return bakLeader;
+    }
+
+    public void setBakLeader(String bakLeader) {
+        this.bakLeader = bakLeader;
     }
 }

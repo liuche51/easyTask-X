@@ -1,11 +1,8 @@
 package com.github.liuche51.easyTaskX.netty.server.handler;
 
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.dto.Schedule;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
-import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
-import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.google.protobuf.ByteString;
 
 /**
@@ -17,7 +14,7 @@ public class ClientDeleteTaskHandler extends BaseHandler {
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {
         String taskId = frame.getBody();
-        boolean ret=ClusterService.deleteTask(taskId);
+        boolean ret= NodeService.deleteTask(taskId);
         if(!ret) throw new Exception("deleteTask()-> exception!");
         return ByteString.copyFromUtf8(taskId);
     }

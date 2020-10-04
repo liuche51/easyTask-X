@@ -1,7 +1,7 @@
 package com.github.liuche51.easyTaskX;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
 import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +29,7 @@ public class EasyTaskXApp {
             initLogConfig();
         EasyTaskConfig config = loadConfig(args);
         log.info("AnnularQueue start config EasyTaskConfig=" + JSONObject.toJSONString(config));
-        ClusterService.start(config);
+        NodeService.start(config);
         log.info("===============================================================================");
         log.info("================== EasyTask-X Started Successfull！=============================");
         log.info("================================================================================");

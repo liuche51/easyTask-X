@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.task;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 
 /**
@@ -16,7 +16,7 @@ public class FollowRequestUpdateRegeditTask extends TimerTask {
                 log.error("FollowRequestUpdateRegeditTask()->exception!", e);
             }
             try {
-                Thread.sleep(ClusterService.getConfig().getAdvanceConfig().getFollowUpdateRegeditTime());
+                Thread.sleep(NodeService.getConfig().getAdvanceConfig().getFollowUpdateRegeditTime());
             } catch (InterruptedException e) {
                 log.error("FollowRequestUpdateRegeditTask()->exception!", e);
             }

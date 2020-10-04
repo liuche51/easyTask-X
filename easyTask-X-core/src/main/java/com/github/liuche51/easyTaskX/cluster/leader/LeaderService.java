@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.alibaba.fastjson.JSONObject;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.task.CheckFollowsAliveTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
@@ -63,13 +64,13 @@ public class LeaderService {
         Iterator<Map.Entry<String, Node>> items = nodes.entrySet().iterator();
         while (items.hasNext()) {
             Map.Entry<String, Node> item = items.next();
-            ClusterService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+            NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                         builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifySalveUpdateRegedit)
-                                .setSource(ClusterService.CURRENTNODE.getAddress());
+                                .setSource(NodeService.CURRENTNODE.getAddress());
                         NodeDto.Node.Builder nodeBuilder=NodeDto.Node.newBuilder();
                         //clients
                         NodeDto.NodeList.Builder clientsBuilder= NodeDto.NodeList.newBuilder();
@@ -107,7 +108,7 @@ public class LeaderService {
                         }
                         nodeBuilder.setMasters(leadersBuilder.build());
                         builder.setBodyBytes(nodeBuilder.build().toByteString());
-                        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, item.getValue().getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, item.getValue().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                         if (!ret)
                             log.info("normally exception!notifySalveUpdateRegedit() failed.");
                     } catch (Exception e) {
@@ -127,13 +128,13 @@ public class LeaderService {
         Iterator<Map.Entry<String, Node>> items = nodes.entrySet().iterator();
         while (items.hasNext()) {
             Map.Entry<String, Node> item = items.next();
-            ClusterService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+            NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                         builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifySalveUpdateRegedit)
-                                .setSource(ClusterService.CURRENTNODE.getAddress());
+                                .setSource(NodeService.CURRENTNODE.getAddress());
                         NodeDto.Node.Builder nodeBuilder=NodeDto.Node.newBuilder();
                         //Brokers
                         NodeDto.NodeList.Builder clientsBuilder= NodeDto.NodeList.newBuilder();
@@ -147,7 +148,7 @@ public class LeaderService {
                         }
                         nodeBuilder.setClients(clientsBuilder.build());
                         builder.setBodyBytes(nodeBuilder.build().toByteString());
-                        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, item.getValue().getClient(), ClusterService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, item.getValue().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                         if (!ret)
                             log.info("normally exception!notifySalveUpdateRegedit() failed.");
                     } catch (Exception e) {
@@ -156,6 +157,21 @@ public class LeaderService {
                 }
             });
         };
+    }
+
+    /**
+     * 通知Follow更新备用leader信息
+     */
+    public static void notifyFollowsBakLeaderChanged(){
+        String bakLeader= JSONObject.toJSONString(NodeService.CURRENTNODE.getSlaves());
+        Iterator<String> items = LeaderService.BROKER_REGISTER_CENTER.keySet().iterator();
+        while (items.hasNext()) {
+            LeaderUtil.notifyFollowBakLeaderChanged(items.next(),bakLeader);
+        }
+        Iterator<String> items2 = LeaderService.CLIENT_REGISTER_CENTER.keySet().iterator();
+        while (items2.hasNext()) {
+            LeaderUtil.notifyFollowBakLeaderChanged(items2.next(),bakLeader);
+        }
     }
     /**
      * 启动leader检查所有follows是否存活任务

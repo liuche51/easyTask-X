@@ -1,10 +1,10 @@
 package com.github.liuche51.easyTaskX.dto.zk;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 
 public class LeaderData {
     private String host;
-    private int port= ClusterService.getConfig().getServerPort();
+    private int port= NodeService.getConfig().getServerPort();
     /**
      * 最近一次心跳时间
      */

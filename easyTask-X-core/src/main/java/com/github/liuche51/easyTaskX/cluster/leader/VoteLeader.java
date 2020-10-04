@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.zk.LeaderData;
 import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.zk.ZKService;
@@ -25,7 +25,7 @@ public class VoteLeader {
                 hasLock=true;
                 LeaderData data=ZKService.getLeaderData(false);
                 if(data==null|| StringUtils.isNullOrEmpty(data.getHost())){//leader节点为空时才需要选新leader
-                    ZKService.registerLeader(new LeaderData(ClusterService.CURRENTNODE.getHost(),ClusterService.CURRENTNODE.getPort()));
+                    ZKService.registerLeader(new LeaderData(NodeService.CURRENTNODE.getHost(), NodeService.CURRENTNODE.getPort()));
                     return true;
                 }
 

@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.netty.server;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 
 import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
@@ -36,7 +36,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         ResultDto.Result.Builder result = ResultDto.Result.newBuilder();
         result.setResult(StringConstant.TRUE);
         try {
-            builder.setSource(ClusterService.getConfig().getAddress());
+            builder.setSource(NodeService.getConfig().getAddress());
             Dto.Frame frame = (Dto.Frame) msg;
             builder.setInterfaceName(frame.getInterfaceName());
             builder.setIdentity(frame.getIdentity());

@@ -1,8 +1,5 @@
 package com.github.liuche51.easyTaskX.dto;
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
-import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
-
 /**
  * 注册表用节点对象
  */

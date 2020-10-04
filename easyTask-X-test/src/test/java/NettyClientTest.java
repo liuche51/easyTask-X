@@ -1,5 +1,5 @@
 
-import com.github.liuche51.easyTaskX.cluster.ClusterService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
@@ -117,7 +117,7 @@ public class NettyClientTest {
     @Test
     public void getList() throws Exception {
         EasyTaskConfig config=new EasyTaskConfig();
-        ClusterService.setConfig(config);
+        NodeService.setConfig(config);
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
         builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestUpdateRegedit).setSource("127.0.0.1:2021")
         .setBody("broker");

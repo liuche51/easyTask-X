@@ -7,7 +7,8 @@ message Node {
   optional NodeList brokers=5;
   optional NodeList salves=6;
   optional NodeList masters=7;
-  optional string ext = 8;//扩展字段。特殊标志用
+  optional string bakleader = 8;
+  optional string ext = 9;//扩展字段。特殊标志用
 
 }
 message NodeList {
