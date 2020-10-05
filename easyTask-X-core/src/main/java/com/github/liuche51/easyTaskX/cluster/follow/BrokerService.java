@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.follow;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.task.BrokerUpdateClientsTask;
 import com.github.liuche51.easyTaskX.cluster.task.HeartbeatsTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.FollowRequestUpdateRegeditTask;
@@ -83,6 +84,14 @@ public class BrokerService {
      */
     public static TimerTask startUpdateRegeditTask() {
         FollowRequestUpdateRegeditTask task = new FollowRequestUpdateRegeditTask();
+        task.start();
+        return task;
+    }
+    /**
+     * 启动点定时从leader更新Client列表。
+     */
+    public static TimerTask startBrokerUpdateClientsTask() {
+        BrokerUpdateClientsTask task = new BrokerUpdateClientsTask();
         task.start();
         return task;
     }

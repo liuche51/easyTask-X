@@ -4,9 +4,7 @@ package com.github.liuche51.easyTaskX.netty.server.handler;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.server.handler.follow.*;
-import com.github.liuche51.easyTaskX.netty.server.handler.leader.ClusterSlaveRequestUpdateRegeditHandler;
-import com.github.liuche51.easyTaskX.netty.server.handler.leader.FollowRequestUpdateRegeditHandler;
-import com.github.liuche51.easyTaskX.netty.server.handler.leader.HeartbeatHandler;
+import com.github.liuche51.easyTaskX.netty.server.handler.leader.*;
 import com.github.liuche51.easyTaskX.netty.server.handler.notify.NotifyLeaderUpdateRegeditForDataStatusHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.notify.LeaderNotifyBrokerUpdateRegeditHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.notify.NotifyMasterVoteNewSlaveHandler;
@@ -36,6 +34,8 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.LeaderNotifyFollwUpdateBakLeaderInfo,new LeaderNotifyFollwUpdateBakLeaderHandler());
                 put(NettyInterfaceEnum.LeaderNotifySalveUpdateRegedit,new LeaderNotifySalveUpdateRegeditHandler());
                 put(NettyInterfaceEnum.SalveRequestUpdateClusterRegedit,new ClusterSlaveRequestUpdateRegeditHandler());
+                put(NettyInterfaceEnum.ClientUpdateBrokers,new ClientRequestUpdateBrokersHandler());
+                put(NettyInterfaceEnum.BrokerUpdateClients,new BrokerRequestUpdateClientsHandler());
             }
         };
     }

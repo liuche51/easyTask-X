@@ -22,11 +22,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class NodeService {
     private static Logger log = LoggerFactory.getLogger(NodeService.class);
     private static EasyTaskConfig config = null;
     private static volatile boolean isStarted = false;//是否已经启动
+    /**
+     * 集群所有可用的clients
+     */
+    private ConcurrentHashMap<String, BaseNode> clients = new ConcurrentHashMap<String, BaseNode>();
     /**
      * 当前集群节点的Node对象
      */
@@ -50,6 +55,14 @@ public class NodeService {
 
     public static void setConfig(EasyTaskConfig config) {
         NodeService.config = config;
+    }
+
+    public ConcurrentHashMap<String, BaseNode> getClients() {
+        return clients;
+    }
+
+    public void setClients(ConcurrentHashMap<String, BaseNode> clients) {
+        this.clients = clients;
     }
 
     /**
@@ -92,6 +105,7 @@ public class NodeService {
         timerTasks.add(BrokerService.startRetryDelTransactionTask());
         timerTasks.add(BrokerService.startUpdateRegeditTask());
         timerTasks.add(SlaveService.startClusterSlaveRequestUpdateRegeditTask());
+        timerTasks.add(BrokerService.startBrokerUpdateClientsTask());
         ZKService.listenLeaderDataNode();
     }
     /**

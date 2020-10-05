@@ -81,4 +81,12 @@ public class NettyInterfaceEnum {
      * broker或client通过定时任务获取leader最新注册表信息
      */
     public static final String FollowRequestUpdateRegedit="FollowRequestUpdateRegedit";
+    /**
+     * Client请求更新Broker列表信
+     */
+    public static final String ClientUpdateBrokers="ClientUpdateBrokers";
+    /**
+     * Broker请求更新Client列表信
+     */
+    public static final String BrokerUpdateClients="BrokerUpdateClients";
 }

@@ -41,6 +41,10 @@ public class AdvanceConfig {
      */
     private int slaveUpdateRegeditTime=600;
     /**
+     * 从leader更新Clients列表间隔时间。单位秒。
+     */
+    private int updateClientsTime=60*60;
+    /**
      * 集群公用程池
      */
     private ExecutorService clusterPool = null;
@@ -125,6 +129,14 @@ public class AdvanceConfig {
 
     public void setSlaveUpdateRegeditTime(int slaveUpdateRegeditTime) {
         this.slaveUpdateRegeditTime = slaveUpdateRegeditTime;
+    }
+
+    public int getUpdateClientsTime() {
+        return updateClientsTime;
+    }
+
+    public void setUpdateClientsTime(int updateClientsTime) {
+        this.updateClientsTime = updateClientsTime;
     }
 
     public ExecutorService getClusterPool() {

@@ -1,0 +1,4 @@
+option java_outer_classname = "StringListDto";
+message StringList {
+  repeated string list = 1;
+}
