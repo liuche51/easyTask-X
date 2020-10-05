@@ -21,7 +21,7 @@ public class AdvanceConfig {
      */
     private int loseTimeOut = 30;
     /**
-     * 节点对zk的心跳频率。默认5s一次
+     * 节点对leader的心跳频率。默认5s一次
      */
     private int heartBeat = 5;
     /**

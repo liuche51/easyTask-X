@@ -27,7 +27,7 @@ public class HeartbeatsTask extends TimerTask {
                 if (leader == null) {//启动时还没获取leader信息，所以需要去zk获取
                     LeaderData node = ZKService.getLeaderData(false);
                     if (node != null && !StringUtils.isNullOrEmpty(node.getHost())) {//获取leader信息成功
-                        leader = new Node(node.getHost(), node.getPort());
+                        leader = new BaseNode(node.getHost(), node.getPort());
                         NodeService.CURRENTNODE.setClusterLeader(leader);
                     }
                     //如果当前备用leader信息是空的，说明是集群首次运行。则每个节点都可以进入选举.
@@ -37,7 +37,7 @@ public class HeartbeatsTask extends TimerTask {
                         VoteLeader.competeLeader();
                     }
                 } else {
-                    dealClusterLeaderCheckFollowsAliveTask(leader);
+                    initLeaderCheckFollowsAliveTask(leader);
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.Heartbeat).setSource(NodeService.getConfig().getAddress())
                             .setBody("Broker");//服务端节点
@@ -55,10 +55,10 @@ public class HeartbeatsTask extends TimerTask {
     }
 
     /**
-     * 处理leader，是否运行检查follows存活任务的逻辑
+     * 初始化是否运行leader的检查follows存活任务
      * @param leader
      */
-    private static void dealClusterLeaderCheckFollowsAliveTask(BaseNode leader) {
+    private static void initLeaderCheckFollowsAliveTask(BaseNode leader) {
         if (leader == null) return;
         //如果当前节点是leader，且没有运行follow存活检查任务，则启动一个任务/
         if (!CheckFollowsAliveTask.hasRuning && NodeService.CURRENTNODE.getAddress().equals(leader.getAddress())) {

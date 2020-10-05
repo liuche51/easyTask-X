@@ -6,6 +6,7 @@ import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.server.handler.follow.*;
 import com.github.liuche51.easyTaskX.netty.server.handler.leader.ClusterSlaveRequestUpdateRegeditHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.leader.FollowRequestUpdateRegeditHandler;
+import com.github.liuche51.easyTaskX.netty.server.handler.leader.HeartbeatHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.notify.NotifyLeaderUpdateRegeditForDataStatusHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.notify.LeaderNotifyBrokerUpdateRegeditHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.notify.NotifyMasterVoteNewSlaveHandler;

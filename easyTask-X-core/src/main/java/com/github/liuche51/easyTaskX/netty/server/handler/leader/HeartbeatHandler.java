@@ -1,10 +1,11 @@
-package com.github.liuche51.easyTaskX.netty.server.handler;
+package com.github.liuche51.easyTaskX.netty.server.handler.leader;
 
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegClient;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
+import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.google.protobuf.ByteString;
 
 import java.time.ZonedDateTime;
@@ -12,7 +13,7 @@ import java.time.ZonedDateTime;
 /**
  * 节点注册/心跳信息处理
  */
-public class HeartbeatHandler extends BaseHandler{
+public class HeartbeatHandler extends BaseHandler {
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {
         String address =frame.getSource();
