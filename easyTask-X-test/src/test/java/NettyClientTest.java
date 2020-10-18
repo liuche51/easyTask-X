@@ -35,7 +35,7 @@ public class NettyClientTest {
                         .setParam("birthday#;1986-1-1&;threadid#;1&;name#;Jack&;age#;32&");
                 Dto.Frame.Builder builder1=Dto.Frame.newBuilder();
                 builder1.setIdentity(Util.generateIdentityId());
-                builder1.setInterfaceName(NettyInterfaceEnum.TRAN_TRYSAVETASK).setBodyBytes(builder.build().toByteString());
+                builder1.setInterfaceName(NettyInterfaceEnum.MasterNotifySlaveTranTrySaveTask).setBodyBytes(builder.build().toByteString());
                 System.out.println("发送任务:"+id);
                 NettyClient client=NettyConnectionFactory.getInstance().getConnection("127.0.0.1",2021);
                 Object msg= NettyMsgService.sendSyncMsg(client,builder1.build());
@@ -93,7 +93,7 @@ public class NettyClientTest {
                         .setParam("birthday#;1986-1-1&;threadid#;1&;name#;Jack&;age#;32&");
                 Dto.Frame.Builder builder1=Dto.Frame.newBuilder();
                 builder1.setIdentity(StringConstant.EMPTY);
-                builder1.setInterfaceName(NettyInterfaceEnum.TRAN_TRYSAVETASK).setBodyBytes(builder.build().toByteString());
+                builder1.setInterfaceName(NettyInterfaceEnum.MasterNotifySlaveTranTrySaveTask).setBodyBytes(builder.build().toByteString());
                 System.out.println("发送任务:"+id);
                 NettyClient client=NettyConnectionFactory.getInstance().getConnection("127.0.0.1",2021);
                 ChannelFuture future= NettyMsgService.sendASyncMsg(client,builder1.build());
@@ -119,8 +119,8 @@ public class NettyClientTest {
         EasyTaskConfig config=new EasyTaskConfig();
         NodeService.setConfig(config);
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestUpdateRegedit).setSource("127.0.0.1:2021")
-        .setBody("broker");
+        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestLeaderSendRegedit).setSource("127.0.0.1:2021")
+        .setBody(StringConstant.BROKER);
         Dto.Frame frame = NettyMsgService.sendSyncMsg(new Node("127.0.0.1",2021).getClient(), builder.build());
         ResultDto.Result result = ResultDto.Result.parseFrom(frame.getBodyBytes());
         if (StringConstant.TRUE.equals(result.getResult())) {

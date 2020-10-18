@@ -17,10 +17,6 @@ public class RegBroker extends BaseNode{
     @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private ZonedDateTime createTime;
     /**
-     * 当前节点的所有clients
-     */
-    private ConcurrentHashMap<String, RegNode> clients = new ConcurrentHashMap();
-    /**
      * 当前节点的所有follows
      */
     private ConcurrentHashMap<String, RegNode> slaves = new ConcurrentHashMap();
@@ -52,14 +48,6 @@ public class RegBroker extends BaseNode{
 
     public void setCreateTime(ZonedDateTime createTime) {
         this.createTime = createTime;
-    }
-
-    public ConcurrentHashMap<String, RegNode> getClients() {
-        return clients;
-    }
-
-    public void setClients(ConcurrentHashMap<String, RegNode> clients) {
-        this.clients = clients;
     }
 
     public ConcurrentHashMap<String, RegNode> getSlaves() {

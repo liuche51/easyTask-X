@@ -70,17 +70,6 @@ public class LeaderService {
                         builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifySalveUpdateRegedit)
                                 .setSource(NodeService.CURRENTNODE.getAddress());
                         NodeDto.Node.Builder nodeBuilder=NodeDto.Node.newBuilder();
-                        //clients
-                        NodeDto.NodeList.Builder clientsBuilder= NodeDto.NodeList.newBuilder();
-                        Iterator<Map.Entry<String,RegNode>> items=node.getClients().entrySet().iterator();
-                        while (items.hasNext()){
-                            Map.Entry<String,RegNode> item=items.next();
-                            RegNode itNode=item.getValue();
-                            NodeDto.Node.Builder clientBuilder= NodeDto.Node.newBuilder();
-                            clientBuilder.setHost(itNode.getHost()).setPort(itNode.getPort());
-                            clientsBuilder.addNodes(clientBuilder.build());
-                        }
-                        nodeBuilder.setClients(clientsBuilder.build());
                         //follows
                         NodeDto.NodeList.Builder followsBuilder= NodeDto.NodeList.newBuilder();
                         Iterator<Map.Entry<String,RegNode>> items2=node.getSlaves().entrySet().iterator();

@@ -5,6 +5,7 @@ import com.github.liuche51.easyTaskX.dto.*;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
+import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.google.protobuf.ByteString;
 
 import java.time.ZonedDateTime;
@@ -20,17 +21,11 @@ public class LeaderNotifySalveUpdateRegeditHandler extends BaseHandler {
     public ByteString process(Dto.Frame frame) throws Exception {
         NodeDto.Node node = NodeDto.Node.parseFrom(frame.getBodyBytes());
         String[] exts = node.getExt().split("|");//格式：客户端类型|操作类型
-        if ("Broker".equalsIgnoreCase(exts[0])) {
+        if (StringConstant.BROKER.equalsIgnoreCase(exts[0])) {
             RegBroker regnode = new RegBroker(node.getHost(), node.getPort());
-            if ("Delete".equalsIgnoreCase(exts[1]))
+            if (StringConstant.DELETE.equalsIgnoreCase(exts[1]))
                 LeaderService.BROKER_REGISTER_CENTER.remove(regnode.getAddress());
-            else if ("Update".equalsIgnoreCase(exts[1])) {
-                NodeDto.NodeList clientNodes = node.getClients();
-                ConcurrentHashMap<String, RegNode> clients = new ConcurrentHashMap<>();
-                clientNodes.getNodesList().forEach(x -> {
-                    RegNode regNode = new RegNode(x.getHost(), x.getPort());
-                    clients.put(regNode.getAddress(), regNode);
-                });
+            else if (StringConstant.UPDATE.equalsIgnoreCase(exts[1])) {
                 NodeDto.NodeList slaveNodes = node.getSalves();
                 ConcurrentHashMap<String, RegNode> follows = new ConcurrentHashMap<>();
                 slaveNodes.getNodesList().forEach(x -> {
@@ -45,18 +40,17 @@ public class LeaderNotifySalveUpdateRegeditHandler extends BaseHandler {
                     RegNode regNode = new RegNode(x.getHost(), x.getPort());
                     leaders.put(regNode.getAddress(),regNode);
                 });
-                regnode.setClients(clients);
                 regnode.setSlaves(follows);
                 regnode.setMasters(leaders);
                 regnode.setCreateTime(ZonedDateTime.now());
                 regnode.setLastHeartbeat(ZonedDateTime.now());
                 LeaderService.BROKER_REGISTER_CENTER.put(regnode.getAddress(), regnode);
             }
-        } else if ("Client".equalsIgnoreCase(exts[0])) {
+        } else if (StringConstant.CLINET.equalsIgnoreCase(exts[0])) {
             RegClient regnode = new RegClient(node.getHost(), node.getPort());
-            if ("Delete".equalsIgnoreCase(exts[1]))
+            if (StringConstant.DELETE.equalsIgnoreCase(exts[1]))
                 LeaderService.CLIENT_REGISTER_CENTER.remove(regnode.getAddress());
-            else if ("Update".equalsIgnoreCase(exts[1])) {
+            else if (StringConstant.UPDATE.equalsIgnoreCase(exts[1])) {
                 NodeDto.NodeList clientNodes = node.getBrokers();
                 ConcurrentHashMap<String, RegNode> brokers = new ConcurrentHashMap<>();
                 clientNodes.getNodesList().forEach(x -> {

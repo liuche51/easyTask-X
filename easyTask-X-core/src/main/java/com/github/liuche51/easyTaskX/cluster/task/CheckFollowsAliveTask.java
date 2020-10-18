@@ -7,6 +7,7 @@ import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
 import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.util.DateUtils;
+import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
 
 import java.util.Collections;
@@ -57,7 +58,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                             VoteMaster.notifySliceFollowsNewLeader(regNode.getSlaves(), newleader.getAddress(), regNode.getAddress());
                         }
                         VoteMaster.updateRegedit(regNode);
-                        LeaderService.notifyFollowsUpdateRegedit(regNode.getSlaves(),"broker");
+                        LeaderService.notifyFollowsUpdateRegedit(regNode.getSlaves(), StringConstant.BROKER);
                         LeaderService.notifySalveUpdateRegedit(NodeService.CURRENTNODE.getSlaves(),regNode);
 
                     }
@@ -68,7 +69,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                         if (follows.size() == 0) {
                             try {
                                 List<RegNode> newSlaves= VoteSlave.initVoteSlaves(regNode);
-                                LeaderService.notifyFollowsUpdateRegedit(newSlaves,"broker");
+                                LeaderService.notifyFollowsUpdateRegedit(newSlaves,StringConstant.BROKER);
                                 //如果是Leader当前节点自己变更slave，则需要通知其他Follows更新备用Leader信息
                                 if(regNode.getAddress().equals(NodeService.CURRENTNODE.getClusterLeader().getAddress())){
                                     LeaderService.notifyFollowsBakLeaderChanged();
@@ -91,7 +92,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                                     try {
                                         RegNode newSlave = VoteSlave.voteNewSlave(regNode, node);
                                         VoteSlave.notifySliceLeaderVoteNewFollow(regNode, newSlave.getAddress(), node.getAddress());
-                                        LeaderService.notifyFollowsUpdateRegedit(Collections.singletonList(newSlave),"broker");
+                                        LeaderService.notifyFollowsUpdateRegedit(Collections.singletonList(newSlave),StringConstant.BROKER);
                                         //如果是Leader当前节点自己变更slave，则需要通知其他Follows更新备用Leader信息
                                         if(regNode.getAddress().equals(NodeService.CURRENTNODE.getClusterLeader().getAddress())){
                                             LeaderService.notifyFollowsBakLeaderChanged();

@@ -10,6 +10,7 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
+import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ public class LeaderUtil {
             public void run() {
                 try {
                     switch (type) {
-                        case "broker":
+                        case StringConstant.BROKER:
                             RegBroker node = LeaderService.BROKER_REGISTER_CENTER.get(address);
                             NodeDto.Node.Builder nodeBuilder = packageBrokerRegeditInfo(node);
                             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
@@ -38,7 +39,7 @@ public class LeaderUtil {
                             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                             if (!ret)
                                 log.info("normally exception!notifyNodeUpdateRegedit() failed.");
-                        case "client":
+                        case StringConstant.CLINET:
                             RegBroker node1 = LeaderService.BROKER_REGISTER_CENTER.get(address);
 
                             break;
