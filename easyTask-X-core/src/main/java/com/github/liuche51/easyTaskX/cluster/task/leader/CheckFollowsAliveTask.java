@@ -6,6 +6,7 @@ import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.RegBroker;
+import com.github.liuche51.easyTaskX.dto.RegClient;
 import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.StringConstant;
@@ -22,12 +23,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CheckFollowsAliveTask extends TimerTask {
     //是否已经存在一个任务实例运行中
-    public static volatile boolean hasRuning=false;
+    public static volatile boolean hasRuning = false;
+
     @Override
     public void run() {
         while (!isExit()) {
             try {
                 dealBrokerRegedit();
+                dealClientRegedit();
             } catch (Exception e) {
                 log.error("CheckFollowsAliveTask()", e);
             }
@@ -51,64 +54,94 @@ public class CheckFollowsAliveTask extends TimerTask {
             NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
                 @Override
                 public void run() {
-                    //master节点失效,且有Slaves。选新master
-                    if (DateUtils.isGreaterThanLoseTime(regNode.getLastHeartbeat())) {
-                        //如果有Slaves。则选出新master，并通知它们。没有则直接移出注册表
-                        if (regNode.getSlaves().size() > 0) {
-                            RegNode newleader = VoteMaster.voteNewLeader(regNode.getSlaves());
-                            VoteMaster.notifySliceFollowsNewLeader(regNode.getSlaves(), newleader.getAddress(), regNode.getAddress());
-                        }
-                        VoteMaster.updateRegedit(regNode);
-                        LeaderService.notifyFollowsUpdateRegedit(regNode.getSlaves(), StringConstant.BROKER);
-                        LeaderService.notifySalveUpdateRegedit(NodeService.CURRENTNODE.getSlaves(),regNode);
-                        LeaderService.notifyClinetsChangedBroker(regNode.getAddress(),StringConstant.DELETE);
-
-                    }
-                    //master没失效，但是Slave失效了
-                    else {
-                        ConcurrentHashMap<String, RegNode> follows = regNode.getSlaves();
-                        //初始化，还没有一个Slave时
-                        if (follows.size() == 0) {
-                            try {
-                                List<RegNode> newSlaves= VoteSlave.initVoteSlaves(regNode);
-                                LeaderService.notifyFollowsUpdateRegedit(newSlaves,StringConstant.BROKER);
-                                //如果是Leader当前节点自己变更slave，则需要通知其他Follows更新备用Leader信息
-                                if(regNode.getAddress().equals(NodeService.CURRENTNODE.getClusterLeader().getAddress())){
-                                    LeaderService.notifyFollowsBakLeaderChanged();
-                                }
-                            } catch (VotingException e) {
-                                log.info("normally exception!{}", e.getMessage());
-                            } catch (Exception e) {
-                                log.error("initVoteFollows()->exception!", e);
+                    try {
+                        //master节点失效,且有Slaves。选新master
+                        if (DateUtils.isGreaterThanLoseTime(regNode.getLastHeartbeat())) {
+                            //如果有Slaves。则选出新master，并通知它们。没有则直接移出注册表
+                            if (regNode.getSlaves().size() > 0) {
+                                RegNode newleader = VoteMaster.voteNewLeader(regNode.getSlaves());
+                                VoteMaster.notifySliceFollowsNewLeader(regNode.getSlaves(), newleader.getAddress(), regNode.getAddress());
                             }
+                            VoteMaster.updateRegedit(regNode);
+                            LeaderService.notifyFollowsUpdateRegedit(regNode.getSlaves(), StringConstant.BROKER);
+                            LeaderService.notifySalveUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), regNode);
+                            LeaderService.notifyClinetsChangedBroker(regNode.getAddress(), StringConstant.DELETE);
+
                         }
-                        //已经有Slaves时
+                        //master没失效，但是Slave失效了
                         else {
-                            Iterator<Map.Entry<String, RegNode>> items = follows.entrySet().iterator();
-                            while (items.hasNext()) {
-                                Map.Entry<String, RegNode> item = items.next();
-                                RegNode node = item.getValue();
-                                RegBroker regNodeFollow = brokers.get(node.getAddress());
-                                //follow没有注册信息或者心跳超时了。（没有注册信息，可能是因为上面判断过程中已经将其移除注册表了）
-                                if (regNodeFollow == null || DateUtils.isGreaterThanLoseTime(regNodeFollow.getLastHeartbeat())) {
-                                    try {
-                                        RegNode newSlave = VoteSlave.voteNewSlave(regNode, node);
-                                        VoteSlave.notifySliceLeaderVoteNewFollow(regNode, newSlave.getAddress(), node.getAddress());
-                                        LeaderService.notifyFollowsUpdateRegedit(Collections.singletonList(newSlave),StringConstant.BROKER);
-                                        //如果是Leader当前节点自己变更slave，则需要通知其他Follows更新备用Leader信息
-                                        if(regNode.getAddress().equals(NodeService.CURRENTNODE.getClusterLeader().getAddress())){
-                                            LeaderService.notifyFollowsBakLeaderChanged();
-                                        }
-                                    } catch (VotingException e) {
-                                        log.info("normally exception!{}", e.getMessage());
-                                    } catch (Exception e) {
-                                        log.error("voteNewSlave()->exception!", e);
+                            ConcurrentHashMap<String, RegNode> follows = regNode.getSlaves();
+                            //初始化，还没有一个Slave时
+                            if (follows.size() == 0) {
+                                try {
+                                    List<RegNode> newSlaves = VoteSlave.initVoteSlaves(regNode);
+                                    LeaderService.notifyFollowsUpdateRegedit(newSlaves, StringConstant.BROKER);
+                                    //如果是Leader当前节点自己变更slave，则需要通知其他Follows更新备用Leader信息
+                                    if (regNode.getAddress().equals(NodeService.CURRENTNODE.getClusterLeader().getAddress())) {
+                                        LeaderService.notifyFollowsBakLeaderChanged();
                                     }
-                                    //items.remove();这里不需要了。因为在voteNewFollow中已经移除了
+                                } catch (VotingException e) {
+                                    log.info("normally exception!{}", e.getMessage());
+                                } catch (Exception e) {
+                                    log.error("initVoteFollows()->exception!", e);
                                 }
                             }
-                        }
+                            //已经有Slaves时
+                            else {
+                                Iterator<Map.Entry<String, RegNode>> items = follows.entrySet().iterator();
+                                while (items.hasNext()) {
+                                    Map.Entry<String, RegNode> item = items.next();
+                                    RegNode node = item.getValue();
+                                    RegBroker regNodeFollow = brokers.get(node.getAddress());
+                                    //follow没有注册信息或者心跳超时了。（没有注册信息，可能是因为上面判断过程中已经将其移除注册表了）
+                                    if (regNodeFollow == null || DateUtils.isGreaterThanLoseTime(regNodeFollow.getLastHeartbeat())) {
+                                        try {
+                                            RegNode newSlave = VoteSlave.voteNewSlave(regNode, node);
+                                            VoteSlave.notifySliceLeaderVoteNewFollow(regNode, newSlave.getAddress(), node.getAddress());
+                                            LeaderService.notifyFollowsUpdateRegedit(Collections.singletonList(newSlave), StringConstant.BROKER);
+                                            //如果是Leader当前节点自己变更slave，则需要通知其他Follows更新备用Leader信息
+                                            if (regNode.getAddress().equals(NodeService.CURRENTNODE.getClusterLeader().getAddress())) {
+                                                LeaderService.notifyFollowsBakLeaderChanged();
+                                            }
+                                        } catch (VotingException e) {
+                                            log.info("normally exception!{}", e.getMessage());
+                                        } catch (Exception e) {
+                                            log.error("voteNewSlave()->exception!", e);
+                                        }
+                                        //items.remove();这里不需要了。因为在voteNewFollow中已经移除了
+                                    }
+                                }
+                            }
 
+                        }
+                    } catch (Exception e) {
+                        log.error("dealBrokerRegedit()->exception!", e);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * 处理Client注册表
+     */
+    private void dealClientRegedit() {
+        Map<String, RegClient> brokers = LeaderService.CLIENT_REGISTER_CENTER;
+        Iterator<Map.Entry<String, RegClient>> items = brokers.entrySet().iterator();
+        while (items.hasNext()) {
+            Map.Entry<String, RegClient> item = items.next();
+            RegClient regNode = item.getValue();
+            NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        //master节点失效,且有Slaves。选新master
+                        if (DateUtils.isGreaterThanLoseTime(regNode.getLastHeartbeat())) {
+                            LeaderService.CLIENT_REGISTER_CENTER.remove(regNode.getAddress());
+                            LeaderService.notifyBrokersChangedClinet(regNode.getAddress(), StringConstant.DELETE);
+                        }
+                    } catch (Exception e) {
+                        log.error("dealClientRegedit()->exception!", e);
                     }
                 }
             });
