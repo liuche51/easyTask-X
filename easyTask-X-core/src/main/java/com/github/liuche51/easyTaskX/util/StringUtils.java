@@ -437,13 +437,13 @@ public class StringUtils {
 	/**
 	 * Replace occurrences of a substring.
 	 *
-	 * StringHelper.replace("1-2-3", "-", "|");<br>
+	 * StringHelper.replace("1-2-3", "-", StringConstant.CHAR_SPRIT_STRING);<br>
 	 * result: "1|2|3"<br>
-	 * StringHelper.replace("-1--2-", "-", "|");<br>
+	 * StringHelper.replace("-1--2-", "-", StringConstant.CHAR_SPRIT_STRING);<br>
 	 * result: "|1||2|"<br>
-	 * StringHelper.replace("123", "", "|");<br>
+	 * StringHelper.replace("123", "", StringConstant.CHAR_SPRIT_STRING);<br>
 	 * result: "123"<br>
-	 * StringHelper.replace("1-2---3----4", "--", "|");<br>
+	 * StringHelper.replace("1-2---3----4", "--", StringConstant.CHAR_SPRIT_STRING);<br>
 	 * result: "1-2|-3||4"<br>
 	 * StringHelper.replace("1-2---3----4", "--", "---");<br>
 	 * result: "1-2----3------4"<br>
@@ -1205,7 +1205,7 @@ public class StringUtils {
 		if (terms.length == 0) throw new IllegalArgumentException("There must be at least one term to find.");
 		sb.append("(?:");
 		for (int i=0; i<terms.length; i++){
-			if (i>0) sb.append("|");
+			if (i>0) sb.append(StringConstant.CHAR_SPRIT_STRING);
 			sb.append("(?:");
 			sb.append(escapeRegularExpressionLiteral(terms[i]));
 			sb.append(")");

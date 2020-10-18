@@ -170,7 +170,7 @@ public class VoteSlave {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyMasterVoteNewSlave)
-                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(newFollowAddress + "|" + oldFollowAddress);
+                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(newFollowAddress + StringConstant.CHAR_SPRIT_STRING + oldFollowAddress);
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if(!ret)
                         log.info("normally exception!notifySliceLeaderVoteNewFollow() failed.");

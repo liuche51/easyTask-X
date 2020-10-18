@@ -141,7 +141,7 @@ public class SlaveService {
             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
             if (ret) {
                 String body=respPack.getRespbody().toStringUtf8();
-                String[] items=body.split("|");
+                String[] items=body.split(StringConstant.CHAR_SPRIT_STRING);
                 ConcurrentHashMap<String, RegBroker> broker= JSONObject.parseObject(items[0], new TypeReference<ConcurrentHashMap<String, RegBroker>>(){});
                 ConcurrentHashMap<String, RegClient> clinet= JSONObject.parseObject(items[1], new TypeReference<ConcurrentHashMap<String, RegClient>>(){});
                 LeaderService.BROKER_REGISTER_CENTER=broker;

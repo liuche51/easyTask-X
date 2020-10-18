@@ -124,7 +124,7 @@ public class LeaderUtil {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyClientUpdateBrokerChange)
-                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(type+"|"+broker);
+                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(type+StringConstant.CHAR_SPRIT_STRING+broker);
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, client.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret)
                         log.info("normally exception!notifyClinetChangedBroker() failed.");
@@ -147,7 +147,7 @@ public class LeaderUtil {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyBrokersUpdateClientChange)
-                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(type+"|"+client);
+                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(type+StringConstant.CHAR_SPRIT_STRING+client);
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, broker.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret)
                         log.info("normally exception!notifyBrokerChangedClient() failed.");

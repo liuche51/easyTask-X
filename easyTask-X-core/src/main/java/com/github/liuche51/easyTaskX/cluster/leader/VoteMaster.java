@@ -47,7 +47,7 @@ public class VoteMaster {
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
         try {
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum. NotifySlaveNewLeader).setSource(NodeService.getConfig().getAddress())
-                    .setBody(oldLeader + "|" + newLeader);
+                    .setBody(oldLeader + StringConstant.CHAR_SPRIT_STRING + newLeader);
             Iterator<Map.Entry<String, RegNode>> items = follows.entrySet().iterator();
             while (items.hasNext()) {
                 Map.Entry<String, RegNode> item = items.next();

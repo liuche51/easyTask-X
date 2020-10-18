@@ -20,7 +20,7 @@ public class LeaderNotifySalveUpdateRegeditHandler extends BaseHandler {
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {
         NodeDto.Node node = NodeDto.Node.parseFrom(frame.getBodyBytes());
-        String[] exts = node.getExt().split("|");//格式：客户端类型|操作类型
+        String[] exts = node.getExt().split(StringConstant.CHAR_SPRIT_STRING);//格式：客户端类型|操作类型
         if (StringConstant.BROKER.equalsIgnoreCase(exts[0])) {
             RegBroker regnode = new RegBroker(node.getHost(), node.getPort());
             if (StringConstant.DELETE.equalsIgnoreCase(exts[1]))

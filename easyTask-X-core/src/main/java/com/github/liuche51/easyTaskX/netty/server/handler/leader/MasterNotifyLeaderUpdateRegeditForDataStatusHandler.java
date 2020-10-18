@@ -14,7 +14,7 @@ public class MasterNotifyLeaderUpdateRegeditForDataStatusHandler extends BaseHan
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {
         String body=frame.getBody();
-        String[] items=body.split("|");//地址|状态
+        String[] items=body.split(StringConstant.CHAR_SPRIT_STRING);//地址|状态
         RegBroker regNode= LeaderService.BROKER_REGISTER_CENTER.get(frame.getSource());
         RegNode follow=regNode.getSlaves().get(items[0]);
         follow.setDataStatus(new Short(items[1]));
