@@ -11,6 +11,10 @@ public class ScheduleBak {
     private String unit;
     private String param;
     private String source;
+    /**
+     * 当前任务执行的Client
+     */
+    private String executer;
     private String transactionId;
     private String createTime;
     private String modifyTime;
@@ -77,7 +81,13 @@ public class ScheduleBak {
     public void setSource(String source) {
         this.source = source;
     }
+    public String getExecuter() {
+        return executer;
+    }
 
+    public void setExecuter(String executer) {
+        this.executer = executer;
+    }
     public String getTransactionId() {
         return transactionId;
     }
@@ -110,6 +120,7 @@ public class ScheduleBak {
         schedule.unit=dto.getUnit();
         schedule.param=dto.getParam();
         schedule.source=dto.getSource();
+        schedule.executer=dto.getExecuter();
         schedule.transactionId=dto.getTransactionId();
         return schedule;
     }

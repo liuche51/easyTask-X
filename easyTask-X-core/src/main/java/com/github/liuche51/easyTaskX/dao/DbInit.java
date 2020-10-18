@@ -40,6 +40,7 @@ public class DbInit {
                         "\"create_time\"  TEXT,\n" +
                         "\"modify_time\"  TEXT,\n" +
                         "\"source\"  TEXT,\n" +
+                        "\"executer\"  TEXT,\n" +
                         "PRIMARY KEY (\"id\" ASC)\n" +
                         ");";
                 SqliteHelper helper = new SqliteHelper(StringConstant.SCHEDULE);
@@ -47,6 +48,9 @@ public class DbInit {
                 String indexsq = "CREATE UNIQUE INDEX index_transactionId ON schedule (transaction_id);";
                 SqliteHelper helper2 = new SqliteHelper(StringConstant.SCHEDULE);
                 helper2.executeUpdate(indexsq);
+                String indexsql3 = "CREATE INDEX index_executer ON schedule (executer);";
+                SqliteHelper helper3 = new SqliteHelper(StringConstant.SCHEDULE_SYNC);
+                helper3.executeUpdate(indexsql3);
             }
             boolean exist2 = ScheduleBakDao.existTable();
             if (!exist2) {
@@ -63,6 +67,7 @@ public class DbInit {
                         "\"create_time\"  TEXT,\n" +
                         "\"modify_time\"  TEXT,\n" +
                         "\"source\"  TEXT,\n" +
+                        "\"executer\"  TEXT,\n" +
                         "PRIMARY KEY (\"id\" ASC)\n" +
                         ");";
                 SqliteHelper helper = new SqliteHelper(StringConstant.SCHEDULE_BAK);

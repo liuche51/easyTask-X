@@ -9,57 +9,57 @@ public final class ScheduleDto {
   public interface ScheduleOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // required string id = 1;
+    // optional string id = 1;
     /**
-     * <code>required string id = 1;</code>
+     * <code>optional string id = 1;</code>
      */
     boolean hasId();
     /**
-     * <code>required string id = 1;</code>
+     * <code>optional string id = 1;</code>
      */
     String getId();
     /**
-     * <code>required string id = 1;</code>
+     * <code>optional string id = 1;</code>
      */
     com.google.protobuf.ByteString
         getIdBytes();
 
-    // required string classPath = 2;
+    // optional string classPath = 2;
     /**
-     * <code>required string classPath = 2;</code>
+     * <code>optional string classPath = 2;</code>
      */
     boolean hasClassPath();
     /**
-     * <code>required string classPath = 2;</code>
+     * <code>optional string classPath = 2;</code>
      */
     String getClassPath();
     /**
-     * <code>required string classPath = 2;</code>
+     * <code>optional string classPath = 2;</code>
      */
     com.google.protobuf.ByteString
         getClassPathBytes();
 
-    // required int64 executeTime = 3;
+    // optional int64 executeTime = 3;
     /**
-     * <code>required int64 executeTime = 3;</code>
+     * <code>optional int64 executeTime = 3;</code>
      */
     boolean hasExecuteTime();
     /**
-     * <code>required int64 executeTime = 3;</code>
+     * <code>optional int64 executeTime = 3;</code>
      */
     long getExecuteTime();
 
-    // required string taskType = 4;
+    // optional string taskType = 4;
     /**
-     * <code>required string taskType = 4;</code>
+     * <code>optional string taskType = 4;</code>
      */
     boolean hasTaskType();
     /**
-     * <code>required string taskType = 4;</code>
+     * <code>optional string taskType = 4;</code>
      */
     String getTaskType();
     /**
-     * <code>required string taskType = 4;</code>
+     * <code>optional string taskType = 4;</code>
      */
     com.google.protobuf.ByteString
         getTaskTypeBytes();
@@ -74,17 +74,17 @@ public final class ScheduleDto {
      */
     long getPeriod();
 
-    // required string unit = 6;
+    // optional string unit = 6;
     /**
-     * <code>required string unit = 6;</code>
+     * <code>optional string unit = 6;</code>
      */
     boolean hasUnit();
     /**
-     * <code>required string unit = 6;</code>
+     * <code>optional string unit = 6;</code>
      */
     String getUnit();
     /**
-     * <code>required string unit = 6;</code>
+     * <code>optional string unit = 6;</code>
      */
     com.google.protobuf.ByteString
         getUnitBytes();
@@ -104,32 +104,47 @@ public final class ScheduleDto {
     com.google.protobuf.ByteString
         getParamBytes();
 
-    // required string source = 8;
+    // optional string source = 8;
     /**
-     * <code>required string source = 8;</code>
+     * <code>optional string source = 8;</code>
      */
     boolean hasSource();
     /**
-     * <code>required string source = 8;</code>
+     * <code>optional string source = 8;</code>
      */
     String getSource();
     /**
-     * <code>required string source = 8;</code>
+     * <code>optional string source = 8;</code>
      */
     com.google.protobuf.ByteString
         getSourceBytes();
 
-    // required string transactionId = 9;
+    // optional string executer = 9;
     /**
-     * <code>required string transactionId = 9;</code>
+     * <code>optional string executer = 9;</code>
+     */
+    boolean hasExecuter();
+    /**
+     * <code>optional string executer = 9;</code>
+     */
+    String getExecuter();
+    /**
+     * <code>optional string executer = 9;</code>
+     */
+    com.google.protobuf.ByteString
+        getExecuterBytes();
+
+    // optional string transactionId = 10;
+    /**
+     * <code>optional string transactionId = 10;</code>
      */
     boolean hasTransactionId();
     /**
-     * <code>required string transactionId = 9;</code>
+     * <code>optional string transactionId = 10;</code>
      */
     String getTransactionId();
     /**
-     * <code>required string transactionId = 9;</code>
+     * <code>optional string transactionId = 10;</code>
      */
     com.google.protobuf.ByteString
         getTransactionIdBytes();
@@ -227,6 +242,11 @@ public final class ScheduleDto {
             }
             case 74: {
               bitField0_ |= 0x00000100;
+              executer_ = input.readBytes();
+              break;
+            }
+            case 82: {
+              bitField0_ |= 0x00000200;
               transactionId_ = input.readBytes();
               break;
             }
@@ -270,17 +290,17 @@ public final class ScheduleDto {
     }
 
     private int bitField0_;
-    // required string id = 1;
+    // optional string id = 1;
     public static final int ID_FIELD_NUMBER = 1;
     private Object id_;
     /**
-     * <code>required string id = 1;</code>
+     * <code>optional string id = 1;</code>
      */
     public boolean hasId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required string id = 1;</code>
+     * <code>optional string id = 1;</code>
      */
     public String getId() {
       Object ref = id_;
@@ -297,7 +317,7 @@ public final class ScheduleDto {
       }
     }
     /**
-     * <code>required string id = 1;</code>
+     * <code>optional string id = 1;</code>
      */
     public com.google.protobuf.ByteString
         getIdBytes() {
@@ -313,17 +333,17 @@ public final class ScheduleDto {
       }
     }
 
-    // required string classPath = 2;
+    // optional string classPath = 2;
     public static final int CLASSPATH_FIELD_NUMBER = 2;
     private Object classPath_;
     /**
-     * <code>required string classPath = 2;</code>
+     * <code>optional string classPath = 2;</code>
      */
     public boolean hasClassPath() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required string classPath = 2;</code>
+     * <code>optional string classPath = 2;</code>
      */
     public String getClassPath() {
       Object ref = classPath_;
@@ -340,7 +360,7 @@ public final class ScheduleDto {
       }
     }
     /**
-     * <code>required string classPath = 2;</code>
+     * <code>optional string classPath = 2;</code>
      */
     public com.google.protobuf.ByteString
         getClassPathBytes() {
@@ -356,33 +376,33 @@ public final class ScheduleDto {
       }
     }
 
-    // required int64 executeTime = 3;
+    // optional int64 executeTime = 3;
     public static final int EXECUTETIME_FIELD_NUMBER = 3;
     private long executeTime_;
     /**
-     * <code>required int64 executeTime = 3;</code>
+     * <code>optional int64 executeTime = 3;</code>
      */
     public boolean hasExecuteTime() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>required int64 executeTime = 3;</code>
+     * <code>optional int64 executeTime = 3;</code>
      */
     public long getExecuteTime() {
       return executeTime_;
     }
 
-    // required string taskType = 4;
+    // optional string taskType = 4;
     public static final int TASKTYPE_FIELD_NUMBER = 4;
     private Object taskType_;
     /**
-     * <code>required string taskType = 4;</code>
+     * <code>optional string taskType = 4;</code>
      */
     public boolean hasTaskType() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>required string taskType = 4;</code>
+     * <code>optional string taskType = 4;</code>
      */
     public String getTaskType() {
       Object ref = taskType_;
@@ -399,7 +419,7 @@ public final class ScheduleDto {
       }
     }
     /**
-     * <code>required string taskType = 4;</code>
+     * <code>optional string taskType = 4;</code>
      */
     public com.google.protobuf.ByteString
         getTaskTypeBytes() {
@@ -431,17 +451,17 @@ public final class ScheduleDto {
       return period_;
     }
 
-    // required string unit = 6;
+    // optional string unit = 6;
     public static final int UNIT_FIELD_NUMBER = 6;
     private Object unit_;
     /**
-     * <code>required string unit = 6;</code>
+     * <code>optional string unit = 6;</code>
      */
     public boolean hasUnit() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>required string unit = 6;</code>
+     * <code>optional string unit = 6;</code>
      */
     public String getUnit() {
       Object ref = unit_;
@@ -458,7 +478,7 @@ public final class ScheduleDto {
       }
     }
     /**
-     * <code>required string unit = 6;</code>
+     * <code>optional string unit = 6;</code>
      */
     public com.google.protobuf.ByteString
         getUnitBytes() {
@@ -517,17 +537,17 @@ public final class ScheduleDto {
       }
     }
 
-    // required string source = 8;
+    // optional string source = 8;
     public static final int SOURCE_FIELD_NUMBER = 8;
     private Object source_;
     /**
-     * <code>required string source = 8;</code>
+     * <code>optional string source = 8;</code>
      */
     public boolean hasSource() {
       return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
-     * <code>required string source = 8;</code>
+     * <code>optional string source = 8;</code>
      */
     public String getSource() {
       Object ref = source_;
@@ -544,7 +564,7 @@ public final class ScheduleDto {
       }
     }
     /**
-     * <code>required string source = 8;</code>
+     * <code>optional string source = 8;</code>
      */
     public com.google.protobuf.ByteString
         getSourceBytes() {
@@ -560,17 +580,60 @@ public final class ScheduleDto {
       }
     }
 
-    // required string transactionId = 9;
-    public static final int TRANSACTIONID_FIELD_NUMBER = 9;
-    private Object transactionId_;
+    // optional string executer = 9;
+    public static final int EXECUTER_FIELD_NUMBER = 9;
+    private Object executer_;
     /**
-     * <code>required string transactionId = 9;</code>
+     * <code>optional string executer = 9;</code>
      */
-    public boolean hasTransactionId() {
+    public boolean hasExecuter() {
       return ((bitField0_ & 0x00000100) == 0x00000100);
     }
     /**
-     * <code>required string transactionId = 9;</code>
+     * <code>optional string executer = 9;</code>
+     */
+    public String getExecuter() {
+      Object ref = executer_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          executer_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string executer = 9;</code>
+     */
+    public com.google.protobuf.ByteString
+        getExecuterBytes() {
+      Object ref = executer_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (String) ref);
+        executer_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional string transactionId = 10;
+    public static final int TRANSACTIONID_FIELD_NUMBER = 10;
+    private Object transactionId_;
+    /**
+     * <code>optional string transactionId = 10;</code>
+     */
+    public boolean hasTransactionId() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    /**
+     * <code>optional string transactionId = 10;</code>
      */
     public String getTransactionId() {
       Object ref = transactionId_;
@@ -587,7 +650,7 @@ public final class ScheduleDto {
       }
     }
     /**
-     * <code>required string transactionId = 9;</code>
+     * <code>optional string transactionId = 10;</code>
      */
     public com.google.protobuf.ByteString
         getTransactionIdBytes() {
@@ -612,6 +675,7 @@ public final class ScheduleDto {
       unit_ = "";
       param_ = "";
       source_ = "";
+      executer_ = "";
       transactionId_ = "";
     }
     private byte memoizedIsInitialized = -1;
@@ -619,34 +683,6 @@ public final class ScheduleDto {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      if (!hasId()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasClassPath()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasExecuteTime()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasTaskType()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasUnit()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasSource()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasTransactionId()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -679,7 +715,10 @@ public final class ScheduleDto {
         output.writeBytes(8, getSourceBytes());
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        output.writeBytes(9, getTransactionIdBytes());
+        output.writeBytes(9, getExecuterBytes());
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeBytes(10, getTransactionIdBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -724,7 +763,11 @@ public final class ScheduleDto {
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(9, getTransactionIdBytes());
+          .computeBytesSize(9, getExecuterBytes());
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(10, getTransactionIdBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -858,8 +901,10 @@ public final class ScheduleDto {
         bitField0_ = (bitField0_ & ~0x00000040);
         source_ = "";
         bitField0_ = (bitField0_ & ~0x00000080);
-        transactionId_ = "";
+        executer_ = "";
         bitField0_ = (bitField0_ & ~0x00000100);
+        transactionId_ = "";
+        bitField0_ = (bitField0_ & ~0x00000200);
         return this;
       }
 
@@ -923,6 +968,10 @@ public final class ScheduleDto {
         if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
           to_bitField0_ |= 0x00000100;
         }
+        result.executer_ = executer_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000200;
+        }
         result.transactionId_ = transactionId_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -976,8 +1025,13 @@ public final class ScheduleDto {
           source_ = other.source_;
           onChanged();
         }
-        if (other.hasTransactionId()) {
+        if (other.hasExecuter()) {
           bitField0_ |= 0x00000100;
+          executer_ = other.executer_;
+          onChanged();
+        }
+        if (other.hasTransactionId()) {
+          bitField0_ |= 0x00000200;
           transactionId_ = other.transactionId_;
           onChanged();
         }
@@ -986,34 +1040,6 @@ public final class ScheduleDto {
       }
 
       public final boolean isInitialized() {
-        if (!hasId()) {
-          
-          return false;
-        }
-        if (!hasClassPath()) {
-          
-          return false;
-        }
-        if (!hasExecuteTime()) {
-          
-          return false;
-        }
-        if (!hasTaskType()) {
-          
-          return false;
-        }
-        if (!hasUnit()) {
-          
-          return false;
-        }
-        if (!hasSource()) {
-          
-          return false;
-        }
-        if (!hasTransactionId()) {
-          
-          return false;
-        }
         return true;
       }
 
@@ -1036,16 +1062,16 @@ public final class ScheduleDto {
       }
       private int bitField0_;
 
-      // required string id = 1;
+      // optional string id = 1;
       private Object id_ = "";
       /**
-       * <code>required string id = 1;</code>
+       * <code>optional string id = 1;</code>
        */
       public boolean hasId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required string id = 1;</code>
+       * <code>optional string id = 1;</code>
        */
       public String getId() {
         Object ref = id_;
@@ -1059,7 +1085,7 @@ public final class ScheduleDto {
         }
       }
       /**
-       * <code>required string id = 1;</code>
+       * <code>optional string id = 1;</code>
        */
       public com.google.protobuf.ByteString
           getIdBytes() {
@@ -1075,7 +1101,7 @@ public final class ScheduleDto {
         }
       }
       /**
-       * <code>required string id = 1;</code>
+       * <code>optional string id = 1;</code>
        */
       public Builder setId(
           String value) {
@@ -1088,7 +1114,7 @@ public final class ScheduleDto {
         return this;
       }
       /**
-       * <code>required string id = 1;</code>
+       * <code>optional string id = 1;</code>
        */
       public Builder clearId() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -1097,7 +1123,7 @@ public final class ScheduleDto {
         return this;
       }
       /**
-       * <code>required string id = 1;</code>
+       * <code>optional string id = 1;</code>
        */
       public Builder setIdBytes(
           com.google.protobuf.ByteString value) {
@@ -1110,16 +1136,16 @@ public final class ScheduleDto {
         return this;
       }
 
-      // required string classPath = 2;
+      // optional string classPath = 2;
       private Object classPath_ = "";
       /**
-       * <code>required string classPath = 2;</code>
+       * <code>optional string classPath = 2;</code>
        */
       public boolean hasClassPath() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required string classPath = 2;</code>
+       * <code>optional string classPath = 2;</code>
        */
       public String getClassPath() {
         Object ref = classPath_;
@@ -1133,7 +1159,7 @@ public final class ScheduleDto {
         }
       }
       /**
-       * <code>required string classPath = 2;</code>
+       * <code>optional string classPath = 2;</code>
        */
       public com.google.protobuf.ByteString
           getClassPathBytes() {
@@ -1149,7 +1175,7 @@ public final class ScheduleDto {
         }
       }
       /**
-       * <code>required string classPath = 2;</code>
+       * <code>optional string classPath = 2;</code>
        */
       public Builder setClassPath(
           String value) {
@@ -1162,7 +1188,7 @@ public final class ScheduleDto {
         return this;
       }
       /**
-       * <code>required string classPath = 2;</code>
+       * <code>optional string classPath = 2;</code>
        */
       public Builder clearClassPath() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -1171,7 +1197,7 @@ public final class ScheduleDto {
         return this;
       }
       /**
-       * <code>required string classPath = 2;</code>
+       * <code>optional string classPath = 2;</code>
        */
       public Builder setClassPathBytes(
           com.google.protobuf.ByteString value) {
@@ -1184,22 +1210,22 @@ public final class ScheduleDto {
         return this;
       }
 
-      // required int64 executeTime = 3;
+      // optional int64 executeTime = 3;
       private long executeTime_ ;
       /**
-       * <code>required int64 executeTime = 3;</code>
+       * <code>optional int64 executeTime = 3;</code>
        */
       public boolean hasExecuteTime() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>required int64 executeTime = 3;</code>
+       * <code>optional int64 executeTime = 3;</code>
        */
       public long getExecuteTime() {
         return executeTime_;
       }
       /**
-       * <code>required int64 executeTime = 3;</code>
+       * <code>optional int64 executeTime = 3;</code>
        */
       public Builder setExecuteTime(long value) {
         bitField0_ |= 0x00000004;
@@ -1208,7 +1234,7 @@ public final class ScheduleDto {
         return this;
       }
       /**
-       * <code>required int64 executeTime = 3;</code>
+       * <code>optional int64 executeTime = 3;</code>
        */
       public Builder clearExecuteTime() {
         bitField0_ = (bitField0_ & ~0x00000004);
@@ -1217,16 +1243,16 @@ public final class ScheduleDto {
         return this;
       }
 
-      // required string taskType = 4;
+      // optional string taskType = 4;
       private Object taskType_ = "";
       /**
-       * <code>required string taskType = 4;</code>
+       * <code>optional string taskType = 4;</code>
        */
       public boolean hasTaskType() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>required string taskType = 4;</code>
+       * <code>optional string taskType = 4;</code>
        */
       public String getTaskType() {
         Object ref = taskType_;
@@ -1240,7 +1266,7 @@ public final class ScheduleDto {
         }
       }
       /**
-       * <code>required string taskType = 4;</code>
+       * <code>optional string taskType = 4;</code>
        */
       public com.google.protobuf.ByteString
           getTaskTypeBytes() {
@@ -1256,7 +1282,7 @@ public final class ScheduleDto {
         }
       }
       /**
-       * <code>required string taskType = 4;</code>
+       * <code>optional string taskType = 4;</code>
        */
       public Builder setTaskType(
           String value) {
@@ -1269,7 +1295,7 @@ public final class ScheduleDto {
         return this;
       }
       /**
-       * <code>required string taskType = 4;</code>
+       * <code>optional string taskType = 4;</code>
        */
       public Builder clearTaskType() {
         bitField0_ = (bitField0_ & ~0x00000008);
@@ -1278,7 +1304,7 @@ public final class ScheduleDto {
         return this;
       }
       /**
-       * <code>required string taskType = 4;</code>
+       * <code>optional string taskType = 4;</code>
        */
       public Builder setTaskTypeBytes(
           com.google.protobuf.ByteString value) {
@@ -1324,16 +1350,16 @@ public final class ScheduleDto {
         return this;
       }
 
-      // required string unit = 6;
+      // optional string unit = 6;
       private Object unit_ = "";
       /**
-       * <code>required string unit = 6;</code>
+       * <code>optional string unit = 6;</code>
        */
       public boolean hasUnit() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>required string unit = 6;</code>
+       * <code>optional string unit = 6;</code>
        */
       public String getUnit() {
         Object ref = unit_;
@@ -1347,7 +1373,7 @@ public final class ScheduleDto {
         }
       }
       /**
-       * <code>required string unit = 6;</code>
+       * <code>optional string unit = 6;</code>
        */
       public com.google.protobuf.ByteString
           getUnitBytes() {
@@ -1363,7 +1389,7 @@ public final class ScheduleDto {
         }
       }
       /**
-       * <code>required string unit = 6;</code>
+       * <code>optional string unit = 6;</code>
        */
       public Builder setUnit(
           String value) {
@@ -1376,7 +1402,7 @@ public final class ScheduleDto {
         return this;
       }
       /**
-       * <code>required string unit = 6;</code>
+       * <code>optional string unit = 6;</code>
        */
       public Builder clearUnit() {
         bitField0_ = (bitField0_ & ~0x00000020);
@@ -1385,7 +1411,7 @@ public final class ScheduleDto {
         return this;
       }
       /**
-       * <code>required string unit = 6;</code>
+       * <code>optional string unit = 6;</code>
        */
       public Builder setUnitBytes(
           com.google.protobuf.ByteString value) {
@@ -1472,16 +1498,16 @@ public final class ScheduleDto {
         return this;
       }
 
-      // required string source = 8;
+      // optional string source = 8;
       private Object source_ = "";
       /**
-       * <code>required string source = 8;</code>
+       * <code>optional string source = 8;</code>
        */
       public boolean hasSource() {
         return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
-       * <code>required string source = 8;</code>
+       * <code>optional string source = 8;</code>
        */
       public String getSource() {
         Object ref = source_;
@@ -1495,7 +1521,7 @@ public final class ScheduleDto {
         }
       }
       /**
-       * <code>required string source = 8;</code>
+       * <code>optional string source = 8;</code>
        */
       public com.google.protobuf.ByteString
           getSourceBytes() {
@@ -1511,7 +1537,7 @@ public final class ScheduleDto {
         }
       }
       /**
-       * <code>required string source = 8;</code>
+       * <code>optional string source = 8;</code>
        */
       public Builder setSource(
           String value) {
@@ -1524,7 +1550,7 @@ public final class ScheduleDto {
         return this;
       }
       /**
-       * <code>required string source = 8;</code>
+       * <code>optional string source = 8;</code>
        */
       public Builder clearSource() {
         bitField0_ = (bitField0_ & ~0x00000080);
@@ -1533,7 +1559,7 @@ public final class ScheduleDto {
         return this;
       }
       /**
-       * <code>required string source = 8;</code>
+       * <code>optional string source = 8;</code>
        */
       public Builder setSourceBytes(
           com.google.protobuf.ByteString value) {
@@ -1546,16 +1572,90 @@ public final class ScheduleDto {
         return this;
       }
 
-      // required string transactionId = 9;
-      private Object transactionId_ = "";
+      // optional string executer = 9;
+      private Object executer_ = "";
       /**
-       * <code>required string transactionId = 9;</code>
+       * <code>optional string executer = 9;</code>
        */
-      public boolean hasTransactionId() {
+      public boolean hasExecuter() {
         return ((bitField0_ & 0x00000100) == 0x00000100);
       }
       /**
-       * <code>required string transactionId = 9;</code>
+       * <code>optional string executer = 9;</code>
+       */
+      public String getExecuter() {
+        Object ref = executer_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          executer_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      /**
+       * <code>optional string executer = 9;</code>
+       */
+      public com.google.protobuf.ByteString
+          getExecuterBytes() {
+        Object ref = executer_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (String) ref);
+          executer_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string executer = 9;</code>
+       */
+      public Builder setExecuter(
+          String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000100;
+        executer_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string executer = 9;</code>
+       */
+      public Builder clearExecuter() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        executer_ = getDefaultInstance().getExecuter();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string executer = 9;</code>
+       */
+      public Builder setExecuterBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000100;
+        executer_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string transactionId = 10;
+      private Object transactionId_ = "";
+      /**
+       * <code>optional string transactionId = 10;</code>
+       */
+      public boolean hasTransactionId() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      /**
+       * <code>optional string transactionId = 10;</code>
        */
       public String getTransactionId() {
         Object ref = transactionId_;
@@ -1569,7 +1669,7 @@ public final class ScheduleDto {
         }
       }
       /**
-       * <code>required string transactionId = 9;</code>
+       * <code>optional string transactionId = 10;</code>
        */
       public com.google.protobuf.ByteString
           getTransactionIdBytes() {
@@ -1585,36 +1685,36 @@ public final class ScheduleDto {
         }
       }
       /**
-       * <code>required string transactionId = 9;</code>
+       * <code>optional string transactionId = 10;</code>
        */
       public Builder setTransactionId(
           String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000100;
+  bitField0_ |= 0x00000200;
         transactionId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required string transactionId = 9;</code>
+       * <code>optional string transactionId = 10;</code>
        */
       public Builder clearTransactionId() {
-        bitField0_ = (bitField0_ & ~0x00000100);
+        bitField0_ = (bitField0_ & ~0x00000200);
         transactionId_ = getDefaultInstance().getTransactionId();
         onChanged();
         return this;
       }
       /**
-       * <code>required string transactionId = 9;</code>
+       * <code>optional string transactionId = 10;</code>
        */
       public Builder setTransactionIdBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000100;
+  bitField0_ |= 0x00000200;
         transactionId_ = value;
         onChanged();
         return this;
@@ -1657,7 +1757,7 @@ public final class ScheduleDto {
      * <code>repeated .Schedule schedules = 1;</code>
      */
     ScheduleOrBuilder getSchedulesOrBuilder(
-            int index);
+        int index);
   }
   /**
    * Protobuf type {@code ScheduleList}
@@ -1804,12 +1904,6 @@ public final class ScheduleDto {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      for (int i = 0; i < getSchedulesCount(); i++) {
-        if (!getSchedules(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -2038,12 +2132,6 @@ public final class ScheduleDto {
       }
 
       public final boolean isInitialized() {
-        for (int i = 0; i < getSchedulesCount(); i++) {
-          if (!getSchedules(i).isInitialized()) {
-            
-            return false;
-          }
-        }
         return true;
       }
 
@@ -2336,13 +2424,13 @@ public final class ScheduleDto {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\021ScheduleDto.proto\"\244\001\n\010Schedule\022\n\n\002id\030\001" +
-      " \002(\t\022\021\n\tclassPath\030\002 \002(\t\022\023\n\013executeTime\030\003" +
-      " \002(\003\022\020\n\010taskType\030\004 \002(\t\022\016\n\006period\030\005 \001(\003\022\014" +
-      "\n\004unit\030\006 \002(\t\022\r\n\005param\030\007 \001(\t\022\016\n\006source\030\010 " +
-      "\002(\t\022\025\n\rtransactionId\030\t \002(\t\",\n\014ScheduleLi" +
-      "st\022\034\n\tschedules\030\001 \003(\0132\t.ScheduleB\rB\013Sche" +
-      "duleDto"
+      "\n\021ScheduleDto.proto\"\266\001\n\010Schedule\022\n\n\002id\030\001" +
+      " \001(\t\022\021\n\tclassPath\030\002 \001(\t\022\023\n\013executeTime\030\003" +
+      " \001(\003\022\020\n\010taskType\030\004 \001(\t\022\016\n\006period\030\005 \001(\003\022\014" +
+      "\n\004unit\030\006 \001(\t\022\r\n\005param\030\007 \001(\t\022\016\n\006source\030\010 " +
+      "\001(\t\022\020\n\010executer\030\t \001(\t\022\025\n\rtransactionId\030\n" +
+      " \001(\t\",\n\014ScheduleList\022\034\n\tschedules\030\001 \003(\0132" +
+      "\t.ScheduleB\rB\013ScheduleDto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2354,7 +2442,7 @@ public final class ScheduleDto {
           internal_static_Schedule_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_Schedule_descriptor,
-              new String[] { "Id", "ClassPath", "ExecuteTime", "TaskType", "Period", "Unit", "Param", "Source", "TransactionId", });
+              new String[] { "Id", "ClassPath", "ExecuteTime", "TaskType", "Period", "Unit", "Param", "Source", "Executer", "TransactionId", });
           internal_static_ScheduleList_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_ScheduleList_fieldAccessorTable = new

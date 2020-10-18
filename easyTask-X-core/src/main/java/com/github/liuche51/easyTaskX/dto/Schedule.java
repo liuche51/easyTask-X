@@ -21,6 +21,10 @@ public class Schedule {
     private String createTime;
     private String modifyTime;
     private String source;
+    /**
+     * 当前任务执行的Client
+     */
+    private String executer;
 
     public String getId() {
         return id;
@@ -110,6 +114,14 @@ public class Schedule {
         this.source = source;
     }
 
+    public String getExecuter() {
+        return executer;
+    }
+
+    public void setExecuter(String executer) {
+        this.executer = executer;
+    }
+
     public static Schedule valueOf(ScheduleBak bak){
         Schedule schedule=new Schedule();
         schedule.id=bak.getId();
@@ -120,6 +132,7 @@ public class Schedule {
         schedule.unit=bak.getUnit();
         schedule.param=bak.getParam();
         schedule.source=bak.getSource();
+        schedule.executer=bak.getExecuter();
         return schedule;
     }
     public static Schedule valueOf(ScheduleDto.Schedule dto){
@@ -133,6 +146,7 @@ public class Schedule {
         schedule.param=dto.getParam();
         schedule.source=dto.getSource();
         schedule.transactionId=dto.getTransactionId();
+        schedule.executer=dto.getExecuter();
         return schedule;
     }
 
@@ -145,7 +159,7 @@ public class Schedule {
         builder.setId(this.id).setClassPath(this.classPath).setExecuteTime(this.executeTime)
                 .setTaskType(this.taskType).setPeriod(this.period).setUnit(this.unit)
                 .setParam(this.param).setSource(NodeService.getConfig().getAddress())
-                .setTransactionId(this.transactionId);
+                .setExecuter(this.executer).setTransactionId(this.transactionId);
         return builder.build();
     }
 }
