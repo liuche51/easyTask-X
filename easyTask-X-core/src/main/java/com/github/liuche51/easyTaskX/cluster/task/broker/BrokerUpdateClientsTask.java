@@ -1,7 +1,8 @@
-package com.github.liuche51.easyTaskX.cluster.task;
+package com.github.liuche51.easyTaskX.cluster.task.broker;
 
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.ByteStringPack;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
@@ -13,7 +14,7 @@ import com.github.liuche51.easyTaskX.util.Util;
 import java.util.List;
 
 /**
- * 从leader更新Client列表。
+ * Broker从leader更新Client列表。
  * 低频率
  */
 public class BrokerUpdateClientsTask extends TimerTask {

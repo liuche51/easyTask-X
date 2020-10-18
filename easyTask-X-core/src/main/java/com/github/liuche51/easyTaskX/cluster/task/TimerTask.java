@@ -1,5 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.task;
 
+import com.github.liuche51.easyTaskX.cluster.task.follow.HeartbeatsTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

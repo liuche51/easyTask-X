@@ -5,6 +5,7 @@ import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
+import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.google.protobuf.ByteString;
 
 /**

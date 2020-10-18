@@ -1,5 +1,6 @@
-package com.github.liuche51.easyTaskX.cluster.task;
+package com.github.liuche51.easyTaskX.cluster.task.master;
 
+import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.cluster.master.MasterUtil;
@@ -12,8 +13,8 @@ import com.github.liuche51.easyTaskX.enume.ScheduleSyncStatusEnum;
 
 import java.util.List;
 /**
- * leader同步数据到新follow
- * 目前设计为只有一个线程同步给某个follow
+ * master同步数据到新slave
+ * 目前设计为只有一个线程同步给某个slave
  */
 public class SyncDataToNewSlaveTask extends OnceTask {
     private Node oldFollow;

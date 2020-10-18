@@ -1,12 +1,15 @@
 package com.github.liuche51.easyTaskX.cluster.master;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.task.master.NewMasterSyncBakDataTask;
+import com.github.liuche51.easyTaskX.cluster.task.master.SyncDataToNewSlaveTask;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
+import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +68,7 @@ public class MasterService {
                 try {
                     Dto.Frame.Builder builder=Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setBody(NettyInterfaceEnum.MasterNotifyLeaderUpdateRegeditForDataStatus)
-                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(followAddress+StringConstant.CHAR_SPRIT_STRING+dataStatus);
+                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(followAddress+ StringConstant.CHAR_SPRIT_STRING+dataStatus);
                     boolean ret=NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(),5,null);
                     if(!ret)
                         log.info("normally exception!notifyClusterLeaderUpdateRegeditForDataStatus() failed.");

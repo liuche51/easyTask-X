@@ -7,6 +7,7 @@ import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
 import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
+import com.github.liuche51.easyTaskX.cluster.task.master.ClearDataTask;
 import com.github.liuche51.easyTaskX.dao.*;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;

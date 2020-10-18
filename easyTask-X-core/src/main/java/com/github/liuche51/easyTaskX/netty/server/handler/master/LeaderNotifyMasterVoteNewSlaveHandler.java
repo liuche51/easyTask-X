@@ -4,6 +4,7 @@ import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
+import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.google.protobuf.ByteString;
 
 /**

@@ -1,10 +1,11 @@
-package com.github.liuche51.easyTaskX.cluster.task;
+package com.github.liuche51.easyTaskX.cluster.task.follow;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
+import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 
 /**
- * 节点定时从leader获取注册表更新
+ * Follow节点定时从leader获取注册表更新
  */
 public class FollowRequestUpdateRegeditTask extends TimerTask {
     @Override

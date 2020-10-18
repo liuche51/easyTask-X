@@ -1,9 +1,10 @@
-package com.github.liuche51.easyTaskX.cluster.task;
+package com.github.liuche51.easyTaskX.cluster.task.leader;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteMaster;
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
+import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.util.DateUtils;
@@ -60,6 +61,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                         VoteMaster.updateRegedit(regNode);
                         LeaderService.notifyFollowsUpdateRegedit(regNode.getSlaves(), StringConstant.BROKER);
                         LeaderService.notifySalveUpdateRegedit(NodeService.CURRENTNODE.getSlaves(),regNode);
+                        LeaderService.notifyClinetsChangedBroker(regNode.getAddress(),StringConstant.DELETE);
 
                     }
                     //master没失效，但是Slave失效了

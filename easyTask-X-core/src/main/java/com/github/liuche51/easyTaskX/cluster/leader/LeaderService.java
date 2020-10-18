@@ -3,7 +3,7 @@ package com.github.liuche51.easyTaskX.cluster.leader;
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.*;
-import com.github.liuche51.easyTaskX.cluster.task.CheckFollowsAliveTask;
+import com.github.liuche51.easyTaskX.cluster.task.leader.CheckFollowsAliveTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class LeaderService {
     private static final Logger log = LoggerFactory.getLogger(VoteSlave.class);

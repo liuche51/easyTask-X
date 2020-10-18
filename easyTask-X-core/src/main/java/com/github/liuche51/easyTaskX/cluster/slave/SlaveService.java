@@ -5,7 +5,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
-import com.github.liuche51.easyTaskX.cluster.task.ClusterSlaveRequestUpdateRegeditTask;
+import com.github.liuche51.easyTaskX.cluster.task.slave.ClusterSlaveRequestUpdateRegeditTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
 import com.github.liuche51.easyTaskX.dto.*;

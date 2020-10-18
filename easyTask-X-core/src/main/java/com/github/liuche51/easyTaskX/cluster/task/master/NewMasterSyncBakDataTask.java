@@ -1,7 +1,8 @@
-package com.github.liuche51.easyTaskX.cluster.task;
+package com.github.liuche51.easyTaskX.cluster.task.master;
 
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
 import com.github.liuche51.easyTaskX.dto.Schedule;
 import com.github.liuche51.easyTaskX.dto.ScheduleBak;
@@ -9,7 +10,7 @@ import com.github.liuche51.easyTaskX.util.exception.VotingException;
 
 import java.util.List;
 /**
- * 新leader将旧leader的备份数据同步给自己的follow
+ * 新master将旧master的备份数据同步给自己的slave
  * 后期需要考虑数据一致性
  */
 public class NewMasterSyncBakDataTask extends OnceTask {

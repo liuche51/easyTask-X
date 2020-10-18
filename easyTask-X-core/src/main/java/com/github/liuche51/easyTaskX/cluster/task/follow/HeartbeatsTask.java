@@ -1,8 +1,9 @@
-package com.github.liuche51.easyTaskX.cluster.task;
+package com.github.liuche51.easyTaskX.cluster.task.follow;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
+import com.github.liuche51.easyTaskX.cluster.task.leader.CheckFollowsAliveTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
-import com.github.liuche51.easyTaskX.dto.Node;
 
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteLeader;
@@ -17,7 +18,7 @@ import com.github.liuche51.easyTaskX.zk.ZKService;
 import io.netty.channel.ChannelFuture;
 
 /**
- * 节点对leader的心跳。
+ * Follow节点对leader的心跳。
  */
 public class HeartbeatsTask extends TimerTask {
     @Override

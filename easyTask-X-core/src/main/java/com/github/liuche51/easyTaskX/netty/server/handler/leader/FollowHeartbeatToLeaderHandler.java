@@ -38,6 +38,7 @@ public class FollowHeartbeatToLeaderHandler extends BaseHandler {
                     BaseNode node=new BaseNode(address);
                     clientNode=new RegClient(node);
                     LeaderService.CLIENT_REGISTER_CENTER.put(address,clientNode);
+                    LeaderService.notifyBrokersChangedClinet(clientNode.getAddress(), StringConstant.ADD);
                 }else {
                     clientNode.setLastHeartbeat(ZonedDateTime.now());
                 }

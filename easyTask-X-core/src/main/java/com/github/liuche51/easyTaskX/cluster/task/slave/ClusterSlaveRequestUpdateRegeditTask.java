@@ -1,7 +1,8 @@
-package com.github.liuche51.easyTaskX.cluster.task;
+package com.github.liuche51.easyTaskX.cluster.task.slave;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
+import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;
 

@@ -1,6 +1,7 @@
-package com.github.liuche51.easyTaskX.cluster.task;
+package com.github.liuche51.easyTaskX.cluster.task.master;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;
 
@@ -15,7 +16,7 @@ import com.github.liuche51.easyTaskX.util.DateUtils;
 import java.util.*;
 
 /**
- * 清理无用的数据定时任务
+ * Master清理无用的数据定时任务
  */
 public class ClearDataTask extends TimerTask {
     @Override

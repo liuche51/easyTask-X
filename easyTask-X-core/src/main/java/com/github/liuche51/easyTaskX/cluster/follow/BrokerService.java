@@ -1,11 +1,11 @@
 package com.github.liuche51.easyTaskX.cluster.follow;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
-import com.github.liuche51.easyTaskX.cluster.task.BrokerUpdateClientsTask;
-import com.github.liuche51.easyTaskX.cluster.task.HeartbeatsTask;
+import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerUpdateClientsTask;
+import com.github.liuche51.easyTaskX.cluster.task.follow.HeartbeatsTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
-import com.github.liuche51.easyTaskX.cluster.task.FollowRequestUpdateRegeditTask;
-import com.github.liuche51.easyTaskX.cluster.task.tran.*;
+import com.github.liuche51.easyTaskX.cluster.task.follow.FollowRequestUpdateRegeditTask;
+import com.github.liuche51.easyTaskX.cluster.task.master.*;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.ByteStringPack;
 import com.github.liuche51.easyTaskX.dto.Node;

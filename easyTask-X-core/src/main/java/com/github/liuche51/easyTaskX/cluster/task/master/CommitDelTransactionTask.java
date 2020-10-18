@@ -1,4 +1,4 @@
-package com.github.liuche51.easyTaskX.cluster.task.tran;
+package com.github.liuche51.easyTaskX.cluster.task.master;
 
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
