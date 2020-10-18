@@ -1,4 +1,4 @@
-package com.github.liuche51.easyTaskX.netty.server.handler.notify;
+package com.github.liuche51.easyTaskX.netty.server.handler.slave;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
@@ -9,7 +9,7 @@ import com.google.protobuf.ByteString;
 /**
  * slave响应：leader通知slaves，已经选举了新master
  */
-public class NotiyNewMasterHandler extends BaseHandler {
+public class LeaderNotiySlaveVotedNewMasterHandler extends BaseHandler {
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {
         String body=frame.getBody();

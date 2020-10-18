@@ -13,6 +13,7 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
+import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,8 +106,8 @@ public class BrokerService {
     public static boolean requestUpdateRegedit() {
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestUpdateRegedit).setSource(NodeService.getConfig().getAddress())
-                    .setBody("broker");
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestLeaderSendRegedit).setSource(NodeService.getConfig().getAddress())
+                    .setBody(StringConstant.BROKER);
             ByteStringPack respPack = new ByteStringPack();
             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
             if (ret) {
@@ -128,11 +129,6 @@ public class BrokerService {
      * @param node
      */
     public static void dealUpdate(NodeDto.Node node) {
-        NodeDto.NodeList clientNodes = node.getClients();
-        ConcurrentHashMap<String, BaseNode> clients = new ConcurrentHashMap<>();
-        clientNodes.getNodesList().forEach(x -> {
-            clients.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
-        });
         NodeDto.NodeList slaveNodes = node.getSalves();
         ConcurrentHashMap<String, BaseNode> follows = new ConcurrentHashMap<>();
         slaveNodes.getNodesList().forEach(x -> {
@@ -144,7 +140,6 @@ public class BrokerService {
             leaders.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
         });
         NodeService.CURRENTNODE.setSlaves(follows);
-        NodeService.CURRENTNODE.setClients(clients);
         NodeService.CURRENTNODE.setMasters(leaders);
     }
 }

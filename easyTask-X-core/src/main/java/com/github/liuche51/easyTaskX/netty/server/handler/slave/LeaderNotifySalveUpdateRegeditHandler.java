@@ -1,4 +1,4 @@
-package com.github.liuche51.easyTaskX.netty.server.handler.follow;
+package com.github.liuche51.easyTaskX.netty.server.handler.slave;
 
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.dto.*;
@@ -11,7 +11,7 @@ import java.time.ZonedDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 集群slave处理来自leader注册表的同步通知。
+ * 集群slave响应：处理来自leader注册表的同步通知。
  * 区分是Broker端还是Client端
  */
 public class LeaderNotifySalveUpdateRegeditHandler extends BaseHandler {

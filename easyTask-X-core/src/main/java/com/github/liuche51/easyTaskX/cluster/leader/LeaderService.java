@@ -172,6 +172,28 @@ public class LeaderService {
         }
     }
     /**
+     * 通知Clinets更新Broker列表变更信息
+     * @param broker
+     * @param type add、delete
+     */
+    public static void notifyClinetsChangedBroker(String broker,String type){
+        Iterator<Map.Entry<String,RegClient>> items = LeaderService.CLIENT_REGISTER_CENTER.entrySet().iterator();
+        while (items.hasNext()) {
+            LeaderUtil.notifyClinetChangedBroker(items.next().getValue(),broker,type);
+        }
+    }
+    /**
+     * 通知Brokers更新Clinet列表变更信息
+     * @param client
+     * @param type add、delete
+     */
+    public static void notifyBrokersChangedClinet(String client,String type){
+        Iterator<Map.Entry<String,RegBroker>> items = LeaderService.BROKER_REGISTER_CENTER.entrySet().iterator();
+        while (items.hasNext()) {
+            LeaderUtil.notifyBrokerChangedClient(items.next().getValue(),client,type);
+        }
+    }
+    /**
      * 启动leader检查所有follows是否存活任务
      */
     public static TimerTask startCheckFollowAliveTask() {

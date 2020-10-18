@@ -7,9 +7,9 @@ import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.google.protobuf.ByteString;
 
 /**
- * leader响应集群slave获取注册表信息
+ * leader响应:集群slave通过定时任务获取全量注册表信息。
  */
-public class ClusterSlaveRequestUpdateRegeditHandler extends BaseHandler {
+public class ClusterSlaveRequestLeaderSendRegeditHandler extends BaseHandler {
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {
         String item0=JSONObject.toJSONString(LeaderService.BROKER_REGISTER_CENTER);

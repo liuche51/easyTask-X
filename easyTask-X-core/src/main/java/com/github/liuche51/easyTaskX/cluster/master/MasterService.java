@@ -64,7 +64,7 @@ public class MasterService {
             public void run() {
                 try {
                     Dto.Frame.Builder builder=Dto.Frame.newBuilder();
-                    builder.setIdentity(Util.generateIdentityId()).setBody(NettyInterfaceEnum.NotifyLeaderUpdateRegeditForDataStatus)
+                    builder.setIdentity(Util.generateIdentityId()).setBody(NettyInterfaceEnum.MasterNotifyLeaderUpdateRegeditForDataStatus)
                             .setSource(NodeService.CURRENTNODE.getAddress()).setBody(followAddress+"|"+dataStatus);
                     boolean ret=NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(),5,null);
                     if(!ret)

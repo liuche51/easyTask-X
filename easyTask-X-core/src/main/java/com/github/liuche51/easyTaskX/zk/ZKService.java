@@ -25,7 +25,7 @@ public class ZKService {
      */
     public static void registerLeader(LeaderData data) {
         try {
-            String path = StringConstant.CHAR_SPRIT + StringConstant.LEADER;
+            String path = StringConstant.CHAR_SPRIT_PATH + StringConstant.LEADER;
             //检查是否存在节点。如果连不上zk，这里就会卡主线程，进入循环重试连接。直到连接成功
             Stat stat1 = ZKUtil.getClient().checkExists().forPath(path);
             if (stat1 != null) {
@@ -47,7 +47,7 @@ public class ZKService {
      * @return
      */
     public static LeaderData getLeaderData(boolean usingWatcher) throws Exception {
-        String path = StringConstant.CHAR_SPRIT + StringConstant.LEADER;
+        String path = StringConstant.CHAR_SPRIT_PATH + StringConstant.LEADER;
         return getDataByPath(path, LeaderData.class, usingWatcher ? new LeaderChangeWatcher() : null);
     }
 
@@ -58,7 +58,7 @@ public class ZKService {
      * @throws Exception
      */
     public static void listenLeaderDataNode() throws Exception {
-        String path = StringConstant.CHAR_SPRIT + StringConstant.LEADER;
+        String path = StringConstant.CHAR_SPRIT_PATH + StringConstant.LEADER;
         NodeCache nodeCache = new NodeCache(ZKUtil.getClient(), path);
         nodeCache.start(true);
         // 为缓存的节点添加watcher，或者说添加监听器

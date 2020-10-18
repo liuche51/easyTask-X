@@ -3,11 +3,15 @@ package com.github.liuche51.easyTaskX.netty.server.handler;
 
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
+import com.github.liuche51.easyTaskX.netty.server.handler.broker.ClientNotifyBrokerDeleteTaskHandler;
+import com.github.liuche51.easyTaskX.netty.server.handler.broker.ClientNotifyBrokerSubmitTaskHandler;
+import com.github.liuche51.easyTaskX.netty.server.handler.broker.LeaderNotifyBrokersUpdateClientChangeHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.follow.*;
 import com.github.liuche51.easyTaskX.netty.server.handler.leader.*;
-import com.github.liuche51.easyTaskX.netty.server.handler.notify.NotifyLeaderUpdateRegeditForDataStatusHandler;
-import com.github.liuche51.easyTaskX.netty.server.handler.notify.LeaderNotifyBrokerUpdateRegeditHandler;
-import com.github.liuche51.easyTaskX.netty.server.handler.notify.NotifyMasterVoteNewSlaveHandler;
+import com.github.liuche51.easyTaskX.netty.server.handler.leader.MasterNotifyLeaderUpdateRegeditForDataStatusHandler;
+import com.github.liuche51.easyTaskX.netty.server.handler.broker.LeaderNotifyBrokerUpdateRegeditHandler;
+import com.github.liuche51.easyTaskX.netty.server.handler.master.LeaderNotifyMasterVoteNewSlaveHandler;
+import com.github.liuche51.easyTaskX.netty.server.handler.slave.*;
 import com.google.protobuf.ByteString;
 
 import java.util.HashMap;
@@ -18,24 +22,27 @@ public abstract class BaseHandler {
     static {
         INSTANCES=new HashMap<String,BaseHandler>(){
             {
-                put(NettyInterfaceEnum.CLIENT_SUBMIT_TASK,new ClientSubmitTaskHandler());
-                put(NettyInterfaceEnum.CLIENT_DELETE_TASK,new ClientDeleteTaskHandler());
-                put(NettyInterfaceEnum.TRAN_TRYSAVETASK,new TranTrySaveTaskHandler());
-                put(NettyInterfaceEnum.TRAN_CONFIRMSAVETASK,new TranConfirmSaveTaskHandler());
-                put(NettyInterfaceEnum.TRAN_CANCELSAVETASK,new TranCancelSaveTaskHandler());
-                put(NettyInterfaceEnum.TRAN_TRYDELTASK,new TranTryDelTaskHandler());
+                put(NettyInterfaceEnum.ClientNotifyBrokerSubmitTask,new ClientNotifyBrokerSubmitTaskHandler());
+                put(NettyInterfaceEnum.ClientNotifyBrokerDeleteTask,new ClientNotifyBrokerDeleteTaskHandler());
+                put(NettyInterfaceEnum.MasterNotifySlaveTranTrySaveTask,new MasterNotifySlaveTranTrySaveTaskHandler());
+                put(NettyInterfaceEnum.MasterNotifySlaveTranConfirmSaveTask,new MasterNotifySlaveTranConfirmSaveTaskHandler());
+                put(NettyInterfaceEnum.MasterNotifySlaveTranCancelSaveTask,new MasterNotifySlaveTranCancelSaveTaskHandler());
+                put(NettyInterfaceEnum.MasterNotifySlaveTranTryDelTask,new MasterNotifySlaveTranTryDelTaskHandler());
+
                 put(NettyInterfaceEnum.MasterSyncDataToNewSlave,new MasterSyncDataToNewSlaveHandler());
                 put(NettyInterfaceEnum.GetDBInfoByTaskId,new GetDBInfoByTaskIdHandler());
-                put(NettyInterfaceEnum.Heartbeat,new HeartbeatHandler());
-                put(NettyInterfaceEnum.FollowRequestUpdateRegedit,new FollowRequestUpdateRegeditHandler());
+                put(NettyInterfaceEnum.FollowHeartbeatToLeader,new FollowHeartbeatToLeaderHandler());
+                put(NettyInterfaceEnum.FollowRequestLeaderSendRegedit,new FollowRequestLeaderSendRegeditHandler());
+                //Leader
                 put(NettyInterfaceEnum.LeaderNotifyBrokerUpdateRegedit,new LeaderNotifyBrokerUpdateRegeditHandler());
-                put(NettyInterfaceEnum.NotifyMasterVoteNewSlave,new NotifyMasterVoteNewSlaveHandler());
-                put(NettyInterfaceEnum.NotifyLeaderUpdateRegeditForDataStatus,new NotifyLeaderUpdateRegeditForDataStatusHandler());
-                put(NettyInterfaceEnum.LeaderNotifyFollwUpdateBakLeaderInfo,new LeaderNotifyFollwUpdateBakLeaderHandler());
+                put(NettyInterfaceEnum.LeaderNotifyBrokersUpdateClientChange,new LeaderNotifyBrokersUpdateClientChangeHandler());
+                put(NettyInterfaceEnum.LeaderNotifyMasterVoteNewSlave,new LeaderNotifyMasterVoteNewSlaveHandler());
+                put(NettyInterfaceEnum.MasterNotifyLeaderUpdateRegeditForDataStatus,new MasterNotifyLeaderUpdateRegeditForDataStatusHandler());
+                put(NettyInterfaceEnum.LeaderNotifyFollwUpdateBakLeaderInfo,new LeaderNotifyFollowUpdateBakLeaderHandler());
                 put(NettyInterfaceEnum.LeaderNotifySalveUpdateRegedit,new LeaderNotifySalveUpdateRegeditHandler());
-                put(NettyInterfaceEnum.SalveRequestUpdateClusterRegedit,new ClusterSlaveRequestUpdateRegeditHandler());
-                put(NettyInterfaceEnum.ClientUpdateBrokers,new ClientRequestUpdateBrokersHandler());
-                put(NettyInterfaceEnum.BrokerUpdateClients,new BrokerRequestUpdateClientsHandler());
+                put(NettyInterfaceEnum.ClusterSlaveRequestLeaderSendRegedit,new ClusterSlaveRequestLeaderSendRegeditHandler());
+                put(NettyInterfaceEnum.ClientRequestLeaderSendBrokers,new ClientRequestLeaderSendBrokersHandler());
+                put(NettyInterfaceEnum.BrokerRequestLeaderSendClients,new BrokerRequestLeaderSendClientsHandler());
             }
         };
     }

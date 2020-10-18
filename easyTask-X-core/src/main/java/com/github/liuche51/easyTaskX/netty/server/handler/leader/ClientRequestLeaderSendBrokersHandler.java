@@ -9,13 +9,13 @@ import com.google.protobuf.ByteString;
 import java.util.Iterator;
 
 /**
- * 息leader响应Broker请求更新Client列表信
+ * leader响应:Client通过定时任务请求leader更新Broker列表信息
  */
-public class BrokerRequestUpdateClientsHandler extends BaseHandler {
+public class ClientRequestLeaderSendBrokersHandler extends BaseHandler {
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {
         StringListDto.StringList.Builder builder=StringListDto.StringList.newBuilder();
-        Iterator<String> items =LeaderService.CLIENT_REGISTER_CENTER.keySet().iterator();
+        Iterator<String> items =LeaderService.BROKER_REGISTER_CENTER.keySet().iterator();
         while (items.hasNext()){
             builder.addList(items.next());
         }

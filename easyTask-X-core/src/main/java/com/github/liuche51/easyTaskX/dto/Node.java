@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.dto;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 节点对象
@@ -10,7 +11,7 @@ public class Node extends BaseNode {
     /**
      * 当前节点所有可用的clients
      */
-    private ConcurrentHashMap<String, BaseNode> clients = new ConcurrentHashMap<String, BaseNode>();
+    private CopyOnWriteArrayList<BaseNode> clients = new CopyOnWriteArrayList<BaseNode>();
     /**
      * 当前节点的所有slaves
      */
@@ -40,11 +41,11 @@ public class Node extends BaseNode {
         super(address);
     }
 
-    public ConcurrentHashMap<String, BaseNode> getClients() {
+    public CopyOnWriteArrayList<BaseNode> getClients() {
         return clients;
     }
 
-    public void setClients(ConcurrentHashMap<String, BaseNode> clients) {
+    public void setClients(CopyOnWriteArrayList<BaseNode> clients) {
         this.clients = clients;
     }
 

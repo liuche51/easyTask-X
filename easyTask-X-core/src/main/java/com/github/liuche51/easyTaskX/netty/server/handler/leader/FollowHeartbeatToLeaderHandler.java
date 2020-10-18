@@ -11,9 +11,9 @@ import com.google.protobuf.ByteString;
 import java.time.ZonedDateTime;
 
 /**
- * 节点注册/心跳信息处理
+ * leader响应：follow发送的心跳信息
  */
-public class HeartbeatHandler extends BaseHandler {
+public class FollowHeartbeatToLeaderHandler extends BaseHandler {
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {
         String address =frame.getSource();

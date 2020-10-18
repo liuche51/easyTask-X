@@ -49,12 +49,12 @@ public class SaveTaskTCC {
             ScheduleSyncDao.save(scheduleSync);//记录同步状态表
             ScheduleDto.Schedule s = schedule.toScheduleDto();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_TRYSAVETASK).setSource(NodeService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.MasterNotifySlaveTranTrySaveTask).setSource(NodeService.getConfig().getAddress())
                     .setBodyBytes(s.toByteString());
             NettyClient client = follow.getClientWithCount(1);
             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder,client,1,0,null);
             if(!ret){
-                throw new Exception("sendSyncMsgWithCount()->exception! ");
+                throw new Exception("ret=false");
             }
         }
 
@@ -72,7 +72,7 @@ public class SaveTaskTCC {
         while (items.hasNext()) {
             BaseNode follow = items.next();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_CONFIRMSAVETASK).setSource(NodeService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.MasterNotifySlaveTranConfirmSaveTask).setSource(NodeService.getConfig().getAddress())
                     .setBody(transactionId);
             NettyClient client = follow.getClientWithCount(1);
             boolean ret =NettyMsgService.sendSyncMsgWithCount(builder,client,1,0,null);
@@ -99,14 +99,14 @@ public class SaveTaskTCC {
         while (items.hasNext()) {
             BaseNode follow = items.next();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_CANCELSAVETASK).setSource(NodeService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.MasterNotifySlaveTranCancelSaveTask).setSource(NodeService.getConfig().getAddress())
                     .setBody(transactionId);
             NettyClient client = follow.getClientWithCount(1);
             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder,client,1,0,null);
             if (ret) {
                 ScheduleSyncDao.deleteByTransactionIdAndFollow(transactionId, follow.getAddress());
             } else
-                throw new Exception("sendSyncMsgWithCount() exception！");
+                throw new Exception("ret=false");
         }
     }
 }

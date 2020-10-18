@@ -39,7 +39,7 @@ public class HeartbeatsTask extends TimerTask {
                 } else {
                     initLeaderCheckFollowsAliveTask(leader);
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.Heartbeat).setSource(NodeService.getConfig().getAddress())
+                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowHeartbeatToLeader).setSource(NodeService.getConfig().getAddress())
                             .setBody("Broker");//服务端节点
                     ChannelFuture future = NettyMsgService.sendASyncMsg(leader.getClient(), builder.build());//这里使用异步即可。也不需要返回值
                 }

@@ -1,4 +1,4 @@
-package com.github.liuche51.easyTaskX.netty.server.handler.follow;
+package com.github.liuche51.easyTaskX.netty.server.handler.slave;
 
 import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
@@ -7,7 +7,7 @@ import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.google.protobuf.ByteString;
 
 /**
- * 新follow处理master同步过来的数据。
+ * 新slave响应：处理master同步过来的数据。
  */
 public class MasterSyncDataToNewSlaveHandler extends BaseHandler {
     @Override

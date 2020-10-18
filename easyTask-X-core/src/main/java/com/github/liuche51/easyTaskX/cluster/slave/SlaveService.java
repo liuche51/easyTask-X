@@ -136,7 +136,7 @@ public class SlaveService {
     public static void requestUpdateClusterRegedit() {
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.SalveRequestUpdateClusterRegedit).setSource(NodeService.getConfig().getAddress());
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.ClusterSlaveRequestLeaderSendRegedit).setSource(NodeService.getConfig().getAddress());
             ByteStringPack respPack = new ByteStringPack();
             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
             if (ret) {

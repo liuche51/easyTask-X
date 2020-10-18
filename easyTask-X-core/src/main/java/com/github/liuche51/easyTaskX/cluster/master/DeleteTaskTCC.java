@@ -55,12 +55,12 @@ public class DeleteTaskTCC {
         while (items.hasNext()) {
             BaseNode follow = items.next();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.TRAN_TRYDELTASK).setSource(NodeService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.MasterNotifySlaveTranTryDelTask).setSource(NodeService.getConfig().getAddress())
                     .setBody(transactionId+","+taskId);
             NettyClient client = follow.getClientWithCount(1);
             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder,client,1,0,null);
             if(!ret){
-                throw new Exception("tryDel->sendSyncMsgWithCount():exception! ");
+                throw new Exception("ret=false");
             }
         }
         //删除操作，如果slave都被通知标记为TRIED了，就不走后面的第二阶段CONFIRM了，可以直接删除任务。只需要master标记即可

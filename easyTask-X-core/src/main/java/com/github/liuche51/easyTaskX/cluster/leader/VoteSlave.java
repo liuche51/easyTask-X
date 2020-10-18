@@ -169,7 +169,7 @@ public class VoteSlave {
             public void run() {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.NotifyMasterVoteNewSlave)
+                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyMasterVoteNewSlave)
                             .setSource(NodeService.CURRENTNODE.getAddress()).setBody(newFollowAddress + "|" + oldFollowAddress);
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if(!ret)

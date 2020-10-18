@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.dto.RegBroker;
+import com.github.liuche51.easyTaskX.dto.RegClient;
 import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
@@ -62,17 +63,6 @@ public class LeaderUtil {
         NodeDto.Node.Builder nodeBuilder = NodeDto.Node.newBuilder();
         //备用leader信息
         nodeBuilder.setBakleader(JSONObject.toJSONString(NodeService.CURRENTNODE.getSlaves()));
-        //clients
-        NodeDto.NodeList.Builder clientsBuilder = NodeDto.NodeList.newBuilder();
-        Iterator<Map.Entry<String, RegNode>> items = node.getClients().entrySet().iterator();
-        while (items.hasNext()) {
-            Map.Entry<String, RegNode> item = items.next();
-            RegNode itNode = item.getValue();
-            NodeDto.Node.Builder clientBuilder = NodeDto.Node.newBuilder();
-            clientBuilder.setHost(itNode.getHost()).setPort(itNode.getPort());
-            clientsBuilder.addNodes(clientBuilder.build());
-        }
-        nodeBuilder.setClients(clientsBuilder.build());
         //slaves
         NodeDto.NodeList.Builder slavesBuilder = NodeDto.NodeList.newBuilder();
         Iterator<Map.Entry<String, RegNode>> items2 = node.getSlaves().entrySet().iterator();
@@ -116,6 +106,52 @@ public class LeaderUtil {
                         log.info("normally exception!notifyFollowBakLeaderChanged() failed.");
                 } catch (Exception e) {
                     log.error("notifyFollowBakLeaderChanged()->exception!", e);
+                }
+            }
+        });
+    }
+    /**
+     * 通知Client。有Broker注册变更消息
+     * @param client
+     * @param broker
+     * @param type add、delete
+     */
+    public static void notifyClinetChangedBroker(RegClient client,String broker, String type) {
+        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyClientUpdateBrokerChange)
+                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(type+"|"+broker);
+                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, client.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                    if (!ret)
+                        log.info("normally exception!notifyClinetChangedBroker() failed.");
+                } catch (Exception e) {
+                    log.error("notifyClinetChangedBroker()->exception!", e);
+                }
+            }
+        });
+    }
+    /**
+     * 通知Broker。有Client注册变更消息
+     * @param client
+     * @param broker
+     * @param type add、delete
+     */
+    public static void notifyBrokerChangedClient(RegBroker broker,String client, String type) {
+        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyBrokersUpdateClientChange)
+                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(type+"|"+client);
+                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, broker.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                    if (!ret)
+                        log.info("normally exception!notifyBrokerChangedClient() failed.");
+                } catch (Exception e) {
+                    log.error("notifyBrokerChangedClient()->exception!", e);
                 }
             }
         });

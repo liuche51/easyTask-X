@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.cluster.task;
 
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.ByteStringPack;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.StringListDto;
@@ -21,7 +22,7 @@ public class BrokerUpdateClientsTask extends TimerTask {
         while (!isExit()) {
             try {
                Dto.Frame.Builder builder= Dto.Frame.newBuilder();
-                builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BrokerUpdateClients).setSource(NodeService.getConfig().getAddress());
+                builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BrokerRequestLeaderSendClients).setSource(NodeService.getConfig().getAddress());
                 ByteStringPack pack=new ByteStringPack();
                 boolean ret= NettyMsgService.sendSyncMsgWithCount(builder,NodeService.CURRENTNODE.getClusterLeader().getClient(),1,0,pack);
                 if(ret){
@@ -30,7 +31,7 @@ public class BrokerUpdateClientsTask extends TimerTask {
                    NodeService.CURRENTNODE.getClients().clear();
                    if(brokers!=null){
                        brokers.forEach(x->{
-                           NodeService.CURRENTNODE.getClients().put(x,null);
+                           NodeService.CURRENTNODE.getClients().add(new BaseNode(x));
                        });
                    }
                 }

@@ -1,4 +1,4 @@
-package com.github.liuche51.easyTaskX.netty.server.handler.notify;
+package com.github.liuche51.easyTaskX.netty.server.handler.leader;
 
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.dto.RegBroker;
@@ -10,7 +10,7 @@ import com.google.protobuf.ByteString;
 /**
  * leader响应：master通知leader，已经完成对新follow的数据同步。请求更新数据同步状态
  */
-public class NotifyLeaderUpdateRegeditForDataStatusHandler extends BaseHandler {
+public class MasterNotifyLeaderUpdateRegeditForDataStatusHandler extends BaseHandler {
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {
         String body=frame.getBody();

@@ -1,19 +1,18 @@
 package com.github.liuche51.easyTaskX.netty.server.handler.follow;
 
-import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.google.protobuf.ByteString;
 
 /**
- * slave处理master发来的删除任务逻辑
+ * Follow响应：接收Leader主动通知的更新备用leader信息
  */
-public class TranTryDelTaskHandler extends BaseHandler {
+public class LeaderNotifyFollowUpdateBakLeaderHandler extends BaseHandler {
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {
-        String tranAndSchedule = frame.getBody();
-        String[] item=tranAndSchedule.split(",");
-        SlaveService.tryDelTask(item[0],item[1]);
+        String info=frame.getBody();
+        NodeService.CURRENTNODE.setBakLeader(info);
         return null;
     }
 }
