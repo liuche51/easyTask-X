@@ -97,6 +97,42 @@ public class ScheduleDao {
         }
         return list;
     }
+    public static List<String> selectIdsByExecuter(String executer) throws SQLException, ClassNotFoundException {
+        List<String> list = new LinkedList<>();
+        SqliteHelper helper = new SqliteHelper(dbName);
+        try {
+            ResultSet resultSet = helper.executeQuery("SELECT id FROM schedule where executer = '" + executer + "';");
+            while (resultSet.next()) {
+                String id = resultSet.getString("id");
+                list.add(id);
+            }
+        }catch (SQLiteException e){
+            SqliteHelper.writeDatabaseLockedExceptionLog(e,"ScheduleDao->selectIdsByExecuter");
+        } finally {
+            helper.destroyed();
+        }
+        return list;
+    }
+
+    /**
+     * 通用更新
+     * @param ids
+     * @param updateStr
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public static void updateByIds(String[] ids,String updateStr) throws SQLException, ClassNotFoundException {
+        List<Schedule> list = new LinkedList<>();
+        SqliteHelper helper = new SqliteHelper(dbName);
+        try {
+            String instr = SqliteHelper.getInConditionStr(ids);
+            int count = helper.executeUpdate("UPDATE schedule set " + updateStr + ",modify_time='"+DateUtils.getCurrentDateTime()+"' where id in " + instr + ";");
+        }catch (SQLiteException e){
+            SqliteHelper.writeDatabaseLockedExceptionLog(e,"ScheduleDao->updateByIds");
+        } finally {
+            helper.destroyed();
+        }
+    }
     public static void deleteByIds(String[] ids) throws SQLException, ClassNotFoundException {
         String instr=SqliteHelper.getInConditionStr(ids);
         String sql = "delete FROM schedule where id in" + instr + ";";

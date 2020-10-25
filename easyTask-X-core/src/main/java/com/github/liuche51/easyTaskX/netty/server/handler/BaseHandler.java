@@ -5,7 +5,7 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.server.handler.broker.ClientNotifyBrokerDeleteTaskHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.broker.ClientNotifyBrokerSubmitTaskHandler;
-import com.github.liuche51.easyTaskX.netty.server.handler.broker.LeaderNotifyBrokersUpdateClientChangeHandler;
+import com.github.liuche51.easyTaskX.netty.server.handler.broker.LeaderNotifyBrokerClientChangedHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.follow.*;
 import com.github.liuche51.easyTaskX.netty.server.handler.leader.*;
 import com.github.liuche51.easyTaskX.netty.server.handler.leader.MasterNotifyLeaderUpdateRegeditForDataStatusHandler;
@@ -28,6 +28,7 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.MasterNotifySlaveTranConfirmSaveTask,new MasterNotifySlaveTranConfirmSaveTaskHandler());
                 put(NettyInterfaceEnum.MasterNotifySlaveTranCancelSaveTask,new MasterNotifySlaveTranCancelSaveTaskHandler());
                 put(NettyInterfaceEnum.MasterNotifySlaveTranTryDelTask,new MasterNotifySlaveTranTryDelTaskHandler());
+                put(NettyInterfaceEnum.MasterNotifySlaveTranTryUpdateTask,new MasterNotifySlaveTranTryUpdateTaskHandler());
 
                 put(NettyInterfaceEnum.MasterSyncDataToNewSlave,new MasterSyncDataToNewSlaveHandler());
                 put(NettyInterfaceEnum.GetDBInfoByTaskId,new GetDBInfoByTaskIdHandler());
@@ -35,7 +36,7 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.FollowRequestLeaderSendRegedit,new FollowRequestLeaderSendRegeditHandler());
                 //Leader
                 put(NettyInterfaceEnum.LeaderNotifyBrokerUpdateRegedit,new LeaderNotifyBrokerUpdateRegeditHandler());
-                put(NettyInterfaceEnum.LeaderNotifyBrokerClientChanged,new LeaderNotifyBrokersUpdateClientChangeHandler());
+                put(NettyInterfaceEnum.LeaderNotifyBrokerClientChanged,new LeaderNotifyBrokerClientChangedHandler());
                 put(NettyInterfaceEnum.LeaderNotifyMasterVoteNewSlave,new LeaderNotifyMasterVoteNewSlaveHandler());
                 put(NettyInterfaceEnum.MasterNotifyLeaderUpdateRegeditForDataStatus,new MasterNotifyLeaderUpdateRegeditForDataStatusHandler());
                 put(NettyInterfaceEnum.LeaderNotifyFollwUpdateBakLeaderInfo,new LeaderNotifyFollowUpdateBakLeaderHandler());

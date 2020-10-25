@@ -48,7 +48,7 @@ public class SlaveService {
         transactionLog.setStatus(TransactionStatusEnum.TRIED);
         transactionLog.setType(TransactionTypeEnum.SAVE);
         transactionLog.setTableName(TransactionTableEnum.SCHEDULE_BAK);
-        transactionLog.setFollows(StringConstant.EMPTY);
+        transactionLog.setSlaves(StringConstant.EMPTY);
         TransactionLogDao.saveBatch(Arrays.asList(transactionLog));
     }
 
@@ -97,7 +97,29 @@ public class SlaveService {
         }
 
     }
+    /**
+     * 接受leader同步更新任务
+     * 本地环境偶尔会出现多次重复瞬时调用现象。导致transactionId冲突了。目前认为是Netty重试造成的。暂不需要加锁处理，
+     */
+    public static void tryUpdateTask(String transactionId, String taskIds,String values) throws Exception {
+        System.out.println(DateUtils.getCurrentDateTime() + "  transactionId=" + transactionId + " taskIds=" + taskIds);
+        TransactionLog transactionLog = new TransactionLog();
+        transactionLog.setId(transactionId);
+        transactionLog.setContent(taskIds+StringConstant.CHAR_SPRIT_STRING+values);
+        transactionLog.setStatus(TransactionStatusEnum.TRIED);
+        transactionLog.setType(TransactionTypeEnum.UPDATE);
+        transactionLog.setTableName(TransactionTableEnum.SCHEDULE_BAK);
+        try {
+            TransactionLogDao.saveBatch(Arrays.asList(transactionLog));
+        } catch (SQLiteException e) {
+            //如果遇到主键冲突异常，则略过。主要原因是Netty重试造成，不影响系统功能
+            if (e.getMessage() != null && e.getMessage().contains("SQLITE_CONSTRAINT_PRIMARYKEY")) {
+                log.info("tryDelTask():transactionId=" + transactionId + " taskIds=" + taskIds);
+                log.error("normally exception!! tryUpdateTask():" + e.getMessage());
+            }
+        }
 
+    }
     /**
      * 接受leader批量同步任务入备库
      *
@@ -115,7 +137,7 @@ public class SlaveService {
             transactionLog.setStatus(TransactionStatusEnum.CONFIRM);
             transactionLog.setType(TransactionTypeEnum.SAVE);
             transactionLog.setTableName(TransactionTableEnum.SCHEDULE_BAK);
-            transactionLog.setFollows(StringConstant.EMPTY);
+            transactionLog.setSlaves(StringConstant.EMPTY);
             logs.add(transactionLog);
         });
         try {

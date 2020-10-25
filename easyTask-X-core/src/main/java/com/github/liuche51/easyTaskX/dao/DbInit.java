@@ -102,7 +102,7 @@ public class DbInit {
                         "\"table_name\"  TEXT,\n" +
                         "\"type\"  INTEGER,\n" +
                         "\"status\"  INTEGER,\n" +
-                        "\"follows\"  TEXT,\n" +
+                        "\"slaves\"  TEXT,\n" +
                         "\"retry_time\"  TEXT,\n" +
                         "\"retry_count\"  INTEGER,\n" +
                         "\"create_time\"  TEXT,\n" +

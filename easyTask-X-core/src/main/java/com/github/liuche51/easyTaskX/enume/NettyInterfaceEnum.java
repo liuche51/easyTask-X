@@ -26,13 +26,9 @@ public class NettyInterfaceEnum {
      */
     public static final String MasterNotifySlaveTranTryDelTask="MasterNotifySlaveTranTryDelTask";
     /**
-     * 确认删除任务接口。阶段二
+     * 预备更新任务接口。阶段一
      */
-    public static final String TRAN_CONFIRMDELTASK="Tran_ConfirmDelTask";
-    /**
-     * 取消任务接口。事务回滚
-     */
-    public static final String TRAN_CANCELDELTASK="Tran_CancelDelTask";
+    public static final String MasterNotifySlaveTranTryUpdateTask="MasterNotifySlaveTranTryUpdateTask";
     /**
      * master同步任务数据给新slave备份接口
      */

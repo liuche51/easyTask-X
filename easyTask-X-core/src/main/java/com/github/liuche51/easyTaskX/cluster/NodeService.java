@@ -4,6 +4,7 @@ import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.master.DeleteTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.master.SaveTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
+import com.github.liuche51.easyTaskX.cluster.master.UpdateTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
@@ -133,21 +134,21 @@ public class NodeService {
         if (VoteSlave.isSelecting())
             throw new VotingException("normally exception!save():cluster is voting,please wait a moment.");
         //防止多线程下，follow元素操作竞争问题。确保参与提交的follow不受集群选举影响
-        List<BaseNode> follows = new ArrayList<>(CURRENTNODE.getSlaves().size());
+        List<BaseNode> slaves = new ArrayList<>(CURRENTNODE.getSlaves().size());
         Iterator<Map.Entry<String, BaseNode>> items = CURRENTNODE.getSlaves().entrySet().iterator();
         while (items.hasNext()) {
-            follows.add(items.next().getValue());
+            slaves.add(items.next().getValue());
         }
-        if (follows.size() != NodeService.getConfig().getBackupCount())
+        if (slaves.size() != NodeService.getConfig().getBackupCount())
             throw new Exception("save() exception！follows.size()!=backupCount");
         String transactionId=Util.generateTransactionId();
         try {
-            SaveTaskTCC.trySave(transactionId,schedule, follows);
-            SaveTaskTCC.confirm(transactionId, schedule.getId(), follows);
+            SaveTaskTCC.trySave(transactionId,schedule, slaves);
+            SaveTaskTCC.confirm(transactionId, schedule.getId(), slaves);
         } catch (Exception e) {
             log.error("saveTask():",e);
             try {
-                SaveTaskTCC.cancel(transactionId, follows);
+                SaveTaskTCC.cancel(transactionId, slaves);
             }catch (Exception e1){
                 log.error("saveTask()->cancel():",e);
                 TransactionLogDao.updateRetryInfoById(transactionId, new Short("1"), DateUtils.getCurrentDateTime());
@@ -164,15 +165,15 @@ public class NodeService {
      * @return
      */
     public static boolean deleteTask(String taskId) {
-        //防止多线程下，follow元素操作竞争问题。确保参与提交的follow不受集群选举影响
-        List<BaseNode> follows = new ArrayList<>(CURRENTNODE.getSlaves().size());
+        //防止多线程下，slave元素操作竞争问题。确保参与提交的slave不受集群选举影响
+        List<BaseNode> slaves = new ArrayList<>(CURRENTNODE.getSlaves().size());
         Iterator<Map.Entry<String,BaseNode>> items = CURRENTNODE.getSlaves().entrySet().iterator();
         while (items.hasNext()) {
-            follows.add(items.next().getValue());
+            slaves.add(items.next().getValue());
         }
         String transactionId=Util.generateTransactionId();
         try {
-            DeleteTaskTCC.tryDel(transactionId,taskId, follows);
+            DeleteTaskTCC.tryDel(transactionId,taskId, slaves);
             return true;
         } catch (Exception e) {
             //如果写本地删除日志都失败了，那么就认为删除失败
@@ -180,7 +181,29 @@ public class NodeService {
             return false;
         }
     }
-
+    /**
+     * 更新任务。含同步至备份库
+     * 使用最大努力通知机制实现事务，达到数据最终一致性
+     * 由于更新操作不需要回滚，不需要执行完整的TCC操作。必须要执行第一阶段即可
+     * @param taskIds
+     * @return
+     */
+    public static boolean updateTask(String[] taskIds, Map<String,String> values) {
+        List<BaseNode> slaves = new ArrayList<>(CURRENTNODE.getSlaves().size());
+        Iterator<Map.Entry<String,BaseNode>> items = CURRENTNODE.getSlaves().entrySet().iterator();
+        while (items.hasNext()) {
+            slaves.add(items.next().getValue());
+        }
+        String transactionId=Util.generateTransactionId();
+        try {
+            UpdateTaskTCC.tryUpdate(transactionId,taskIds, slaves,values);
+            return true;
+        } catch (Exception e) {
+            //如果写本地更新日志都失败了，那么就认为删除失败
+            log.error("updateTask exception!", e);
+            return false;
+        }
+    }
     /**
      * 清空所有表的记录
      * 节点宕机后，重启。或失去联系zk后又重新连接了。都视为新节点加入集群。加入前需要清空所有记录，避免有重复数据在集群中
@@ -196,7 +219,9 @@ public class NodeService {
             log.error("deleteAllData exception!", e);
         }
     }
+    public static void changeTaskClient(String oldClinet){
 
+    }
     public static TimerTask clearDataTask() {
         ClearDataTask task = new ClearDataTask();
         task.start();

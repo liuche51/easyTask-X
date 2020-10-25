@@ -46,11 +46,11 @@ public class RetryDelTransactionTask extends TimerTask {
                                     continue;
                                 }
                             }
-                            List<String> cancelFollowsHost = JSONObject.parseObject(x.getFollows(), new TypeReference<List<String>>() {
+                            List<String> cancelSlavesHost = JSONObject.parseObject(x.getSlaves(), new TypeReference<List<String>>() {
                             });
-                            List<BaseNode> cancelFollows = new ArrayList<>(cancelFollowsHost.size());
-                            if (cancelFollowsHost != null) {
-                                cancelFollowsHost.forEach(y -> {
+                            List<BaseNode> cancelFollows = new ArrayList<>(cancelSlavesHost.size());
+                            if (cancelSlavesHost != null) {
+                                cancelSlavesHost.forEach(y -> {
                                     String[] hp = y.split(":");
                                     cancelFollows.add(new Node(hp[0], Integer.parseInt(hp[1])));
                                 });

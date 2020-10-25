@@ -48,7 +48,7 @@ public class RetryCancelSaveTransactionTask extends TimerTask {
                                     continue;
                                 }
                             }
-                            List<String> cancelFollowsHost = JSONObject.parseObject(x.getFollows(), new TypeReference<List<String>>() {});
+                            List<String> cancelFollowsHost = JSONObject.parseObject(x.getSlaves(), new TypeReference<List<String>>() {});
                             List<BaseNode> cancelFollows = new ArrayList<>(cancelFollowsHost.size());
                             if (cancelFollowsHost != null) {
                                 cancelFollowsHost.forEach(y -> {

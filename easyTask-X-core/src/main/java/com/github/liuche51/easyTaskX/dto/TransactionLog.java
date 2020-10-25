@@ -6,7 +6,7 @@ public class TransactionLog {
     private String tableName;
     private short type;
     private short status;
-    private String follows;//重试事务所需的follow地址
+    private String slaves;//重试事务所需的slave地址
     private String retryTime;
     private short retryCount;
     private String createTime;
@@ -52,12 +52,12 @@ public class TransactionLog {
         this.status = status;
     }
 
-    public String getFollows() {
-        return follows;
+    public String getSlaves() {
+        return slaves;
     }
 
-    public void setFollows(String follows) {
-        this.follows = follows;
+    public void setSlaves(String slaves) {
+        this.slaves = slaves;
     }
 
     public String getRetryTime() {

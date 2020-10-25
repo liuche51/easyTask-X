@@ -10,6 +10,7 @@ public class StringConstant {
 
     public static final String CHAR_SPRIT_PATH="/";
     public static final String CHAR_SPRIT_STRING="|";
+    public static final String CHAR_SPRIT_COMMA=",";
 
     public static final String EMPTY="";
 

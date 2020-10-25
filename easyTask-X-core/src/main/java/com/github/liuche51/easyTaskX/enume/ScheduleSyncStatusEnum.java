@@ -21,4 +21,12 @@ public class   ScheduleSyncStatusEnum {
      * 已删除
      */
     public static final short DELETED=6;
+    /**
+     * 更新中
+     */
+    public static final short UPDATING=10;
+    /**
+     * 已更新
+     */
+    public static final short UPDATED=11;
 }
