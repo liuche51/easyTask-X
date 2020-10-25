@@ -62,13 +62,13 @@ public class NettyInterfaceEnum {
      */
     public static final String LeaderNotifyBrokerUpdateRegedit="LeaderNotifyBrokerUpdateRegedit";
     /**
-     * leader通知clients更新Broker列表变动信息
+     * leader通知Clinets。Broker发生变更。
      */
-    public static final String LeaderNotifyClientUpdateBrokerChange="LeaderNotifyClientUpdateRegedit";
+    public static final String LeaderNotifyClientBrokerChanged="LeaderNotifyClientBrokerChanged";
     /**
-     * leader通知brokers更新Client列表变动信息
+     * leader通知brokers。Client已经变动
      */
-    public static final String LeaderNotifyBrokersUpdateClientChange="LeaderNotifyBrokerUpdateRegedit";
+    public static final String LeaderNotifyBrokerClientChanged="LeaderNotifyBrokerClientChanged";
     /**
      * leader通知Follow更新备用leader信息
      */

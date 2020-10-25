@@ -11,6 +11,7 @@ import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.StringConstant;
+import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,19 +113,22 @@ public class LeaderUtil {
         });
     }
     /**
-     * 通知Client。有Broker注册变更消息
+     * 通知Clinets。Broker发生变更。
      * @param client
      * @param broker
      * @param type add、delete
      */
-    public static void notifyClinetChangedBroker(RegClient client,String broker, String type) {
+    public static void notifyClinetChangedBroker(RegClient client,String broker,String newMaster, String type) {
         NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 try {
+                    StringBuilder str=new StringBuilder(broker);
+                    if(!StringUtils.isNullOrEmpty(newMaster))
+                        str.append(StringConstant.CHAR_SPRIT_STRING).append(newMaster);
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyClientUpdateBrokerChange)
-                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(type+StringConstant.CHAR_SPRIT_STRING+broker);
+                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyClientBrokerChanged)
+                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(type+str.toString());//type+Broker地址+新master地址
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, client.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret)
                         log.info("normally exception!notifyClinetChangedBroker() failed.");
@@ -146,7 +150,7 @@ public class LeaderUtil {
             public void run() {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyBrokersUpdateClientChange)
+                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyBrokerClientChanged)
                             .setSource(NodeService.CURRENTNODE.getAddress()).setBody(type+StringConstant.CHAR_SPRIT_STRING+client);
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, broker.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret)

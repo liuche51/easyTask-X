@@ -9,6 +9,7 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
+import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LeaderService {
     private static final Logger log = LoggerFactory.getLogger(VoteSlave.class);
     /**
-     * 集群BROKER注册表
+     * 集群BROKER注册表LeaderNotifyClientUpdateBrokerChange
      */
     public static ConcurrentHashMap<String, RegBroker> BROKER_REGISTER_CENTER = new ConcurrentHashMap<>(10);
     /**
@@ -160,14 +161,15 @@ public class LeaderService {
         }
     }
     /**
-     * 通知Clinets更新Broker列表变更信息
+     * 通知Clinets。Broker发生变更。
      * @param broker
+     * @param newMaster
      * @param type add、delete
      */
-    public static void notifyClinetsChangedBroker(String broker,String type){
+    public static void notifyClinetsChangedBroker(String broker,String newMaster,String type){
         Iterator<Map.Entry<String,RegClient>> items = LeaderService.CLIENT_REGISTER_CENTER.entrySet().iterator();
         while (items.hasNext()) {
-            LeaderUtil.notifyClinetChangedBroker(items.next().getValue(),broker,type);
+            LeaderUtil.notifyClinetChangedBroker(items.next().getValue(),broker,newMaster,type);
         }
     }
     /**
@@ -180,6 +182,33 @@ public class LeaderService {
         while (items.hasNext()) {
             LeaderUtil.notifyBrokerChangedClient(items.next().getValue(),client,type);
         }
+    }
+    /**
+     * leader通知slaves。旧Master失效，leader已选新Master。
+     *
+     * @param slaves
+     * @param newMaster
+     * @param oldMaster
+     * @return
+     */
+    public static boolean notifySlavesNewMaster(Map<String, RegNode> slaves, String newMaster, String oldMaster) {
+        Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+        try {
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum. NotifySlaveNewLeader).setSource(NodeService.getConfig().getAddress())
+                    .setBody(oldMaster + StringConstant.CHAR_SPRIT_STRING + newMaster);
+            Iterator<Map.Entry<String, RegNode>> items = slaves.entrySet().iterator();
+            while (items.hasNext()) {
+                Map.Entry<String, RegNode> item = items.next();
+                RegNode node = item.getValue();
+                boolean ret=NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                if(!ret)
+                    log.info("normally exception!notifySlavesNewMaster() failed.");
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("", e);
+        }
+        return false;
     }
     /**
      * 启动leader检查所有follows是否存活任务

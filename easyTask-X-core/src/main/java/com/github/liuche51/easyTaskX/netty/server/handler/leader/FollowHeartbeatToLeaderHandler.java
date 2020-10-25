@@ -27,7 +27,7 @@ public class FollowHeartbeatToLeaderHandler extends BaseHandler {
                     BaseNode node=new BaseNode(address);
                     registerNode=new RegBroker(node);
                     LeaderService.BROKER_REGISTER_CENTER.put(address,registerNode);
-                    LeaderService.notifyClinetsChangedBroker(registerNode.getAddress(), StringConstant.ADD);
+                    LeaderService.notifyClinetsChangedBroker(registerNode.getAddress(),null, StringConstant.ADD);
                 }else {
                     registerNode.setLastHeartbeat(ZonedDateTime.now());
                 }
