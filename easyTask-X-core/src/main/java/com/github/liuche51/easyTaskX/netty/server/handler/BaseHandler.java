@@ -40,7 +40,7 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.LeaderNotifyMasterVoteNewSlave,new LeaderNotifyMasterVoteNewSlaveHandler());
                 put(NettyInterfaceEnum.MasterNotifyLeaderUpdateRegeditForDataStatus,new MasterNotifyLeaderUpdateRegeditForDataStatusHandler());
                 put(NettyInterfaceEnum.LeaderNotifyFollwUpdateBakLeaderInfo,new LeaderNotifyFollowUpdateBakLeaderHandler());
-                put(NettyInterfaceEnum.LeaderNotifySalveUpdateRegedit,new LeaderNotifySalveUpdateRegeditHandler());
+                put(NettyInterfaceEnum.LeaderNotifyBakLeaderUpdateRegedit,new LeaderNotifyBakLeaderUpdateRegeditHandler());
                 put(NettyInterfaceEnum.ClusterSlaveRequestLeaderSendRegedit,new ClusterSlaveRequestLeaderSendRegeditHandler());
                 put(NettyInterfaceEnum.ClientRequestLeaderSendBrokers,new ClientRequestLeaderSendBrokersHandler());
                 put(NettyInterfaceEnum.BrokerRequestLeaderSendClients,new BrokerRequestLeaderSendClientsHandler());

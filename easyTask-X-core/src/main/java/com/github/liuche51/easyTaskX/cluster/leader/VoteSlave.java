@@ -158,29 +158,6 @@ public class VoteSlave {
         return follows;
     }
 
-    /**
-     * leader通知master，已经选出新follow。
-     *
-     * @param leader
-     * @param newFollowAddress
-     */
-    public static void notifySliceLeaderVoteNewFollow(RegBroker leader, String newFollowAddress, String oldFollowAddress) {
-        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyMasterVoteNewSlave)
-                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(newFollowAddress + StringConstant.CHAR_SPRIT_STRING + oldFollowAddress);
-                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
-                    if(!ret)
-                        log.info("normally exception!notifySliceLeaderVoteNewFollow() failed.");
-                } catch (Exception e) {
-                    log.error("", e);
-                }
-            }
-        });
-    }
 
     /**
      * 节点初始化选新follows，更新注册表

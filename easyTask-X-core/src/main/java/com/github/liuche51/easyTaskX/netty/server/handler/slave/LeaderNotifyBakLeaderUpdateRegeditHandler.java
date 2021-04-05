@@ -12,10 +12,10 @@ import java.time.ZonedDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 集群slave响应：处理来自leader注册表的同步通知。
+ * BakLeader响应：处理来自leader注册表的同步通知。
  * 区分是Broker端还是Client端
  */
-public class LeaderNotifySalveUpdateRegeditHandler extends BaseHandler {
+public class LeaderNotifyBakLeaderUpdateRegeditHandler extends BaseHandler {
 
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {

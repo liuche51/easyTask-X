@@ -32,14 +32,14 @@ public class MasterService {
         ScheduleBakDao.deleteBySource(oldLeaderAddress);
     }
     /**
-     * leader同步数据到新follow
-     * 目前设计为只有一个线程同步给某个follow
+     * master同步数据到新Slave
+     * 目前设计为只有一个线程同步给某个Slave
      *
-     * @param oldFollow
-     * @param newFollow
+     * @param oldSlave
+     * @param newSlave
      */
-    public static OnceTask syncDataToNewFollow(Node oldFollow, Node newFollow) {
-        SyncDataToNewSlaveTask task=new SyncDataToNewSlaveTask(oldFollow,newFollow);
+    public static OnceTask syncDataToNewSlave(Node oldSlave, Node newSlave) {
+        SyncDataToNewSlaveTask task=new SyncDataToNewSlaveTask(oldSlave,newSlave);
         task.start();
         NodeService.onceTasks.add(task);
         return task;

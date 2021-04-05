@@ -70,9 +70,9 @@ public class NettyInterfaceEnum {
      */
     public static final String LeaderNotifyFollwUpdateBakLeaderInfo="LeaderNotifyFollwUpdateBakLeaderInfo";
     /**
-     * leader通知其slave节点更新注册表信息
+     * leader通知其BakLeader节点更新注册表信息
      */
-    public static final String LeaderNotifySalveUpdateRegedit="LeaderNotifySalveUpdateRegedit";
+    public static final String LeaderNotifyBakLeaderUpdateRegedit="LeaderNotifyBakLeaderUpdateRegedit";
     /**
      * 集群slave主动通过定时任务从leader更新注册表
      */

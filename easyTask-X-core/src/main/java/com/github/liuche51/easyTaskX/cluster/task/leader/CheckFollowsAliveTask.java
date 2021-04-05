@@ -65,19 +65,19 @@ public class CheckFollowsAliveTask extends TimerTask {
                             }
                             VoteMaster.updateRegedit(regNode);
                             LeaderService.notifyFollowsUpdateRegedit(regNode.getSlaves(), StringConstant.BROKER);
-                            LeaderService.notifySalveUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), regNode);
+                            LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), regNode);
                             LeaderService.notifyClinetsChangedBroker(regNode.getAddress(),newleader==null?null:newleader.getAddress(), StringConstant.DELETE);
 
                         }
                         //master没失效，但是Slave失效了
                         else {
-                            ConcurrentHashMap<String, RegNode> follows = regNode.getSlaves();
-                            //初始化，还没有一个Slave时
-                            if (follows.size() == 0) {
+                            ConcurrentHashMap<String, RegNode> slaves = regNode.getSlaves();
+                            //初始化，还没有一个Slave时，选出一批slave
+                            if (slaves.size() == 0) {
                                 try {
                                     List<RegNode> newSlaves = VoteSlave.initVoteSlaves(regNode);
                                     LeaderService.notifyFollowsUpdateRegedit(newSlaves, StringConstant.BROKER);
-                                    //如果是Leader当前节点自己变更slave，则需要通知其他Follows更新备用Leader信息
+                                    //如果当前节点是Leader自己选slave，则需要通知所有其他所有Follows更新备用Leader信息
                                     if (regNode.getAddress().equals(NodeService.CURRENTNODE.getClusterLeader().getAddress())) {
                                         LeaderService.notifyFollowsBakLeaderChanged();
                                     }
@@ -89,18 +89,18 @@ public class CheckFollowsAliveTask extends TimerTask {
                             }
                             //已经有Slaves时
                             else {
-                                Iterator<Map.Entry<String, RegNode>> items = follows.entrySet().iterator();
+                                Iterator<Map.Entry<String, RegNode>> items = slaves.entrySet().iterator();
                                 while (items.hasNext()) {
                                     Map.Entry<String, RegNode> item = items.next();
                                     RegNode node = item.getValue();
                                     RegBroker regNodeFollow = brokers.get(node.getAddress());
-                                    //follow没有注册信息或者心跳超时了。（没有注册信息，可能是因为上面判断过程中已经将其移除注册表了）
+                                    //slave没有注册信息或者心跳超时了。（没有注册信息，可能是因为上面判断过程中已经将其移除注册表了）
                                     if (regNodeFollow == null || DateUtils.isGreaterThanLoseTime(regNodeFollow.getLastHeartbeat())) {
                                         try {
                                             RegNode newSlave = VoteSlave.voteNewSlave(regNode, node);
-                                            VoteSlave.notifySliceLeaderVoteNewFollow(regNode, newSlave.getAddress(), node.getAddress());
+                                            LeaderService.notifyMasterVoteNewSlave(regNode, newSlave.getAddress(), node.getAddress());
                                             LeaderService.notifyFollowsUpdateRegedit(Collections.singletonList(newSlave), StringConstant.BROKER);
-                                            //如果是Leader当前节点自己变更slave，则需要通知其他Follows更新备用Leader信息
+                                            //如果当前节点是Leader自己变更slave，则需要通知所有其他所有Follows更新备用Leader信息
                                             if (regNode.getAddress().equals(NodeService.CURRENTNODE.getClusterLeader().getAddress())) {
                                                 LeaderService.notifyFollowsBakLeaderChanged();
                                             }
@@ -109,7 +109,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                                         } catch (Exception e) {
                                             log.error("voteNewSlave()->exception!", e);
                                         }
-                                        //items.remove();这里不需要了。因为在voteNewFollow中已经移除了
+                                        //items.remove();这里不需要了。因为在voteNewSlave中已经移除了
                                     }
                                 }
                             }

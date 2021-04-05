@@ -186,7 +186,7 @@ public class TransactionLogDao {
         transactionLog.setType(type);
         transactionLog.setStatus(status);
         transactionLog.setContent(content);
-        transactionLog.setFollows(follows);
+        transactionLog.setSlaves(follows);
         transactionLog.setRetryTime(retryTime);
         transactionLog.setRetryCount(retryCount);
         transactionLog.setModifyTime(modifyTime);
@@ -202,7 +202,7 @@ public class TransactionLogDao {
             sql1.append(log.getTableName()).append("','");
             sql1.append(log.getType()).append("',");
             sql1.append(log.getStatus()).append(",'");
-            sql1.append(log.getFollows()).append("','");
+            sql1.append(log.getSlaves()).append("','");
             sql1.append(log.getRetryTime()).append("',");
             sql1.append(log.getRetryCount()).append(",'");
             sql1.append(log.getCreateTime()).append("','");

@@ -54,11 +54,12 @@ public class LeaderService {
     }
 
     /**
-     * leader通知其slave 更新Broker类型注册表信息
+     * leader通知其BakLeader 更新Broker类型注册表信息
      *
-     * @param nodes
+     * @param nodes 备用leader节点
+     * @param node broker
      */
-    public static void notifySalveUpdateRegedit(Map<String, BaseNode> nodes, RegBroker node) {
+    public static void notifyBakLeaderUpdateRegedit(Map<String, BaseNode> nodes, RegBroker node) {
         Iterator<Map.Entry<String, BaseNode>> items = nodes.entrySet().iterator();
         while (items.hasNext()) {
             Map.Entry<String, BaseNode> item = items.next();
@@ -67,11 +68,11 @@ public class LeaderService {
                 public void run() {
                     try {
                         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifySalveUpdateRegedit)
+                        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyBakLeaderUpdateRegedit)
                                 .setSource(NodeService.CURRENTNODE.getAddress());
                         NodeDto.Node.Builder nodeBuilder=NodeDto.Node.newBuilder();
-                        //follows
-                        NodeDto.NodeList.Builder followsBuilder= NodeDto.NodeList.newBuilder();
+                        //slaves
+                        NodeDto.NodeList.Builder slavesBuilder= NodeDto.NodeList.newBuilder();
                         Iterator<Map.Entry<String,RegNode>> items2=node.getSlaves().entrySet().iterator();
                         while (items2.hasNext()){
                             Map.Entry<String,RegNode> item2=items2.next();
@@ -80,24 +81,24 @@ public class LeaderService {
                             followBuilder.setHost(itNode.getHost()).setPort(itNode.getPort());
                             if(itNode.getDataStatus()!=null)
                                 followBuilder.setDataStatus(itNode.getDataStatus().toString());
-                            followsBuilder.addNodes(followBuilder.build());
+                            slavesBuilder.addNodes(followBuilder.build());
                         }
-                        nodeBuilder.setSalves(followsBuilder.build());
-                        //leaders
-                        NodeDto.NodeList.Builder leadersBuilder= NodeDto.NodeList.newBuilder();
+                        nodeBuilder.setSalves(slavesBuilder.build());
+                        //masters
+                        NodeDto.NodeList.Builder mastersBuilder= NodeDto.NodeList.newBuilder();
                         Iterator<Map.Entry<String,RegNode>> items3=node.getMasters().entrySet().iterator();
                         while (items3.hasNext()){
                             Map.Entry<String,RegNode> item3=items3.next();
                             RegNode itNode=item3.getValue();
                             NodeDto.Node.Builder followBuilder3= NodeDto.Node.newBuilder();
                             followBuilder3.setHost(itNode.getHost()).setPort(itNode.getPort());
-                            leadersBuilder.addNodes(followBuilder3.build());
+                            mastersBuilder.addNodes(followBuilder3.build());
                         }
-                        nodeBuilder.setMasters(leadersBuilder.build());
+                        nodeBuilder.setMasters(mastersBuilder.build());
                         builder.setBodyBytes(nodeBuilder.build().toByteString());
                         boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, item.getValue().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                         if (!ret)
-                            log.info("normally exception!notifySalveUpdateRegedit() failed.");
+                            log.info("normally exception!notifyBakLeaderUpdateRegedit() failed.");
                     } catch (Exception e) {
                         log.error("", e);
                     }
@@ -107,11 +108,12 @@ public class LeaderService {
     }
 
     /**
-     * leader通知其slave 更新Client类型注册表信息
+     * leader通知其BakLeader 更新Client类型注册表信息
      *
-     * @param nodes
+     * @param nodes 备用leader节点
+     * @param node broker
      */
-    public static void notifySalveUpdateRegedit(Map<String, Node> nodes, RegClient node) {
+    public static void notifyBakLeaderUpdateRegedit(Map<String, Node> nodes, RegClient node) {
         Iterator<Map.Entry<String, Node>> items = nodes.entrySet().iterator();
         while (items.hasNext()) {
             Map.Entry<String, Node> item = items.next();
@@ -120,7 +122,7 @@ public class LeaderService {
                 public void run() {
                     try {
                         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifySalveUpdateRegedit)
+                        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyBakLeaderUpdateRegedit)
                                 .setSource(NodeService.CURRENTNODE.getAddress());
                         NodeDto.Node.Builder nodeBuilder=NodeDto.Node.newBuilder();
                         //Brokers
@@ -137,7 +139,7 @@ public class LeaderService {
                         builder.setBodyBytes(nodeBuilder.build().toByteString());
                         boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, item.getValue().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                         if (!ret)
-                            log.info("normally exception!notifySalveUpdateRegedit() failed.");
+                            log.info("normally exception!notifyBakLeaderUpdateRegedit() failed.");
                     } catch (Exception e) {
                         log.error("", e);
                     }
@@ -209,6 +211,31 @@ public class LeaderService {
             log.error("", e);
         }
         return false;
+    }
+
+    /**
+     * leader通知master，已经选出新Slave。
+     *
+     * @param master
+     * @param newSlaveAddress
+     * @param oldSlaveAddress
+     */
+    public static void notifyMasterVoteNewSlave(RegBroker master, String newSlaveAddress, String oldSlaveAddress) {
+        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyMasterVoteNewSlave)
+                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(newSlaveAddress + StringConstant.CHAR_SPRIT_STRING + oldSlaveAddress);
+                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, master.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                    if(!ret)
+                        log.info("normally exception!notifyMasterVoteNewSlave() failed.");
+                } catch (Exception e) {
+                    log.error("", e);
+                }
+            }
+        });
     }
     /**
      * 启动leader检查所有follows是否存活任务

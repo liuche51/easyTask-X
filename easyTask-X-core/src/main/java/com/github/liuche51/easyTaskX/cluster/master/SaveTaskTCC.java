@@ -36,7 +36,7 @@ public class SaveTaskTCC {
         transactionLog.setTableName(TransactionTableEnum.SCHEDULE);
         transactionLog.setStatus(TransactionStatusEnum.TRIED);
         transactionLog.setType(TransactionTypeEnum.SAVE);
-        transactionLog.setFollows(JSONObject.toJSONString(cancelHost));
+        transactionLog.setSlaves(JSONObject.toJSONString(cancelHost));
         TransactionLogDao.saveBatch(Arrays.asList(transactionLog));
         Iterator<BaseNode> items = follows.iterator();
         while (items.hasNext()) {
