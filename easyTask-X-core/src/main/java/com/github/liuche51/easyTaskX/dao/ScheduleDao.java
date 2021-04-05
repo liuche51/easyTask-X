@@ -97,11 +97,11 @@ public class ScheduleDao {
         }
         return list;
     }
-    public static List<String> selectIdsByExecuter(String executer) throws SQLException, ClassNotFoundException {
+    public static List<String> selectIdsByExecuter(String executer,int count) throws SQLException, ClassNotFoundException {
         List<String> list = new LinkedList<>();
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
-            ResultSet resultSet = helper.executeQuery("SELECT id FROM schedule where executer = '" + executer + "';");
+            ResultSet resultSet = helper.executeQuery("SELECT id FROM schedule where executer = '" + executer + " limit " + count + ";");
             while (resultSet.next()) {
                 String id = resultSet.getString("id");
                 list.add(id);

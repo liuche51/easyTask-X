@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class UpdateTaskTCC {
     private static Logger log = LoggerFactory.getLogger(UpdateTaskTCC.class);
     /**
-     * 删除任务事务第一阶段。
+     * 更新任务事务第一阶段。
      * 先记入事务表
      * @param taskIds  任务ID
      * @param slaves

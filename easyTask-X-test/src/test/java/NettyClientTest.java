@@ -85,6 +85,10 @@ public class NettyClientTest {
     @Test
     public void sendASyncMsg(){
         try {
+            EasyTaskConfig config=new EasyTaskConfig();
+            config.getAdvanceConfig().setTimeOut(30);
+            config.getAdvanceConfig().setNettyPoolSize(2);
+            NodeService.setConfig(config);
             while (true){
                 ScheduleDto.Schedule.Builder builder=ScheduleDto.Schedule.newBuilder();
                 String id=String.valueOf(System.currentTimeMillis());
@@ -97,12 +101,17 @@ public class NettyClientTest {
                 System.out.println("发送任务:"+id);
                 NettyClient client=NettyConnectionFactory.getInstance().getConnection("127.0.0.1",2021);
                 ChannelFuture future= NettyMsgService.sendASyncMsg(client,builder1.build());
-                //这种异步消息回调方法，没法获取服务器返回的结果信息，只能知道是否完成异步通信。有点坑
+                //这种异步消息回调方法，没法获取服务器返回的结果信息，只能知道是否完成异步通信。如果正常通信了则
+                //会进入isSuccess()方法，连接失败，则直接抛出异常。超时可能会进入isDone()方法
                 future.addListener(new GenericFutureListener<Future<? super Void>>() {
                     @Override
                     public void operationComplete(Future<? super Void> future) throws Exception {
                         if(future.isSuccess()){
-                            System.out.println("服务器返回完成");
+                            System.out.println("future.isSuccess()");
+                        }else if(future.isDone()){
+                            System.out.println("future.isDone()");
+                        }else {
+                            System.out.println("else");
                         }
 
                     }

@@ -16,14 +16,6 @@ import java.util.List;
 public class NewMasterSyncBakDataTask extends OnceTask {
     private String oldLeaderAddress;
 
-    public String getOldLeaderAddress() {
-        return oldLeaderAddress;
-    }
-
-    public void setOldLeaderAddress(String oldLeaderAddress) {
-        this.oldLeaderAddress = oldLeaderAddress;
-    }
-
     public NewMasterSyncBakDataTask(String oldLeaderAddress) {
         this.oldLeaderAddress = oldLeaderAddress;
     }
