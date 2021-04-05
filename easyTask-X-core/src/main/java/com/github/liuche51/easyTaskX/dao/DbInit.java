@@ -82,7 +82,7 @@ public class DbInit {
                 String sql3 = "CREATE TABLE \"schedule_sync\" (\n" +
                         "\"transaction_id\"  TEXT,\n" +
                         "\"schedule_id\"  TEXT NOT NULL,\n" +
-                        "\"follow\"  TEXT,\n" +
+                        "\"slave\"  TEXT,\n" +
                         "\"status\"  INTEGER,\n" +
                         "\"create_time\"  TEXT,\n" +
                         "\"modify_time\"  TEXT\n" +

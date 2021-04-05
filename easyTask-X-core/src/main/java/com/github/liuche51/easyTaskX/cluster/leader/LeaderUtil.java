@@ -39,7 +39,7 @@ public class LeaderUtil {
                                     .setSource(NodeService.CURRENTNODE.getAddress()).setBodyBytes(nodeBuilder.build().toByteString());
                             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                             if (!ret)
-                                log.info("normally exception!notifyNodeUpdateRegedit() failed.");
+                                log.info("normally exception!notifyFollowUpdateRegedit() failed.");
                         case StringConstant.CLINET:
                             RegBroker node1 = LeaderService.BROKER_REGISTER_CENTER.get(address);
 

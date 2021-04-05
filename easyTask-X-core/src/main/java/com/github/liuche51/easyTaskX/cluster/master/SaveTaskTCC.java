@@ -44,7 +44,7 @@ public class SaveTaskTCC {
             ScheduleSync scheduleSync = new ScheduleSync();
             scheduleSync.setTransactionId(transactionLog.getId());
             scheduleSync.setScheduleId(schedule.getId());
-            scheduleSync.setFollows(follow.getAddress());
+            scheduleSync.setSlave(follow.getAddress());
             scheduleSync.setStatus(ScheduleSyncStatusEnum.SYNCING);
             ScheduleSyncDao.save(scheduleSync);//记录同步状态表
             ScheduleDto.Schedule s = schedule.toScheduleDto();
@@ -77,7 +77,7 @@ public class SaveTaskTCC {
             NettyClient client = follow.getClientWithCount(1);
             boolean ret =NettyMsgService.sendSyncMsgWithCount(builder,client,1,0,null);
             if (ret) {
-                ScheduleSyncDao.updateStatusByScheduleIdAndFollow(scheduleId, follow.getAddress(), ScheduleSyncStatusEnum.SYNCED);
+                ScheduleSyncDao.updateStatusByScheduleIdAndSlave(scheduleId, follow.getAddress(), ScheduleSyncStatusEnum.SYNCED);
             } else
                 throw new Exception("sendSyncMsgWithCount() exception！");
         }
@@ -104,7 +104,7 @@ public class SaveTaskTCC {
             NettyClient client = follow.getClientWithCount(1);
             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder,client,1,0,null);
             if (ret) {
-                ScheduleSyncDao.deleteByTransactionIdAndFollow(transactionId, follow.getAddress());
+                ScheduleSyncDao.deleteByTransactionIdAndSlave(transactionId, follow.getAddress());
             } else
                 throw new Exception("ret=false");
         }

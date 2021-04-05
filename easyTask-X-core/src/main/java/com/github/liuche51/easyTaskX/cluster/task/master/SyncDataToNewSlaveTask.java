@@ -17,45 +17,29 @@ import java.util.List;
  * 目前设计为只有一个线程同步给某个slave
  */
 public class SyncDataToNewSlaveTask extends OnceTask {
-    private Node oldFollow;
-    private Node newFollow;
-
-    public Node getOldFollow() {
-        return oldFollow;
-    }
-
-    public void setOldFollow(Node oldFollow) {
-        this.oldFollow = oldFollow;
-    }
-
-    public Node getNewFollow() {
-        return newFollow;
-    }
-
-    public void setNewFollow(Node newFollow) {
-        this.newFollow = newFollow;
-    }
-    public SyncDataToNewSlaveTask(Node oldFollow, Node newFollow){
-        this.oldFollow=oldFollow;
-        this.newFollow=newFollow;
+    private Node oldSlave;
+    private Node newSlave;
+    public SyncDataToNewSlaveTask(Node oldSlave, Node newSlave){
+        this.oldSlave=oldSlave;
+        this.newSlave=newSlave;
     }
     @Override
     public void run() {
         try {
             while (!isExit()) {
                 //获取批次数据
-                List<ScheduleSync> list = ScheduleSyncDao.selectByFollowAndStatusWithCount(newFollow.getAddress(), ScheduleSyncStatusEnum.UNSYNC, 5);
+                List<ScheduleSync> list = ScheduleSyncDao.selectBySlaveAndStatusWithCount(newSlave.getAddress(), ScheduleSyncStatusEnum.UNSYNC, 5);
                 if (list.size() == 0) {//如果已经同步完，通知leader更新注册表状态并则跳出循环
-                    MasterService.notifyClusterLeaderUpdateRegeditForDataStatus(newFollow.getAddress(),String.valueOf(NodeSyncDataStatusEnum.SYNC));
+                    MasterService.notifyClusterLeaderUpdateRegeditForDataStatus(newSlave.getAddress(),String.valueOf(NodeSyncDataStatusEnum.SYNC));
                     setExit(true);
                     break;
                 }
                 String[] ids = list.stream().distinct().map(ScheduleSync::getScheduleId).toArray(String[]::new);
-                ScheduleSyncDao.updateStatusByFollowAndScheduleIds(newFollow.getAddress(), ids, ScheduleSyncStatusEnum.SYNCING);
+                ScheduleSyncDao.updateStatusByFollowAndScheduleIds(newSlave.getAddress(), ids, ScheduleSyncStatusEnum.SYNCING);
                 List<Schedule> list1 = ScheduleDao.selectByIds(ids);
-                boolean ret = MasterUtil.syncDataToFollowBatch(list1, newFollow);
+                boolean ret = MasterUtil.syncDataToFollowBatch(list1, newSlave);
                 if (ret)
-                    ScheduleSyncDao.updateStatusByFollowAndStatus(newFollow.getAddress(), ScheduleSyncStatusEnum.SYNCING, ScheduleSyncStatusEnum.SYNCED);
+                    ScheduleSyncDao.updateStatusBySlaveAndStatus(newSlave.getAddress(), ScheduleSyncStatusEnum.SYNCING, ScheduleSyncStatusEnum.SYNCED);
             }
         } catch (Exception e) {
             log.error("syncDataToNewFollow() exception!", e);

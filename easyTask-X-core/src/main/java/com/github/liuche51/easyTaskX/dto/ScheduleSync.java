@@ -3,7 +3,7 @@ package com.github.liuche51.easyTaskX.dto;
 public class ScheduleSync {
     private String transactionId;
     private String scheduleId;
-    private String follow;
+    private String slave;
     private short status;
     private String createTime;
     private String modifyTime;
@@ -24,12 +24,12 @@ public class ScheduleSync {
         this.scheduleId = scheduleId;
     }
 
-    public String getFollow() {
-        return follow;
+    public String getSlave() {
+        return slave;
     }
 
-    public void setFollows(String follows) {
-        this.follow = follows;
+    public void setSlave(String slave) {
+        this.slave = slave;
     }
 
     public short getStatus() {

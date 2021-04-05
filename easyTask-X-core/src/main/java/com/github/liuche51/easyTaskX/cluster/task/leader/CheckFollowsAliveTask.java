@@ -136,7 +136,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                 @Override
                 public void run() {
                     try {
-                        //master节点失效,且有Slaves。选新master
+                        //clinet节点失效
                         if (DateUtils.isGreaterThanLoseTime(regNode.getLastHeartbeat())) {
                             LeaderService.CLIENT_REGISTER_CENTER.remove(regNode.getAddress());
                             LeaderService.notifyBrokersChangedClinet(regNode.getAddress(), StringConstant.DELETE);
