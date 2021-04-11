@@ -93,4 +93,8 @@ public class NettyInterfaceEnum {
      * Broker请求更新Client列表信
      */
     public static final String BrokerRequestLeaderSendClients="BrokerRequestLeaderSendClients";
+    /**
+     * Broker通知Client接受执行新任务
+     */
+    public static final String BrokerNotifyClientExecuteNewTask="BrokerNotifyClientExecuteNewTask";
 }

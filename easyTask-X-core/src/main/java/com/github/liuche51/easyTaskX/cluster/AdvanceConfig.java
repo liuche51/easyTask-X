@@ -29,6 +29,10 @@ public class AdvanceConfig {
      */
     private int tryCount = 2;
     /**
+     * Client的失效Broker将任务重新分配给新Client的批次大小。默认5个任务一批次
+     */
+    private int reDispatchBatchCount=5;
+    /**
      * 清理任务备份表中失效的leader备份。默认1小时一次。单位毫秒
      */
     private int clearScheduleBakTime = 36500000;
@@ -105,6 +109,14 @@ public class AdvanceConfig {
 
     public void setTryCount(int tryCount) {
         this.tryCount = tryCount;
+    }
+
+    public int getReDispatchBatchCount() {
+        return reDispatchBatchCount;
+    }
+
+    public void setReDispatchBatchCount(int reDispatchBatchCount) {
+        this.reDispatchBatchCount = reDispatchBatchCount;
     }
 
     public int getClearScheduleBakTime() {

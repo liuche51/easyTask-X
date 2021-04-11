@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -56,7 +57,7 @@ public class CommitUpdateTransactionTask extends TimerTask {
                             }
                             ScheduleDao.updateByIds(ids,updatestr.toString());
                         }catch (Exception e){
-
+                            log.error("", e);
                         }
 
 
@@ -79,7 +80,7 @@ public class CommitUpdateTransactionTask extends TimerTask {
             }
             try {
                 if (new Date().getTime()-getLastRunTime().getTime()<500)//防止频繁空转
-                    Thread.sleep(500);
+                    TimeUnit.MILLISECONDS.sleep(500);
             } catch (InterruptedException e) {
                 log.error("", e);
             }
