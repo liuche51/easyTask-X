@@ -101,8 +101,8 @@ public class NettyClientTest {
                 System.out.println("发送任务:"+id);
                 NettyClient client=NettyConnectionFactory.getInstance().getConnection("127.0.0.1",2021);
                 ChannelFuture future= NettyMsgService.sendASyncMsg(client,builder1.build());
-                //这种异步消息回调方法，没法获取服务器返回的结果信息，只能知道是否完成异步通信。如果正常通信了则
-                //会进入isSuccess()方法，连接失败，则直接抛出异常。超时可能会进入isDone()方法
+                //这种异步消息回调方法，没法获取服务器返回的结果信息，只能知道是否完成异步通信。如果正常通信了(消息发出去了)则
+                //会进入isSuccess()方法，即便接受方发生异常了也不影响，连接失败，则直接抛出异常。超时可能会进入isDone()方法
                 future.addListener(new GenericFutureListener<Future<? super Void>>() {
                     @Override
                     public void operationComplete(Future<? super Void> future) throws Exception {

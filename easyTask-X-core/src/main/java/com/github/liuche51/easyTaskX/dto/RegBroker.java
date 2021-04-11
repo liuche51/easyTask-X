@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.dto;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 
 import java.time.ZonedDateTime;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,6 +25,10 @@ public class RegBroker extends BaseNode{
      * 当前节点的所有leader
      */
     private ConcurrentHashMap<String, RegNode> masters = new ConcurrentHashMap<>();
+    /**
+     * 重新分配任务至新Client数据同步状态
+     */
+    private Short ReDispatchTaskStatus= NodeSyncDataStatusEnum.SUCCEEDED ;
     public RegBroker(BaseNode baseNode){
         super(baseNode.getHost(), baseNode.getPort());
     }
@@ -64,5 +69,13 @@ public class RegBroker extends BaseNode{
 
     public void setMasters(ConcurrentHashMap<String, RegNode> masters) {
         this.masters = masters;
+    }
+
+    public Short getReDispatchTaskStatus() {
+        return ReDispatchTaskStatus;
+    }
+
+    public void setReDispatchTaskStatus(Short reDispatchTaskStatus) {
+        ReDispatchTaskStatus = reDispatchTaskStatus;
     }
 }

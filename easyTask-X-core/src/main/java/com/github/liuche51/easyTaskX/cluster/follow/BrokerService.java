@@ -3,7 +3,9 @@ package com.github.liuche51.easyTaskX.cluster.follow;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil;
+import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
 import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerUpdateClientsTask;
+import com.github.liuche51.easyTaskX.cluster.task.broker.ReDispatchToClientTask;
 import com.github.liuche51.easyTaskX.cluster.task.follow.HeartbeatsTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.follow.FollowRequestUpdateRegeditTask;
@@ -104,6 +106,15 @@ public class BrokerService {
     }
 
     /**
+     * 启动Broker重新将旧Client任务分配给新Clientd的任务。
+     */
+    public static OnceTask startReDispatchToClientTask(BaseNode oldClient) {
+        ReDispatchToClientTask task = new ReDispatchToClientTask(oldClient);
+        task.start();
+        return task;
+    }
+
+    /**
      * Broker定时从leader获取注册表最新信息
      * 覆盖本地信息
      *
@@ -152,6 +163,7 @@ public class BrokerService {
 
     /**
      * Broker通知Client接受执行新任务
+     *
      * @param newClient
      * @param schedules
      * @return
@@ -171,4 +183,24 @@ public class BrokerService {
         return ret;
     }
 
+    /**
+     * broker通知leader，已经完成重新分配任务至新client以及salve的数据同步。请求更新数据同步状态
+     */
+    public static void notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus(Short reDispatchTaskStatus) {
+        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+                    builder.setIdentity(Util.generateIdentityId()).setBody(NettyInterfaceEnum.BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus)
+                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(String.valueOf(reDispatchTaskStatus));
+                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                    if (!ret)
+                        log.info("normally exception!notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus() failed.");
+                } catch (Exception e) {
+                    log.error("notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus()->exception!", e);
+                }
+            }
+        });
+    }
 }

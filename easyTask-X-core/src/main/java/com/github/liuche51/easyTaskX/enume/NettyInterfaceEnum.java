@@ -97,4 +97,8 @@ public class NettyInterfaceEnum {
      * Broker通知Client接受执行新任务
      */
     public static final String BrokerNotifyClientExecuteNewTask="BrokerNotifyClientExecuteNewTask";
+    /**
+     *broker通知leader，已经完成重新分配任务至新client以及salve的数据同步。请求更新数据同步状态
+     */
+    public static final String BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus="BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus";
 }

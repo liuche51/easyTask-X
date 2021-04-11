@@ -32,7 +32,7 @@ public class VoteMaster {
         while (items.hasNext()) {
             Map.Entry<String, RegNode> item = items.next();
             RegNode node = item.getValue();
-            if (NodeSyncDataStatusEnum.SYNC == node.getDataStatus()) {
+            if (NodeSyncDataStatusEnum.SUCCEEDED == node.getDataStatus()) {
                 return node;
             }
         }

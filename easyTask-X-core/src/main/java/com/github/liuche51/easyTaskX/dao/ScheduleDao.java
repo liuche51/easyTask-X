@@ -97,6 +97,22 @@ public class ScheduleDao {
         }
         return list;
     }
+    public static boolean isExistByExecuter(String executer) throws SQLException, ClassNotFoundException {
+        SqliteHelper helper = new SqliteHelper(dbName);
+        try {
+            ResultSet resultSet = helper.executeQuery("SELECT count(0) as count FROM schedule where executer ='"+executer+"';");
+            while (resultSet.next()) {
+                int count = resultSet.getInt("count");
+                if(count>0) return true;
+            }
+        }catch (SQLiteException e){
+            SqliteHelper.writeDatabaseLockedExceptionLog(e,"ScheduleDao->isExistByExecuter");
+        }
+        finally {
+            helper.destroyed();
+        }
+        return false;
+    }
     public static List<Schedule> selectByExecuter(String executer,int count) throws SQLException, ClassNotFoundException {
         List<Schedule> list = new LinkedList<>();
         SqliteHelper helper = new SqliteHelper(dbName);

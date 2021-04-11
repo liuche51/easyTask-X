@@ -43,6 +43,7 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.LeaderNotifyBakLeaderUpdateRegedit,new LeaderNotifyBakLeaderUpdateRegeditHandler());
                 put(NettyInterfaceEnum.ClusterSlaveRequestLeaderSendRegedit,new ClusterSlaveRequestLeaderSendRegeditHandler());
                 put(NettyInterfaceEnum.ClientRequestLeaderSendBrokers,new ClientRequestLeaderSendBrokersHandler());
+                put(NettyInterfaceEnum.BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus,new BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatusHandler());
 
                 //Broker
                 //put(NettyInterfaceEnum.BrokerNotifyClientExecuteNewTask,new BrokerRequestLeaderSendClientsHandler());

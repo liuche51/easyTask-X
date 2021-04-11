@@ -20,11 +20,9 @@ import java.util.concurrent.TimeUnit;
  * 触发条件：旧Client失效
  */
 public class ReDispatchToClientTask extends OnceTask {
-    private Node oldClient;
-    private Node newClient;
-    public ReDispatchToClientTask(Node oldClient,Node newClient){
+    private BaseNode oldClient;
+    public ReDispatchToClientTask(BaseNode oldClient){
         this.oldClient=oldClient;
-        this.newClient=newClient;
     }
     @Override
     public void run() {
@@ -33,19 +31,19 @@ public class ReDispatchToClientTask extends OnceTask {
                 //获取批次数据
                 List<Schedule> list = ScheduleDao.selectByExecuter(this.oldClient.getAddress(),NodeService.getConfig().getAdvanceConfig().getReDispatchBatchCount());
                 if (list.size() == 0) {//如果已经同步完，通知leader更新注册表状态并则跳出循环
-                    //MasterService.notifyClusterLeaderUpdateRegeditForDataStatus(newSlave.getAddress(),String.valueOf(NodeSyncDataStatusEnum.SYNC));
+                    BrokerService.notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus(NodeSyncDataStatusEnum.SUCCEEDED);
                     setExit(true);
                     break;
                 }
                 List<BaseNode> objHost=new LinkedList<>();
                 objHost.addAll((Collection<? extends BaseNode>) NodeService.CURRENTNODE.getSlaves());
+                BaseNode newClient = findNewClient(this.oldClient);
                 objHost.add(newClient);
                 if(NodeService.canAllConnect(objHost)){
-                    BaseNode newClient = findNewClient(this.oldClient);
                     boolean ret = BrokerService.notifyClientExecuteNewTask(newClient, list);
                     if(ret){
                         Map<String,String> values=new HashMap<>();
-                        values.put("executer", this.newClient.getAddress());
+                        values.put("executer", newClient.getAddress());
                         String[] scheduleIds=list.stream().map(Schedule::getId).toArray(String[]::new);
                         NodeService.updateTask(scheduleIds,values);
                     }
@@ -63,7 +61,7 @@ public class ReDispatchToClientTask extends OnceTask {
      * @return
      * @throws Exception
      */
-    private BaseNode findNewClient(Node oldClient) throws Exception {
+    private BaseNode findNewClient(BaseNode oldClient) throws Exception {
         CopyOnWriteArrayList<BaseNode> clients= NodeService.CURRENTNODE.getClients();
         BaseNode selectedNode = null;
         if(clients==null||clients.size()==0)
