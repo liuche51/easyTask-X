@@ -243,6 +243,7 @@ public class LeaderService {
     public static TimerTask startCheckFollowAliveTask() {
         CheckFollowsAliveTask task = new CheckFollowsAliveTask();
         task.start();
+        NodeService.timerTasks.add(task);
         return task;
     }
 }

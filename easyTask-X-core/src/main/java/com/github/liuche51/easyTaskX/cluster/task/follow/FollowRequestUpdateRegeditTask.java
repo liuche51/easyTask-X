@@ -14,12 +14,12 @@ public class FollowRequestUpdateRegeditTask extends TimerTask {
             try {
                 BrokerService.requestUpdateRegedit();
             } catch (Exception e) {
-                log.error("FollowRequestUpdateRegeditTask()->exception!", e);
+                log.error("", e);
             }
             try {
                 Thread.sleep(NodeService.getConfig().getAdvanceConfig().getFollowUpdateRegeditTime());
             } catch (InterruptedException e) {
-                log.error("FollowRequestUpdateRegeditTask()->exception!", e);
+                log.error("", e);
             }
         }
     }

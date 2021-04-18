@@ -116,7 +116,7 @@ public class CheckFollowsAliveTask extends TimerTask {
 
                         }
                     } catch (Exception e) {
-                        log.error("dealBrokerRegedit()->exception!", e);
+                        log.error("", e);
                     }
                 }
             });
@@ -142,7 +142,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                             LeaderService.notifyBrokersChangedClinet(regNode.getAddress(), StringConstant.DELETE);
                         }
                     } catch (Exception e) {
-                        log.error("dealClientRegedit()->exception!", e);
+                        log.error("", e);
                     }
                 }
             });

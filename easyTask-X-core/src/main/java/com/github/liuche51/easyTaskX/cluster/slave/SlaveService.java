@@ -5,7 +5,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
-import com.github.liuche51.easyTaskX.cluster.task.slave.ClusterSlaveRequestUpdateRegeditTask;
+import com.github.liuche51.easyTaskX.cluster.task.slave.BakLeaderRequestUpdateRegeditTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
 import com.github.liuche51.easyTaskX.dto.*;
@@ -158,7 +158,7 @@ public class SlaveService {
     public static void requestUpdateClusterRegedit() {
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.ClusterSlaveRequestLeaderSendRegedit).setSource(NodeService.getConfig().getAddress());
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BakLeaderRequestLeaderSendRegedit).setSource(NodeService.getConfig().getAddress());
             ByteStringPack respPack = new ByteStringPack();
             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
             if (ret) {
@@ -176,11 +176,12 @@ public class SlaveService {
         }
     }
     /**
-     * 启动集群slave主动通过定时任务从leader更新注册表
+     * 启动BakLeader主动通过定时任务从leader更新注册表
      */
-    public static TimerTask startClusterSlaveRequestUpdateRegeditTask() {
-        ClusterSlaveRequestUpdateRegeditTask task = new ClusterSlaveRequestUpdateRegeditTask();
+    public static TimerTask startBakLeaderRequestUpdateRegeditTask() {
+        BakLeaderRequestUpdateRegeditTask task = new BakLeaderRequestUpdateRegeditTask();
         task.start();
+        NodeService.timerTasks.add(task);
         return task;
     }
 }

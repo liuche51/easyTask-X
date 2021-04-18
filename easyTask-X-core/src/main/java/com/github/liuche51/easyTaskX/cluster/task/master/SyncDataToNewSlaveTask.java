@@ -12,6 +12,8 @@ import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 import com.github.liuche51.easyTaskX.enume.ScheduleSyncStatusEnum;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * master同步数据到新slave
  * 目前设计为只有一个线程同步给某个slave
@@ -19,6 +21,11 @@ import java.util.List;
 public class SyncDataToNewSlaveTask extends OnceTask {
     private Node oldSlave;
     private Node newSlave;
+    /**
+     * 当前正在运行的Task实例。
+     * 需要保证不能重复启动相同的任务检查。
+     */
+    public static ConcurrentHashMap<String, Object> runningTask = new ConcurrentHashMap<>();
     public SyncDataToNewSlaveTask(Node oldSlave, Node newSlave){
         this.oldSlave=oldSlave;
         this.newSlave=newSlave;
@@ -41,6 +48,7 @@ public class SyncDataToNewSlaveTask extends OnceTask {
                 if (ret)
                     ScheduleSyncDao.updateStatusBySlaveAndStatus(newSlave.getAddress(), ScheduleSyncStatusEnum.SYNCING, ScheduleSyncStatusEnum.SYNCED);
             }
+            runningTask.remove(this.getClass().getName() + "," + this.oldSlave.getAddress());
         } catch (Exception e) {
             log.error("syncDataToNewFollow() exception!", e);
         }

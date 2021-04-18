@@ -40,7 +40,7 @@ public class CancelSaveTransactionTask extends TimerTask {
                 }
 
             } catch (Exception e) {
-                log.error("CancelSaveTransactionTask（）：exception!", e);
+                log.error("", e);
             }
             try {
                 if (new Date().getTime()-getLastRunTime().getTime()<500)//防止频繁空转

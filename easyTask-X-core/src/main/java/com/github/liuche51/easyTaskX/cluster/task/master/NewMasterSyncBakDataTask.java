@@ -9,22 +9,28 @@ import com.github.liuche51.easyTaskX.dto.ScheduleBak;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * 新master将旧master的备份数据同步给自己的slave
  * 后期需要考虑数据一致性
  */
 public class NewMasterSyncBakDataTask extends OnceTask {
-    private String oldLeaderAddress;
-
-    public NewMasterSyncBakDataTask(String oldLeaderAddress) {
-        this.oldLeaderAddress = oldLeaderAddress;
+    private String oldMasterAddress;
+    /**
+     * 当前正在运行的Task实例。
+     * 需要保证不能重复启动相同的任务检查。
+     */
+    public static ConcurrentHashMap<String, Object> runningTask = new ConcurrentHashMap<>();
+    public NewMasterSyncBakDataTask(String oldMasterAddress) {
+        this.oldMasterAddress = oldMasterAddress;
     }
 
     @Override
     public void run() {
         try {
             while (!isExit()) {
-                List<ScheduleBak> baks = ScheduleBakDao.getBySourceWithCount(oldLeaderAddress, 5);
+                List<ScheduleBak> baks = ScheduleBakDao.getBySourceWithCount(oldMasterAddress, 5);
                 if (baks.size() == 0) {//如果已经同步完，标记状态并则跳出循环
                     setExit(true);
                     break;
@@ -37,7 +43,7 @@ public class NewMasterSyncBakDataTask extends OnceTask {
                     }
                     //遇到正在选举follow时，需要休眠500毫秒。防止短时间内反复提交失败
                     catch (VotingException e){
-                        log.error("normally exception!submitNewTaskByOldLeader()->"+e.getMessage());
+                        log.info("normally exception!NewMasterSyncBakDataTask() faied."+e.getMessage());
                         try {
                             Thread.sleep(500l);
                         } catch (InterruptedException ex) {
@@ -45,12 +51,13 @@ public class NewMasterSyncBakDataTask extends OnceTask {
                         }
                     }
                     catch (Exception e) {
-                        log.error("submitNewTaskByOldLeader()->", e);
+                        log.error("", e);
                     }
                 });
             }
+            runningTask.remove(this.getClass().getName() + "," + this.oldMasterAddress);
         } catch (Exception e) {
-            log.error("submitNewTaskByOldLeader()->", e);
+            log.error("", e);
         }
     }
 }

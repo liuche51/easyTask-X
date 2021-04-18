@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.master;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.task.broker.ReDispatchToClientTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.NewMasterSyncBakDataTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.SyncDataToNewSlaveTask;
 import com.github.liuche51.easyTaskX.dto.Node;
@@ -24,6 +25,7 @@ public class MasterService {
 
     /**
      * 将失效的leader的备份任务数据删除掉
+     *
      * @param oldLeaderAddress
      * @throws SQLException
      * @throws ClassNotFoundException
@@ -31,6 +33,7 @@ public class MasterService {
     public static void deleteOldLeaderBackTask(String oldLeaderAddress) throws SQLException, ClassNotFoundException {
         ScheduleBakDao.deleteBySource(oldLeaderAddress);
     }
+
     /**
      * master同步数据到新Slave
      * 目前设计为只有一个线程同步给某个Slave
@@ -38,21 +41,27 @@ public class MasterService {
      * @param oldSlave
      * @param newSlave
      */
-    public static OnceTask syncDataToNewSlave(Node oldSlave, Node newSlave) {
-        SyncDataToNewSlaveTask task=new SyncDataToNewSlaveTask(oldSlave,newSlave);
+    public static synchronized OnceTask syncDataToNewSlave(Node oldSlave, Node newSlave) {
+        SyncDataToNewSlaveTask task = new SyncDataToNewSlaveTask(oldSlave, newSlave);
+        String key = task.getClass().getName() + "," + oldSlave.getAddress();
+        if (ReDispatchToClientTask.runningTask.contains(key)) return null;
+        ReDispatchToClientTask.runningTask.put(key, null);
         task.start();
         NodeService.onceTasks.add(task);
         return task;
     }
 
     /**
-     * 新leader将旧leader的备份数据同步给自己的follow
+     * 新master将旧master的备份数据同步给自己的slave
      * 后期需要考虑数据一致性
      *
-     * @param oldLeaderAddress
+     * @param oldMasterAddress
      */
-    public static OnceTask submitNewTaskByOldLeader(String oldLeaderAddress) {
-        NewMasterSyncBakDataTask task=new NewMasterSyncBakDataTask(oldLeaderAddress);
+    public static synchronized OnceTask submitNewTaskByOldMaster(String oldMasterAddress) {
+        NewMasterSyncBakDataTask task = new NewMasterSyncBakDataTask(oldMasterAddress);
+        String key = task.getClass().getName() + "," + oldMasterAddress;
+        if (ReDispatchToClientTask.runningTask.contains(key)) return null;
+        ReDispatchToClientTask.runningTask.put(key, null);
         task.start();
         NodeService.onceTasks.add(task);
         return task;
@@ -61,19 +70,19 @@ public class MasterService {
     /**
      * master通知leader，已经完成对新follow的数据同步。请求更新数据同步状态
      */
-    public static void notifyClusterLeaderUpdateRegeditForDataStatus(String followAddress,String dataStatus){
+    public static void notifyClusterLeaderUpdateRegeditForDataStatus(String followAddress, String dataStatus) {
         NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Dto.Frame.Builder builder=Dto.Frame.newBuilder();
+                    Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setBody(NettyInterfaceEnum.MasterNotifyLeaderUpdateRegeditForDataStatus)
-                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(followAddress+ StringConstant.CHAR_SPRIT_STRING+dataStatus);
-                    boolean ret=NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(),5,null);
-                    if(!ret)
+                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(followAddress + StringConstant.CHAR_SPRIT_STRING + dataStatus);
+                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                    if (!ret)
                         log.info("normally exception!notifyClusterLeaderUpdateRegeditForDataStatus() failed.");
-                }catch (Exception e){
-                    log.error("notifyClusterLeaderUpdateRegeditForDataStatus()->exception!",e);
+                } catch (Exception e) {
+                    log.error("notifyClusterLeaderUpdateRegeditForDataStatus()->exception!", e);
                 }
             }
         });

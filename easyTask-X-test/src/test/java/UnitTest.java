@@ -9,7 +9,7 @@ public class UnitTest {
 
     @Test
     public void test() {
-
+          System.out.println(this.getClass().getName());
     }
 
 }

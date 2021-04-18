@@ -33,12 +33,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BrokerService {
     private static final Logger log = LoggerFactory.getLogger(BrokerService.class);
 
+
     /**
      * 启动批量事务数据提交任务
      */
     public static TimerTask startCommitSaveTransactionTask() {
         CommitSaveTransactionTask task = new CommitSaveTransactionTask();
         task.start();
+        NodeService.timerTasks.add(task);
         return task;
     }
 
@@ -48,6 +50,7 @@ public class BrokerService {
     public static TimerTask startCommitDelTransactionTask() {
         CommitDelTransactionTask task = new CommitDelTransactionTask();
         task.start();
+        NodeService.timerTasks.add(task);
         return task;
     }
 
@@ -57,6 +60,7 @@ public class BrokerService {
     public static TimerTask startCancelSaveTransactionTask() {
         CancelSaveTransactionTask task = new CancelSaveTransactionTask();
         task.start();
+        NodeService.timerTasks.add(task);
         return task;
     }
 
@@ -66,6 +70,7 @@ public class BrokerService {
     public static TimerTask startRetryCancelSaveTransactionTask() {
         RetryCancelSaveTransactionTask task = new RetryCancelSaveTransactionTask();
         task.start();
+        NodeService.timerTasks.add(task);
         return task;
     }
 
@@ -75,6 +80,7 @@ public class BrokerService {
     public static TimerTask startRetryDelTransactionTask() {
         RetryDelTransactionTask task = new RetryDelTransactionTask();
         task.start();
+        NodeService.timerTasks.add(task);
         return task;
     }
 
@@ -84,6 +90,7 @@ public class BrokerService {
     public static TimerTask startHeartBeat() {
         HeartbeatsTask task = new HeartbeatsTask();
         task.start();
+        NodeService.timerTasks.add(task);
         return task;
     }
 
@@ -93,6 +100,7 @@ public class BrokerService {
     public static TimerTask startUpdateRegeditTask() {
         FollowRequestUpdateRegeditTask task = new FollowRequestUpdateRegeditTask();
         task.start();
+        NodeService.timerTasks.add(task);
         return task;
     }
 
@@ -102,15 +110,21 @@ public class BrokerService {
     public static TimerTask startBrokerUpdateClientsTask() {
         BrokerUpdateClientsTask task = new BrokerUpdateClientsTask();
         task.start();
+        NodeService.timerTasks.add(task);
         return task;
     }
 
     /**
      * 启动Broker重新将旧Client任务分配给新Clientd的任务。
+     * 需要保证幂等性。防止接口重复触发相同任务
      */
-    public static OnceTask startReDispatchToClientTask(BaseNode oldClient) {
+    public static synchronized OnceTask startReDispatchToClientTask(BaseNode oldClient) {
         ReDispatchToClientTask task = new ReDispatchToClientTask(oldClient);
+        String key = task.getClass().getName() + "," + oldClient.getAddress();
+        if (ReDispatchToClientTask.runningTask.contains(key)) return null;
+        ReDispatchToClientTask.runningTask.put(key, null);
         task.start();
+        NodeService.onceTasks.add(task);
         return task;
     }
 

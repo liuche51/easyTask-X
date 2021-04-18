@@ -4,12 +4,11 @@ import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
-import com.github.liuche51.easyTaskX.dto.Node;
 
 /**
- * 集群Slave定时从leader获取注册表更新
+ * bakLeader定时从leader获取注册表更新
  */
-public class ClusterSlaveRequestUpdateRegeditTask extends TimerTask {
+public class BakLeaderRequestUpdateRegeditTask extends TimerTask {
     @Override
     public void run() {
         while (!isExit()) {
@@ -20,12 +19,12 @@ public class ClusterSlaveRequestUpdateRegeditTask extends TimerTask {
                 if (node != null)
                     SlaveService.requestUpdateClusterRegedit();
             } catch (Exception e) {
-                log.error("ClusterSlaveRequestUpdateRegeditTask()->exception!", e);
+                log.error("BakLeaderRequestUpdateRegeditTask()->exception!", e);
             }
             try {
                 Thread.sleep(NodeService.getConfig().getAdvanceConfig().getSlaveUpdateRegeditTime());
             } catch (InterruptedException e) {
-                log.error("ClusterSlaveRequestUpdateRegeditTask()->exception!", e);
+                log.error("BakLeaderRequestUpdateRegeditTask()->exception!", e);
             }
         }
     }

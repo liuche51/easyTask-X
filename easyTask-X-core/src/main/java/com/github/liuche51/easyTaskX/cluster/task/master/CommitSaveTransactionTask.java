@@ -52,7 +52,7 @@ public class CommitSaveTransactionTask extends TimerTask {
                 }
 
             } catch (Exception e) {
-                log.error("CommitSaveTransactionTask():exception!", e);
+                log.error("", e);
             }
             try {
                 if (new Date().getTime()-getLastRunTime().getTime()<500)//防止频繁空转

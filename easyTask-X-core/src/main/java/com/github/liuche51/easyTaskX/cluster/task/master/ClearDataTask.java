@@ -41,12 +41,12 @@ public class ClearDataTask extends TimerTask {
                 });
                 TransactionLogDao.deleteByIds(deleteids.toArray(new String[]{}));
             } catch (Exception e) {
-                log.error("clearScheduleBak()", e);
+                log.error("", e);
             }
             try {
                 Thread.sleep(NodeService.getConfig().getAdvanceConfig().getClearScheduleBakTime());
             } catch (InterruptedException e) {
-                log.error("clearScheduleBak()", e);
+                log.error("", e);
             }
         }
     }

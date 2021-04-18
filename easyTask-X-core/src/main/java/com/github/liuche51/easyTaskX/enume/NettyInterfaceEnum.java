@@ -68,15 +68,15 @@ public class NettyInterfaceEnum {
     /**
      * leader通知Follow更新备用leader信息
      */
-    public static final String LeaderNotifyFollwUpdateBakLeaderInfo="LeaderNotifyFollwUpdateBakLeaderInfo";
+    public static final String LeaderNotifyFollowUpdateBakLeaderInfo="LeaderNotifyFollowUpdateBakLeaderInfo";
     /**
      * leader通知其BakLeader节点更新注册表信息
      */
     public static final String LeaderNotifyBakLeaderUpdateRegedit="LeaderNotifyBakLeaderUpdateRegedit";
     /**
-     * 集群slave主动通过定时任务从leader更新注册表
+     * BakLeader主动通过定时任务从leader更新注册表
      */
-    public static final String ClusterSlaveRequestLeaderSendRegedit="ClusterSlaveRequestLeaderSendRegedit";
+    public static final String BakLeaderRequestLeaderSendRegedit="BakLeaderRequestLeaderSendRegedit";
     /**
      * master通知leader，已经完成对新follow的数据同步。请求更新数据同步状态
      */

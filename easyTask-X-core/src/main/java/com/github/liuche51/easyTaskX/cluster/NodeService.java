@@ -117,7 +117,7 @@ public class NodeService {
         timerTasks.add(BrokerService.startRetryCancelSaveTransactionTask());
         timerTasks.add(BrokerService.startRetryDelTransactionTask());
         timerTasks.add(BrokerService.startUpdateRegeditTask());
-        timerTasks.add(SlaveService.startClusterSlaveRequestUpdateRegeditTask());
+        timerTasks.add(SlaveService.startBakLeaderRequestUpdateRegeditTask());
         timerTasks.add(BrokerService.startBrokerUpdateClientsTask());
         ZKService.listenLeaderDataNode();
     }

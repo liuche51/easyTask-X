@@ -15,11 +15,11 @@ public class LeaderNotiySlaveVotedNewMasterHandler extends BaseHandler {
     public ByteString process(Dto.Frame frame) throws Exception {
         String body=frame.getBody();
         String[] items=body.split(StringConstant.CHAR_SPRIT_STRING);
-        //如果自己就是新leader。就重新提交旧leader的任务给自己
+        //如果自己就是新master。就重新提交旧master的任务给自己
         if(NodeService.CURRENTNODE.getAddress().equals(items[1])){
-            MasterService.submitNewTaskByOldLeader(items[0]);
+            MasterService.submitNewTaskByOldMaster(items[0]);
         }
-        //如果自己不是新leader。则删除旧leader的备份数据
+        //如果自己不是新master。则删除旧master的备份数据
         else {
             MasterService.deleteOldLeaderBackTask(items[0]);
         }
