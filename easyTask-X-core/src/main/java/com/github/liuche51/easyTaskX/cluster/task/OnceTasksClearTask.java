@@ -4,6 +4,7 @@ import com.github.liuche51.easyTaskX.cluster.NodeService;
 
 
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 后台一次性的任务清理掉已经运行完退出的线程对象
@@ -24,7 +25,7 @@ public class OnceTasksClearTask extends TimerTask {
                 log.error("", e);
             }
             try {
-                Thread.sleep(NodeService.getConfig().getAdvanceConfig().getClearScheduleBakTime());
+                TimeUnit.HOURS.sleep(NodeService.getConfig().getAdvanceConfig().getClearScheduleBakTime());
             } catch (InterruptedException e) {
                 log.error("", e);
             }

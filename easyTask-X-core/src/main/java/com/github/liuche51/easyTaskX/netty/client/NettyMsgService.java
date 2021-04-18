@@ -85,9 +85,9 @@ public class NettyMsgService {
         } finally {
             tryCount--;
         }
-        log.info("sendSyncMsgWithCount()-> error" + error + ",tryCount=" + tryCount + ",objectHost=" + client.getObjectAddress());
+        log.info("normally exception!sendSyncMsgWithCount()-> error=" + error + ",tryCount=" + tryCount + ",objectHost=" + client.getObjectAddress());
         try {
-            Thread.sleep(waiteSecond * 1000);
+            TimeUnit.SECONDS.sleep(waiteSecond);
         } catch (InterruptedException e) {
             log.error("", e);
         }

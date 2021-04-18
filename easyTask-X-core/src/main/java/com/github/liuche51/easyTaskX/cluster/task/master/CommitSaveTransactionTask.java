@@ -15,6 +15,7 @@ import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -56,7 +57,7 @@ public class CommitSaveTransactionTask extends TimerTask {
             }
             try {
                 if (new Date().getTime()-getLastRunTime().getTime()<500)//防止频繁空转
-                    Thread.sleep(500);
+                    TimeUnit.MILLISECONDS.sleep(500L);
             } catch (InterruptedException e) {
                 log.error("", e);
             }

@@ -50,7 +50,7 @@ public class LeaderUtil {
                     }
 
                 } catch (Exception e) {
-                    log.error("notifyNodeUpdateRegedit()->exception!", e);
+                    log.error("", e);
                 }
             }
         });
@@ -107,7 +107,7 @@ public class LeaderUtil {
                     if (!ret)
                         log.info("normally exception!notifyFollowBakLeaderChanged() failed.");
                 } catch (Exception e) {
-                    log.error("notifyFollowBakLeaderChanged()->exception!", e);
+                    log.error("", e);
                 }
             }
         });
@@ -133,7 +133,7 @@ public class LeaderUtil {
                     if (!ret)
                         log.info("normally exception!notifyClinetChangedBroker() failed.");
                 } catch (Exception e) {
-                    log.error("notifyClinetChangedBroker()->exception!", e);
+                    log.error("", e);
                 }
             }
         });
@@ -156,7 +156,7 @@ public class LeaderUtil {
                     if (!ret)
                         log.info("normally exception!notifyBrokerChangedClient() failed.");
                 } catch (Exception e) {
-                    log.error("notifyBrokerChangedClient()->exception!", e);
+                    log.error("", e);
                 }
             }
         });

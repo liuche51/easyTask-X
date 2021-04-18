@@ -45,7 +45,7 @@ public class DeleteTaskTCC {
             retryDel( transactionId, taskId,  slaves);
         }catch (Exception e){
             //通知slaves删除时异常，可视为删除成功，只要本节点本地已经写了删除事务日志。后续会重试删除
-            log.error("retryDel()-> exception!", e);
+            log.error("", e);
         }
 
     }

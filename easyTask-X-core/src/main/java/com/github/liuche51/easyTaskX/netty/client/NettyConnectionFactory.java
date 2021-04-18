@@ -84,7 +84,7 @@ public class NettyConnectionFactory {
                 });
             }
         }catch (Exception e){
-            log.error("removeHostPool()-> exception!key="+key,e);
+            log.error("key="+key,e);
         }
         this.pools.remove(key);
     }

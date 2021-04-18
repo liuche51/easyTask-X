@@ -146,7 +146,7 @@ class SqliteHelper {
      */
     public static void writeDatabaseLockedExceptionLog(SQLiteException e,String methond) throws SQLiteException {
         if(e.getMessage()!=null&&e.getMessage().contains("SQLITE_BUSY"))
-            logger.error("normally exception!"+methond+":"+e.getMessage());
+            logger.info("normally exception!"+methond+":"+e.getMessage());
         else
             throw e;
     }

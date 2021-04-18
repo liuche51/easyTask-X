@@ -36,7 +36,7 @@ public class ZKService {
                 ZKUtil.getClient().create().withMode(CreateMode.EPHEMERAL).forPath(path, JSONObject.toJSONString(data).getBytes());
             }
         } catch (Exception e) {
-            log.error("registerLeader() exception！", e);
+            log.error("", e);
         }
     }
 
@@ -71,7 +71,7 @@ public class ZKService {
                 log.info("listenLeaderDataNode()->leader节点变更事件触发!value={}", data);
                 // 防止节点被删除时发生错误
                 if (nodeCache.getCurrentData() == null) {
-                    log.error("listenLeaderDataNode()->exception!nodeCache.getCurrentData() == null，可能该节点已被删除");
+                    log.error("nodeCache.getCurrentData() == null，可能该节点已被删除");
                     NodeService.CURRENTNODE.setClusterLeader(null);
                 } else {
                     // 获取节点最新的数据
@@ -101,7 +101,7 @@ public class ZKService {
             return JSONObject.parseObject(bytes, clazz);
         } catch (Exception e) {
             //节点不存在了，属于正常情况。
-            log.error("normally exception!getDataByPath():" + e.getMessage());
+            log.info("normally exception!getDataByPath():" + e.getMessage());
         }
         return null;
     }

@@ -32,14 +32,14 @@ public class VoteLeader {
 
             }
         } catch (Exception e) {
-           log.error("competeLeader()->exception!",e);
+           log.error("",e);
         }
         finally {
             if(hasLock){
                 try {
                     zkMutex.release();//释放锁，会删除mutex节点下的子节点（参与竞争的节点信息），所以你可能看不到，因为存续时间非常短
                 } catch (Exception e) {
-                    log.error("zkMutex.release()->exception!",e);
+                    log.error("",e);
                 }
             }
 

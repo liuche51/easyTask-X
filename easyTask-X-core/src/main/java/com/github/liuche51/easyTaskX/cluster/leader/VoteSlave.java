@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -43,7 +44,7 @@ public class VoteSlave {
         int count = NodeService.getConfig().getBackupCount();
         try {
             lock.lock();
-            List<String> availableFollows = VoteSlave.getAvailableFollows(regNode);
+            List<String> availableFollows = VoteSlave.getAvailableSlave(regNode);
             List<RegNode> follows = VoteSlave.voteFollows(count, availableFollows);
             if (follows.size() < count) {
                 log.info("[{}] follows.size() < count,so retry to initVoteFollows()",regNode.getAddress());
@@ -76,7 +77,7 @@ public class VoteSlave {
             //多线程下，如果follows已经选好，则让客户端重新提交任务。以后可以优化为获取选举后的follow
             if (regNode.getSlaves().size() >= NodeService.getConfig().getBackupCount())
                 throw new VotedException(String.format("[%s] has voted a new follow.",regNode.getAddress()));
-            List<String> availableFollows = getAvailableFollows(regNode);
+            List<String> availableFollows = getAvailableSlave(regNode);
             follows = voteFollows(1, availableFollows);
             if (follows.size() < 1)
                 voteNewSlave(regNode, oldFollow);//数量不够递归重新选
@@ -99,7 +100,7 @@ public class VoteSlave {
      *
      * @return
      */
-    private static List<String> getAvailableFollows(RegBroker regNode) throws Exception {
+    private static List<String> getAvailableSlave(RegBroker regNode) throws Exception {
         int count = NodeService.getConfig().getBackupCount();
         Iterator<Map.Entry<String, RegBroker>> items = LeaderService.BROKER_REGISTER_CENTER.entrySet().iterator();
         List<String> availableFollows = new ArrayList<>(LeaderService.BROKER_REGISTER_CENTER.size());
@@ -127,9 +128,9 @@ public class VoteSlave {
         }
         if (availableFollows.size() < count - NodeService.CURRENTNODE.getSlaves().size())//如果可选备库节点数量不足，则等待1s，然后重新选。注意：等待会阻塞整个服务可用性
         {
-            log.info("[{}] availableFollows is not enough! only has {},current own {}",regNode.getAddress(), availableFollows.size(), regNode.getSlaves().size());
-            Thread.sleep(1000);
-            return getAvailableFollows(regNode);
+            log.info("[{}] getAvailableSlave is not enough! only has {},current own {}",regNode.getAddress(), availableFollows.size(), regNode.getSlaves().size());
+            TimeUnit.SECONDS.sleep(1L);
+            return getAvailableSlave(regNode);
         } else
             return availableFollows;
     }
@@ -154,7 +155,8 @@ public class VoteSlave {
                 follows.add(newFollow);//这里一定要用新对象。否则对象重用会导致属性值也被公用了
             } else break;//已选数量够了就跳出
         }
-        if (follows.size() < count) Thread.sleep(1000);//此处防止不满足条件时重复高频递归本方法
+        if (follows.size() < count)
+           TimeUnit.SECONDS.sleep(1L); //此处防止不满足条件时重复高频递归本方法
         return follows;
     }
 

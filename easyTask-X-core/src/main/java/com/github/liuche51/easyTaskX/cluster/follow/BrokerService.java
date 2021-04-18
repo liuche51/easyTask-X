@@ -212,7 +212,7 @@ public class BrokerService {
                     if (!ret)
                         log.info("normally exception!notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus() failed.");
                 } catch (Exception e) {
-                    log.error("notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus()->exception!", e);
+                    log.error("", e);
                 }
             }
         });

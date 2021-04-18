@@ -82,7 +82,7 @@ public class MasterService {
                     if (!ret)
                         log.info("normally exception!notifyClusterLeaderUpdateRegeditForDataStatus() failed.");
                 } catch (Exception e) {
-                    log.error("notifyClusterLeaderUpdateRegeditForDataStatus()->exception!", e);
+                    log.error("", e);
                 }
             }
         });

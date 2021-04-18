@@ -21,9 +21,9 @@ public class AdvanceConfig {
      */
     private int loseTimeOut = 30;
     /**
-     * 节点对leader的心跳频率。默认5s一次
+     * 节点对leader的心跳频率。单位秒
      */
-    private int heartBeat = 5;
+    private int heartBeat = 30;
     /**
      * 集群节点之间通信失败重试次数。默认2次
      */
@@ -33,21 +33,21 @@ public class AdvanceConfig {
      */
     private int reDispatchBatchCount=5;
     /**
-     * 清理任务备份表中失效的leader备份。默认1小时一次。单位毫秒
+     * 清理任务备份表中失效的leader备份。默认1小时一次。
      */
-    private int clearScheduleBakTime = 36500000;
+    private int clearScheduleBakTime = 1;
     /**
-     * Folow节点从leader更新注册表信息间隔时间。单位秒。
+     * Folow节点从leader更新注册表信息间隔时间。单位分钟。
      */
-    private int followUpdateRegeditTime=300;
+    private int followUpdateRegeditTime=5;
     /**
-     * 集群Slave节点从leader更新注册表信息间隔时间。单位秒。
+     * bakleader节点从leader更新注册表信息间隔时间。单位分钟。
      */
-    private int slaveUpdateRegeditTime=600;
+    private int bakLeaderUpdateRegeditTime=10;
     /**
-     * 从leader更新Clients列表间隔时间。单位秒。
+     * 从leader更新Clients列表间隔时间。单位小时。
      */
-    private int updateClientsTime=60*60;
+    private int updateClientsTime=1;
     /**
      * 集群公用程池
      */
@@ -96,7 +96,7 @@ public class AdvanceConfig {
     }
 
     public int getHeartBeat() {
-        return heartBeat * 1000;
+        return heartBeat;
     }
 
     public void setHeartBeat(int heartBeat) {
@@ -135,12 +135,12 @@ public class AdvanceConfig {
         this.followUpdateRegeditTime = followUpdateRegeditTime;
     }
 
-    public int getSlaveUpdateRegeditTime() {
-        return slaveUpdateRegeditTime;
+    public int getBakLeaderUpdateRegeditTime() {
+        return bakLeaderUpdateRegeditTime;
     }
 
-    public void setSlaveUpdateRegeditTime(int slaveUpdateRegeditTime) {
-        this.slaveUpdateRegeditTime = slaveUpdateRegeditTime;
+    public void setBakLeaderUpdateRegeditTime(int bakLeaderUpdateRegeditTime) {
+        this.bakLeaderUpdateRegeditTime = bakLeaderUpdateRegeditTime;
     }
 
     public int getUpdateClientsTime() {

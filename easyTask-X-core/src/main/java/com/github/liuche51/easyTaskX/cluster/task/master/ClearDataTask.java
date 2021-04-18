@@ -14,6 +14,7 @@ import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Master清理无用的数据定时任务
@@ -44,7 +45,7 @@ public class ClearDataTask extends TimerTask {
                 log.error("", e);
             }
             try {
-                Thread.sleep(NodeService.getConfig().getAdvanceConfig().getClearScheduleBakTime());
+                TimeUnit.HOURS.sleep(NodeService.getConfig().getAdvanceConfig().getClearScheduleBakTime());
             } catch (InterruptedException e) {
                 log.error("", e);
             }

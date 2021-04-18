@@ -6,6 +6,8 @@ import com.github.liuche51.easyTaskX.dto.zk.LeaderData;
 import com.github.liuche51.easyTaskX.zk.ZKService;
 import org.junit.Test;
 
+import java.util.concurrent.TimeUnit;
+
 public class ZKTest {
     public ZKTest() {
         try {
@@ -57,7 +59,7 @@ public class ZKTest {
         }
         while (true){
             try {
-                Thread.sleep(1000l);
+                TimeUnit.SECONDS.sleep(1L);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -17,6 +17,8 @@ import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.zk.ZKService;
 import io.netty.channel.ChannelFuture;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Follow节点对leader的心跳。
  */
@@ -49,7 +51,7 @@ public class HeartbeatsTask extends TimerTask {
                 log.error("", e);
             }
             try {
-                Thread.sleep(NodeService.getConfig().getAdvanceConfig().getHeartBeat());
+                TimeUnit.SECONDS.sleep(NodeService.getConfig().getAdvanceConfig().getHeartBeat());
             } catch (InterruptedException e) {
                 log.error("", e);
             }

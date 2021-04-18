@@ -10,6 +10,7 @@ import com.github.liuche51.easyTaskX.util.exception.VotingException;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 新master将旧master的备份数据同步给自己的slave
@@ -45,7 +46,7 @@ public class NewMasterSyncBakDataTask extends OnceTask {
                     catch (VotingException e){
                         log.info("normally exception!NewMasterSyncBakDataTask() faied."+e.getMessage());
                         try {
-                            Thread.sleep(500l);
+                            TimeUnit.MILLISECONDS.sleep(500L);
                         } catch (InterruptedException ex) {
                             ex.printStackTrace();
                         }

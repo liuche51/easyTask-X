@@ -50,7 +50,7 @@ public class SyncDataToNewSlaveTask extends OnceTask {
             }
             runningTask.remove(this.getClass().getName() + "," + this.oldSlave.getAddress());
         } catch (Exception e) {
-            log.error("syncDataToNewFollow() exception!", e);
+            log.error("", e);
         }
     }
 }

@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * leader检查follows存活状态
@@ -32,12 +33,12 @@ public class CheckFollowsAliveTask extends TimerTask {
                 dealBrokerRegedit();
                 dealClientRegedit();
             } catch (Exception e) {
-                log.error("CheckFollowsAliveTask()", e);
+                log.error("", e);
             }
             try {
-                Thread.sleep(NodeService.getConfig().getAdvanceConfig().getHeartBeat());
+                TimeUnit.SECONDS.sleep(NodeService.getConfig().getAdvanceConfig().getHeartBeat());
             } catch (InterruptedException e) {
-                log.error("CheckFollowsAliveTask()", e);
+                log.error("", e);
             }
         }
     }
@@ -84,7 +85,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                                 } catch (VotingException e) {
                                     log.info("normally exception!{}", e.getMessage());
                                 } catch (Exception e) {
-                                    log.error("initVoteFollows()->exception!", e);
+                                    log.error("", e);
                                 }
                             }
                             //已经有Slaves时
@@ -107,7 +108,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                                         } catch (VotingException e) {
                                             log.info("normally exception!{}", e.getMessage());
                                         } catch (Exception e) {
-                                            log.error("voteNewSlave()->exception!", e);
+                                            log.error("", e);
                                         }
                                         //items.remove();这里不需要了。因为在voteNewSlave中已经移除了
                                     }

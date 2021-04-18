@@ -34,7 +34,7 @@ public class EasyTaskXApp {
         log.info("================== EasyTask-X Started Successfull！=============================");
         log.info("================================================================================");
         while (true) {
-            Thread.sleep(1000);
+            TimeUnit.SECONDS.sleep(1L);
         }
     }
 
@@ -104,7 +104,7 @@ public class EasyTaskXApp {
         if (!StringUtils.isNullOrEmpty(followUpdateRegeditTime))
             config.getAdvanceConfig().setFollowUpdateRegeditTime(Integer.parseInt(followUpdateRegeditTime));
         if (!StringUtils.isNullOrEmpty(slaveUpdateRegeditTime))
-            config.getAdvanceConfig().setSlaveUpdateRegeditTime(Integer.parseInt(slaveUpdateRegeditTime));
+            config.getAdvanceConfig().setBakLeaderUpdateRegeditTime(Integer.parseInt(slaveUpdateRegeditTime));
         if (!StringUtils.isNullOrEmpty(clearScheduleBakTime))
             config.getAdvanceConfig().setClearScheduleBakTime(Integer.parseInt(clearScheduleBakTime));
         if (!StringUtils.isNullOrEmpty(clusterPool_corePoolSize) && !StringUtils.isNullOrEmpty(clusterPool_maximumPoolSize) && !StringUtils.isNullOrEmpty(clusterPool_keepAliveTime)) {

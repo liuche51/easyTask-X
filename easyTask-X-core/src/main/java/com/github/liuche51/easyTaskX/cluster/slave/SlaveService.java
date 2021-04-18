@@ -92,7 +92,7 @@ public class SlaveService {
             //如果遇到主键冲突异常，则略过。主要原因是Netty重试造成，不影响系统功能
             if (e.getMessage() != null && e.getMessage().contains("SQLITE_CONSTRAINT_PRIMARYKEY")) {
                 log.info("tryDelTask():transactionId=" + transactionId + " scheduleId=" + scheduleId);
-                log.error("normally exception!! tryDelTask():" + e.getMessage());
+                log.info("normally exception!! tryDelTask():" + e.getMessage());
             }
         }
 
@@ -115,7 +115,7 @@ public class SlaveService {
             //如果遇到主键冲突异常，则略过。主要原因是Netty重试造成，不影响系统功能
             if (e.getMessage() != null && e.getMessage().contains("SQLITE_CONSTRAINT_PRIMARYKEY")) {
                 log.info("tryDelTask():transactionId=" + transactionId + " taskIds=" + taskIds);
-                log.error("normally exception!! tryUpdateTask():" + e.getMessage());
+                log.info("normally exception!! tryUpdateTask():" + e.getMessage());
             }
         }
 
@@ -145,7 +145,7 @@ public class SlaveService {
         } catch (SQLiteException e) {
             //如果遇到主键冲突异常，则略过。主要原因是Netty重试造成，不影响系统功能
             if (e.getMessage() != null && e.getMessage().contains("SQLITE_CONSTRAINT_PRIMARYKEY")) {
-                log.error("normally exception!! tryDelTask():" + e.getMessage());
+                log.info("normally exception!! tryDelTask():" + e.getMessage());
             }
         }
     }

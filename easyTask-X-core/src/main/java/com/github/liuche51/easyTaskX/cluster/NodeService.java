@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class NodeService {
     private static Logger log = LoggerFactory.getLogger(NodeService.class);
@@ -132,7 +133,7 @@ public class NodeService {
     public void submitTaskAllowWait(Schedule schedule) throws Exception {
         //集群未启动或正在选举follow中，则继续等待完成
         while (!isStarted || VoteSlave.isSelecting()) {
-            Thread.sleep(1000l);
+            TimeUnit.SECONDS.sleep(1L);
         }
         this.submitTask(schedule);
     }
@@ -192,7 +193,7 @@ public class NodeService {
             return true;
         } catch (Exception e) {
             //如果写本地删除日志都失败了，那么就认为删除失败
-            log.error("deleteTask exception!", e);
+            log.error("", e);
             return false;
         }
     }
@@ -217,7 +218,7 @@ public class NodeService {
             return true;
         } catch (Exception e) {
             //如果写本地更新日志都失败了，那么就认为删除失败
-            log.error("updateTask exception!", e);
+            log.error("", e);
             return false;
         }
     }

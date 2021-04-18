@@ -19,6 +19,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -72,11 +73,11 @@ public class RetryCancelSaveTransactionTask extends TimerTask {
                 }
 
             } catch (Exception e) {
-                log.error("RetryCancelSaveTransactionTask() exception!", e);
+                log.error("", e);
             }
             try {
                 if (new Date().getTime()-getLastRunTime().getTime()<500)//防止频繁空转
-                    Thread.sleep(500);
+                    TimeUnit.MILLISECONDS.sleep(500L);
             } catch (InterruptedException e) {
                 log.error("", e);
             }

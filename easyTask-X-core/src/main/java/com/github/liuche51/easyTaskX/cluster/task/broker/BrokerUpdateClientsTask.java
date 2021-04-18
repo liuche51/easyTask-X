@@ -12,6 +12,7 @@ import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.Util;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Broker从leader更新Client列表。
@@ -40,7 +41,7 @@ public class BrokerUpdateClientsTask extends TimerTask {
                 log.error("", e);
             }
             try {
-                Thread.sleep(NodeService.getConfig().getAdvanceConfig().getUpdateClientsTime());
+                TimeUnit.HOURS.sleep(NodeService.getConfig().getAdvanceConfig().getUpdateClientsTime());
             } catch (InterruptedException e) {
                 log.error("", e);
             }

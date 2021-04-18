@@ -5,6 +5,8 @@ import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * bakLeader定时从leader获取注册表更新
  */
@@ -19,12 +21,12 @@ public class BakLeaderRequestUpdateRegeditTask extends TimerTask {
                 if (node != null)
                     SlaveService.requestUpdateClusterRegedit();
             } catch (Exception e) {
-                log.error("BakLeaderRequestUpdateRegeditTask()->exception!", e);
+                log.error("", e);
             }
             try {
-                Thread.sleep(NodeService.getConfig().getAdvanceConfig().getSlaveUpdateRegeditTime());
+                TimeUnit.SECONDS.sleep(NodeService.getConfig().getAdvanceConfig().getBakLeaderUpdateRegeditTime());
             } catch (InterruptedException e) {
-                log.error("BakLeaderRequestUpdateRegeditTask()->exception!", e);
+                log.error("", e);
             }
         }
     }

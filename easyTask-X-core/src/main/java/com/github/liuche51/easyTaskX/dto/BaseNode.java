@@ -61,7 +61,7 @@ public class BaseNode implements Serializable {
             return getClient();
         } catch (Exception e) {
             log.info("getClientWithCount tryCount=" + tryCount + ",objectHost="+this.getAddress());
-            log.error("getClientWithCount()-> exception!", e);
+            log.error("", e);
             return getClientWithCount(tryCount);
         } finally {
             tryCount--;

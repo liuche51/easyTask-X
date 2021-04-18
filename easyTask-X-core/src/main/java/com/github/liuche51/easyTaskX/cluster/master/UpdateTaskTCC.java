@@ -48,7 +48,7 @@ public class UpdateTaskTCC {
             retryUpdate( transactionId, taskIds2,  slaves,json);
         }catch (Exception e){
             //通知slaves更新时异常，可视为更新成功，只要本节点本地已经写了更新事务日志。后续会重试更新
-            log.error("tryUpdate()-> exception!", e);
+            log.error("", e);
         }
 
     }
