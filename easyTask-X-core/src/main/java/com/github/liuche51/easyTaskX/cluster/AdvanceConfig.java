@@ -17,9 +17,9 @@ public class AdvanceConfig {
      */
     private int timeOut = 30;
     /**
-     * 集群节点失效判定时间。默认30s
+     * 集群节点失效判定时间。单位分钟
      */
-    private int loseTimeOut = 30;
+    private int loseTimeOut = 5;
     /**
      * 节点对leader的心跳频率。单位秒
      */

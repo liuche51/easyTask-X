@@ -10,6 +10,7 @@ import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.StringConstant;
+import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,6 +162,27 @@ public class LeaderService {
         while (items2.hasNext()) {
             LeaderUtil.notifyFollowBakLeaderChanged(items2.next(),bakLeader);
         }
+    }
+    /**
+     * 通知Broker注册成功。
+     * @param broker
+     */
+    public static void notifyBrokerRegisterSucceeded(BaseNode broker){
+        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyBrokerRegisterSucceeded)
+                            .setSource(NodeService.CURRENTNODE.getAddress());
+                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, broker.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                    if (!ret)
+                        log.info("normally exception!notifyBrokerRegisterSucceeded() failed.");
+                } catch (Exception e) {
+                    log.error("", e);
+                }
+            }
+        });
     }
     /**
      * 通知Clinets。Broker发生变更。

@@ -25,7 +25,7 @@ public class DateUtils {
      * @return
      */
     public static boolean isGreaterThanLoseTime(ZonedDateTime dateTime){
-        if(ZonedDateTime.now().minusSeconds(NodeService.getConfig().getAdvanceConfig().getLoseTimeOut())
+        if(ZonedDateTime.now().minusMinutes(NodeService.getConfig().getAdvanceConfig().getLoseTimeOut())
                 .compareTo(dateTime) > 0)
             return true;
         else return false;

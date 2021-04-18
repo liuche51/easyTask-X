@@ -3,13 +3,10 @@ package com.github.liuche51.easyTaskX.netty.server.handler;
 
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
-import com.github.liuche51.easyTaskX.netty.server.handler.broker.ClientNotifyBrokerDeleteTaskHandler;
-import com.github.liuche51.easyTaskX.netty.server.handler.broker.ClientNotifyBrokerSubmitTaskHandler;
-import com.github.liuche51.easyTaskX.netty.server.handler.broker.LeaderNotifyBrokerClientChangedHandler;
+import com.github.liuche51.easyTaskX.netty.server.handler.broker.*;
 import com.github.liuche51.easyTaskX.netty.server.handler.follow.*;
 import com.github.liuche51.easyTaskX.netty.server.handler.leader.*;
 import com.github.liuche51.easyTaskX.netty.server.handler.leader.MasterNotifyLeaderUpdateRegeditForDataStatusHandler;
-import com.github.liuche51.easyTaskX.netty.server.handler.broker.LeaderNotifyBrokerUpdateRegeditHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.master.LeaderNotifyMasterVoteNewSlaveHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.slave.*;
 import com.google.protobuf.ByteString;
@@ -43,6 +40,7 @@ public abstract class BaseHandler {
                 //Leader to Broker
                 put(NettyInterfaceEnum.LeaderNotifyBrokerUpdateRegedit,new LeaderNotifyBrokerUpdateRegeditHandler());
                 put(NettyInterfaceEnum.LeaderNotifyBrokerClientChanged,new LeaderNotifyBrokerClientChangedHandler());
+                put(NettyInterfaceEnum.LeaderNotifyBrokerRegisterSucceeded,new LeaderNotifyBrokerRegisterSucceededHandler());
                 //Leader to Master
                 put(NettyInterfaceEnum.LeaderNotifyMasterVoteNewSlave,new LeaderNotifyMasterVoteNewSlaveHandler());
                 //Leader to Follow

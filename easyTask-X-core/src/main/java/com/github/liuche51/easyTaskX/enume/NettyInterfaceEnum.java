@@ -62,6 +62,10 @@ public class NettyInterfaceEnum {
      */
     public static final String LeaderNotifyClientBrokerChanged="LeaderNotifyClientBrokerChanged";
     /**
+     * leader通知Broker注册成功。
+     */
+    public static final String LeaderNotifyBrokerRegisterSucceeded="LeaderNotifyBrokerRegisterSucceeded";
+    /**
      * leader通知brokers。Client已经变动
      */
     public static final String LeaderNotifyBrokerClientChanged="LeaderNotifyBrokerClientChanged";

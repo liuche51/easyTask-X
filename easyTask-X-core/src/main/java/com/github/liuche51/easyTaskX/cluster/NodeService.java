@@ -40,6 +40,7 @@ public class NodeService {
     private static Logger log = LoggerFactory.getLogger(NodeService.class);
     private static EasyTaskConfig config = null;
     private static volatile boolean isStarted = false;//是否已经启动
+    public static volatile boolean isFirstStarted=true;//当前节点是否属于首次启动注册到leader。默认是
     /**
      * 集群所有可用的clients
      */
@@ -100,9 +101,8 @@ public class NodeService {
     }
 
     /**
-     * 初始化当前节点的集群。(系统重启或心跳超时重启)
-     * zk注册，选follows,开始心跳
-     * 这里不考虑短暂宕机重启继续使用原follows情况。让原follows等待超时后重新选举leader就好了
+     * 初始化当前节点的集群。
+     * (系统重启或因心网络问题被leader踢出，然后又恢复了)
      *
      * @return
      */
