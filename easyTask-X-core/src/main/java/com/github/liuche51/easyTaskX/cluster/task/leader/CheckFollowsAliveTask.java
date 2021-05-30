@@ -59,15 +59,15 @@ public class CheckFollowsAliveTask extends TimerTask {
                         //master节点失效,且有Slaves。选新master
                         if (DateUtils.isGreaterThanLoseTime(regNode.getLastHeartbeat())) {
                             //如果有Slaves。则选出新master，并通知它们。没有则直接移出注册表
-                            RegNode newleader=null;
+                            RegNode newMaster=null;
                             if (regNode.getSlaves().size() > 0) {
-                                newleader = VoteMaster.voteNewMaster(regNode.getSlaves());
-                                LeaderService.notifySlavesNewMaster(regNode.getSlaves(), newleader.getAddress(), regNode.getAddress());
+                                newMaster = VoteMaster.voteNewMaster(regNode.getSlaves());
+                                LeaderService.notifySlaveVotedNewMaster(regNode.getSlaves(), newMaster.getAddress(), regNode.getAddress());
                             }
                             VoteMaster.updateRegedit(regNode);
                             LeaderService.notifyFollowsUpdateRegedit(regNode.getSlaves(), StringConstant.BROKER);
                             LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), regNode);
-                            LeaderService.notifyClinetsChangedBroker(regNode.getAddress(),newleader==null?null:newleader.getAddress(), StringConstant.DELETE);
+                            LeaderService.notifyClinetsChangedBroker(regNode.getAddress(),newMaster==null?null:newMaster.getAddress(), StringConstant.DELETE);
 
                         }
                         //master没失效，但是Slave失效了

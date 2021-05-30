@@ -215,10 +215,10 @@ public class LeaderService {
      * @param oldMaster
      * @return
      */
-    public static boolean notifySlavesNewMaster(Map<String, RegNode> slaves, String newMaster, String oldMaster) {
+    public static boolean notifySlaveVotedNewMaster(Map<String, RegNode> slaves, String newMaster, String oldMaster) {
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
         try {
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum. NotifySlaveNewLeader).setSource(NodeService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum. LeaderNotiySlaveVotedNewMaster).setSource(NodeService.getConfig().getAddress())
                     .setBody(oldMaster + StringConstant.CHAR_SPRIT_STRING + newMaster);
             Iterator<Map.Entry<String, RegNode>> items = slaves.entrySet().iterator();
             while (items.hasNext()) {

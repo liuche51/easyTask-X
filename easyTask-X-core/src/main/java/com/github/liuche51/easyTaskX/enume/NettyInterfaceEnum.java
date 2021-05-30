@@ -44,7 +44,7 @@ public class NettyInterfaceEnum {
     /**
      * leader通知slaves已经选出新master
      */
-    public static final String NotifySlaveNewLeader="NotifySlaveNewLeader";
+    public static final String LeaderNotiySlaveVotedNewMaster="LeaderNotiySlaveVotedNewMaster";
     /**
      * leader通知master已经选出新Slave
      */
