@@ -145,9 +145,9 @@ public class NodeService {
      * @throws Exception
      */
     public static void submitTask(Schedule schedule) throws Exception {
-        if (!isStarted) throw new Exception("the easyTask has not started,please wait a moment!");
+        if (!isStarted) throw new Exception("normally exception!the easyTask has not started,please wait a moment!");
         if (VoteSlave.isSelecting())
-            throw new VotingException("normally exception!save():cluster is voting,please wait a moment.");
+            throw new VotingException("normally exception!leader is voting slave,please wait a moment.");
         //防止多线程下，follow元素操作竞争问题。确保参与提交的follow不受集群选举影响
         List<BaseNode> slaves = new ArrayList<>(CURRENTNODE.getSlaves().size());
         Iterator<Map.Entry<String, BaseNode>> items = CURRENTNODE.getSlaves().entrySet().iterator();
@@ -155,17 +155,17 @@ public class NodeService {
             slaves.add(items.next().getValue());
         }
         if (slaves.size() != NodeService.getConfig().getBackupCount())
-            throw new Exception("save() exception！follows.size()!=backupCount");
+            throw new Exception("slaves.size()!=backupCount");
         String transactionId = Util.generateTransactionId();
         try {
             SaveTaskTCC.trySave(transactionId, schedule, slaves);
             SaveTaskTCC.confirm(transactionId, schedule.getId(), slaves);
         } catch (Exception e) {
-            log.error("saveTask():", e);
+            log.error("", e);
             try {
                 SaveTaskTCC.cancel(transactionId, slaves);
             } catch (Exception e1) {
-                log.error("saveTask()->cancel():", e);
+                log.error("", e);
                 TransactionLogDao.updateRetryInfoById(transactionId, new Short("1"), DateUtils.getCurrentDateTime());
             }
             throw new Exception("task submit failed!");

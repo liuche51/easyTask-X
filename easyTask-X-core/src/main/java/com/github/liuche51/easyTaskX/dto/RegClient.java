@@ -8,24 +8,31 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 注册表用服务端节点对象
  */
-public class RegClient extends BaseNode{
+public class RegClient extends RegNode {
     /**
      * 最近一次心跳时间
      */
-    @JSONField(format="yyyy-MM-dd HH:mm:ss")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private ZonedDateTime lastHeartbeat;
-    @JSONField(format="yyyy-MM-dd HH:mm:ss")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private ZonedDateTime createTime;
-    /**
-     * 当前节点的所有follows
-     */
-    private ConcurrentHashMap<String, RegNode> brokers = new ConcurrentHashMap();
-    public RegClient(BaseNode baseNode){
+
+    public RegClient(BaseNode baseNode) {
         super(baseNode.getHost(), baseNode.getPort());
     }
+
+    public RegClient(RegNode regNode) {
+        super(regNode.getHost(), regNode.getPort(), regNode.getDataStatus());
+    }
+
     public RegClient(String host, int port) {
         super(host, port);
     }
+
+    public RegClient(String host, int port, Short dataStatus) {
+        super(host, port, dataStatus);
+    }
+
     public RegClient(String address) {
         super(address);
     }
@@ -44,13 +51,5 @@ public class RegClient extends BaseNode{
 
     public void setCreateTime(ZonedDateTime createTime) {
         this.createTime = createTime;
-    }
-
-    public ConcurrentHashMap<String, RegNode> getBrokers() {
-        return brokers;
-    }
-
-    public void setBrokers(ConcurrentHashMap<String, RegNode> brokers) {
-        this.brokers = brokers;
     }
 }

@@ -12,10 +12,7 @@ import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -59,15 +56,16 @@ public class CheckFollowsAliveTask extends TimerTask {
                         //master节点失效,且有Slaves。选新master
                         if (DateUtils.isGreaterThanLoseTime(regNode.getLastHeartbeat())) {
                             //如果有Slaves。则选出新master，并通知它们。没有则直接移出注册表
-                            RegNode newMaster=null;
+                            RegNode newMaster = null;
                             if (regNode.getSlaves().size() > 0) {
                                 newMaster = VoteMaster.voteNewMaster(regNode.getSlaves());
                                 LeaderService.notifySlaveVotedNewMaster(regNode.getSlaves(), newMaster.getAddress(), regNode.getAddress());
+                                LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), Arrays.asList(brokers.get(newMaster.getAddress())), StringConstant.UPDATE);
                             }
                             VoteMaster.updateRegedit(regNode);
                             LeaderService.notifyFollowsUpdateRegedit(regNode.getSlaves(), StringConstant.BROKER);
-                            LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), regNode);
-                            LeaderService.notifyClinetsChangedBroker(regNode.getAddress(),newMaster==null?null:newMaster.getAddress(), StringConstant.DELETE);
+                            LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), Arrays.asList(regNode), StringConstant.DELETE);
+                            LeaderService.notifyClinetsChangedBroker(regNode.getAddress(), newMaster == null ? null : newMaster.getAddress(), StringConstant.DELETE);
 
                         }
                         //master没失效，但是Slave失效了
@@ -78,6 +76,12 @@ public class CheckFollowsAliveTask extends TimerTask {
                                 try {
                                     List<RegNode> newSlaves = VoteSlave.initVoteSlaves(regNode);
                                     LeaderService.notifyFollowsUpdateRegedit(newSlaves, StringConstant.BROKER);
+                                    List<RegBroker> updateRegBrokers = new ArrayList<>(newSlaves.size() + 1);
+                                    newSlaves.forEach(x -> {
+                                        updateRegBrokers.add(brokers.get(x.getAddress()));
+                                    });
+                                    updateRegBrokers.add(regNode);
+                                    LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), updateRegBrokers, StringConstant.UPDATE);// 当前master和新选的slave都需要同步注册表信息给bakleader
                                     //如果当前节点是Leader自己选slave，则需要通知所有其他所有Follows更新备用Leader信息
                                     if (regNode.getAddress().equals(NodeService.CURRENTNODE.getClusterLeader().getAddress())) {
                                         LeaderService.notifyFollowsBakLeaderChanged();
@@ -93,14 +97,15 @@ public class CheckFollowsAliveTask extends TimerTask {
                                 Iterator<Map.Entry<String, RegNode>> items = slaves.entrySet().iterator();
                                 while (items.hasNext()) {
                                     Map.Entry<String, RegNode> item = items.next();
-                                    RegNode node = item.getValue();
-                                    RegBroker regNodeFollow = brokers.get(node.getAddress());
-                                    //slave没有注册信息或者心跳超时了。（没有注册信息，可能是因为上面判断过程中已经将其移除注册表了）
-                                    if (regNodeFollow == null || DateUtils.isGreaterThanLoseTime(regNodeFollow.getLastHeartbeat())) {
+                                    RegNode slave = item.getValue();
+                                    RegBroker regSlave = brokers.get(slave.getAddress());
+                                    //slave没有注册信息或者心跳超时了。（没有注册信息，可能是因为上面判断过程中已经将其移除注册表了）.心跳超时，这里不需要移除注册表操作，因为leader检查该slave注册表时会操作移除
+                                    if (regSlave == null || DateUtils.isGreaterThanLoseTime(regSlave.getLastHeartbeat())) {
                                         try {
-                                            RegNode newSlave = VoteSlave.voteNewSlave(regNode, node);
-                                            LeaderService.notifyMasterVoteNewSlave(regNode, newSlave.getAddress(), node.getAddress());
+                                            RegNode newSlave = VoteSlave.voteNewSlave(regNode, slave);
+                                            LeaderService.notifyMasterVoteNewSlave(regNode, newSlave.getAddress(), slave.getAddress());
                                             LeaderService.notifyFollowsUpdateRegedit(Collections.singletonList(newSlave), StringConstant.BROKER);
+                                            LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), Arrays.asList(regNode, brokers.get(newSlave.getAddress())), StringConstant.UPDATE);
                                             //如果当前节点是Leader自己变更slave，则需要通知所有其他所有Follows更新备用Leader信息
                                             if (regNode.getAddress().equals(NodeService.CURRENTNODE.getClusterLeader().getAddress())) {
                                                 LeaderService.notifyFollowsBakLeaderChanged();
@@ -128,8 +133,8 @@ public class CheckFollowsAliveTask extends TimerTask {
      * 处理Client注册表
      */
     private void dealClientRegedit() {
-        Map<String, RegClient> brokers = LeaderService.CLIENT_REGISTER_CENTER;
-        Iterator<Map.Entry<String, RegClient>> items = brokers.entrySet().iterator();
+        Map<String, RegClient> clients = LeaderService.CLIENT_REGISTER_CENTER;
+        Iterator<Map.Entry<String, RegClient>> items = clients.entrySet().iterator();
         while (items.hasNext()) {
             Map.Entry<String, RegClient> item = items.next();
             RegClient regNode = item.getValue();
@@ -141,6 +146,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                         if (DateUtils.isGreaterThanLoseTime(regNode.getLastHeartbeat())) {
                             LeaderService.CLIENT_REGISTER_CENTER.remove(regNode.getAddress());
                             LeaderService.notifyBrokersChangedClinet(regNode.getAddress(), StringConstant.DELETE);
+                            LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), regNode, StringConstant.DELETE);
                         }
                     } catch (Exception e) {
                         log.error("", e);

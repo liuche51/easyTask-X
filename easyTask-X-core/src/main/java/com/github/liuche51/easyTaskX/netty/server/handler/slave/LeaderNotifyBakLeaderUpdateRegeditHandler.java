@@ -23,7 +23,10 @@ public class LeaderNotifyBakLeaderUpdateRegeditHandler extends BaseHandler {
         String[] exts = node.getExt().split(StringConstant.CHAR_SPRIT_STRING);//格式：客户端类型|操作类型
         if (StringConstant.BROKER.equalsIgnoreCase(exts[0])) {
             RegBroker regnode = new RegBroker(node.getHost(), node.getPort());
-            if (StringConstant.DELETE.equalsIgnoreCase(exts[1]))
+            if (StringConstant.ADD.equalsIgnoreCase(exts[1])) {
+                regnode.setLastHeartbeat(ZonedDateTime.now());
+                LeaderService.BROKER_REGISTER_CENTER.put(regnode.getAddress(), regnode);
+            } else if (StringConstant.DELETE.equalsIgnoreCase(exts[1]))
                 LeaderService.BROKER_REGISTER_CENTER.remove(regnode.getAddress());
             else if (StringConstant.UPDATE.equalsIgnoreCase(exts[1])) {
                 NodeDto.NodeList slaveNodes = node.getSalves();
@@ -38,7 +41,7 @@ public class LeaderNotifyBakLeaderUpdateRegeditHandler extends BaseHandler {
                 ConcurrentHashMap<String, RegNode> leaders = new ConcurrentHashMap<>();
                 masterNodes.getNodesList().forEach(x -> {
                     RegNode regNode = new RegNode(x.getHost(), x.getPort());
-                    leaders.put(regNode.getAddress(),regNode);
+                    leaders.put(regNode.getAddress(), regNode);
                 });
                 regnode.setSlaves(follows);
                 regnode.setMasters(leaders);
@@ -48,17 +51,9 @@ public class LeaderNotifyBakLeaderUpdateRegeditHandler extends BaseHandler {
             }
         } else if (StringConstant.CLINET.equalsIgnoreCase(exts[0])) {
             RegClient regnode = new RegClient(node.getHost(), node.getPort());
-            if (StringConstant.DELETE.equalsIgnoreCase(exts[1]))
+            if (StringConstant.DELETE.equalsIgnoreCase(exts[1])) {
                 LeaderService.CLIENT_REGISTER_CENTER.remove(regnode.getAddress());
-            else if (StringConstant.UPDATE.equalsIgnoreCase(exts[1])) {
-                NodeDto.NodeList clientNodes = node.getBrokers();
-                ConcurrentHashMap<String, RegNode> brokers = new ConcurrentHashMap<>();
-                clientNodes.getNodesList().forEach(x -> {
-                    RegNode regNode = new RegNode(x.getHost(), x.getPort());
-                    brokers.put(regNode.getAddress(), regNode);
-                });
-                regnode.setBrokers(brokers);
-                regnode.setCreateTime(ZonedDateTime.now());
+            } else if (StringConstant.ADD.equalsIgnoreCase(exts[1]) || StringConstant.UPDATE.equalsIgnoreCase(exts[1])) {
                 regnode.setLastHeartbeat(ZonedDateTime.now());
                 LeaderService.CLIENT_REGISTER_CENTER.put(regnode.getAddress(), regnode);
             }

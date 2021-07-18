@@ -50,10 +50,6 @@ public class NettyInterfaceEnum {
      */
     public static final String LeaderNotifyMasterVoteNewSlave="LeaderNotifyMasterVoteNewSlave";
     /**
-     * leader通知client更新注册表信息
-     */
-    public static final String LeaderNotifyClientUpdateRegedit="LeaderNotifyClientUpdateRegedit";
-    /**
      * leader通知broker更新注册表信息
      */
     public static final String LeaderNotifyBrokerUpdateRegedit="LeaderNotifyBrokerUpdateRegedit";

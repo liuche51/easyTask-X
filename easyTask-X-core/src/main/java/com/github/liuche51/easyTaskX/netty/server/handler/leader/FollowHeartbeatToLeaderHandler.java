@@ -1,5 +1,6 @@
 package com.github.liuche51.easyTaskX.netty.server.handler.leader;
 
+import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
@@ -40,8 +41,10 @@ public class FollowHeartbeatToLeaderHandler extends BaseHandler {
                     clientNode=new RegClient(node);
                     LeaderService.CLIENT_REGISTER_CENTER.put(address,clientNode);
                     LeaderService.notifyBrokersChangedClinet(clientNode.getAddress(), StringConstant.ADD);
+                    LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), clientNode, StringConstant.ADD);
                 }else {
                     clientNode.setLastHeartbeat(ZonedDateTime.now());
+                    LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), clientNode, StringConstant.UPDATE);
                 }
                 break;
             default:break;

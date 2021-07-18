@@ -39,23 +39,23 @@ public class VoteSlave {
      * @return
      */
     public static List<RegNode> initVoteSlaves(RegBroker regNode) throws Exception {
-        if (selecting) throw new VotingException(String.format("[%s] is voting a new follow",regNode.getAddress()));
+        if (selecting) throw new VotingException(String.format("[%s] is voting a new follow", regNode.getAddress()));
         selecting = true;
         int count = NodeService.getConfig().getBackupCount();
         try {
             lock.lock();
-            List<String> availableFollows = VoteSlave.getAvailableSlave(regNode);
-            List<RegNode> follows = VoteSlave.voteFollows(count, availableFollows);
-            if (follows.size() < count) {
-                log.info("[{}] follows.size() < count,so retry to initVoteFollows()",regNode.getAddress());
-               return initVoteSlaves(regNode);//数量不够递归重新选VoteFollows.selectFollows中
+            List<String> availableSlaves = VoteSlave.getAvailableSlave(regNode);
+            List<RegNode> slaves = VoteSlave.voteSlaves(count, availableSlaves);
+            if (slaves.size() < count) {
+                log.info("[{}] slaves.size() < count,so retry to initVoteSlaves()", regNode.getAddress());
+                return initVoteSlaves(regNode);//数量不够递归重新选
             } else {
-                ConcurrentHashMap<String, RegNode> follows2 = new ConcurrentHashMap<>(follows.size());
-                follows.forEach(x -> {
-                    follows2.put(x.getAddress(), x);
+                ConcurrentHashMap<String, RegNode> slaves2 = new ConcurrentHashMap<>(slaves.size());
+                slaves.forEach(x -> {
+                    slaves2.put(x.getAddress(), x);
                 });
-                updateRegedit(regNode, follows2);
-                return follows;
+                updateRegedit(regNode, slaves2);
+                return slaves;
             }
         } finally {
             selecting = false;//复原选举状态
@@ -64,35 +64,35 @@ public class VoteSlave {
     }
 
     /**
-     * 选择新follow。旧follow失效
+     * 选择新slave。旧slave失效
      *
      * @return
      */
-    public static RegNode voteNewSlave(RegBroker regNode, RegNode oldFollow) throws Exception {
-        if (selecting) throw new VotingException(String.format("[%s] is voting a new follow",regNode.getAddress()));
+    public static RegNode voteNewSlave(RegBroker regNode, RegNode oldSlave) throws Exception {
+        if (selecting) throw new VotingException(String.format("[%s] is voting a new slave", regNode.getAddress()));
         selecting = true;
-        List<RegNode> follows = null;
+        List<RegNode> slaves = null;
         try {
             lock.lock();
             //多线程下，如果follows已经选好，则让客户端重新提交任务。以后可以优化为获取选举后的follow
             if (regNode.getSlaves().size() >= NodeService.getConfig().getBackupCount())
-                throw new VotedException(String.format("[%s] has voted a new follow.",regNode.getAddress()));
+                throw new VotedException(String.format("[%s] has voted a new slave.", regNode.getAddress()));
             List<String> availableFollows = getAvailableSlave(regNode);
-            follows = voteFollows(1, availableFollows);
-            if (follows.size() < 1)
-                voteNewSlave(regNode, oldFollow);//数量不够递归重新选
+            slaves = voteSlaves(1, availableFollows);
+            if (slaves.size() < 1)
+                voteNewSlave(regNode, oldSlave);//数量不够递归重新选
             else {
-                RegNode newFollow = follows.get(0);
-                updateRegedit(regNode, oldFollow.getAddress(), newFollow);
+                RegNode newFollow = slaves.get(0);
+                updateRegedit(regNode, oldSlave.getAddress(), newFollow);
             }
 
         } finally {
             selecting = false;//复原选举装填
             lock.unlock();
         }
-        if (follows == null || follows.size() == 0)
-            throw new Exception(String.format("[%s] is vote follow failed",regNode.getAddress()));
-        return follows.get(0);
+        if (slaves == null || slaves.size() == 0)
+            throw new Exception(String.format("[%s] is vote slaves failed", regNode.getAddress()));
+        return slaves.get(0);
     }
 
     /**
@@ -128,7 +128,7 @@ public class VoteSlave {
         }
         if (availableFollows.size() < count - NodeService.CURRENTNODE.getSlaves().size())//如果可选备库节点数量不足，则等待1s，然后重新选。注意：等待会阻塞整个服务可用性
         {
-            log.info("[{}] getAvailableSlave is not enough! only has {},current own {}",regNode.getAddress(), availableFollows.size(), regNode.getSlaves().size());
+            log.info("[{}] getAvailableSlave is not enough! only has {},current own {}", regNode.getAddress(), availableFollows.size(), regNode.getSlaves().size());
             TimeUnit.SECONDS.sleep(1L);
             return getAvailableSlave(regNode);
         } else
@@ -136,28 +136,28 @@ public class VoteSlave {
     }
 
     /**
-     * 从可用follows中选择若干个follow
+     * 从可用Brokers中选择若干个slaves
      *
      * @param count            需要的数量
-     * @param availableFollows 可用follows
+     * @param availableBrokers 可用Brokers
      */
-    private static List<RegNode> voteFollows(int count, List<String> availableFollows) throws InterruptedException {
-        List<RegNode> follows = new LinkedList<>();//备选follows
-        int size = availableFollows.size();
+    private static List<RegNode> voteSlaves(int count, List<String> availableBrokers) throws InterruptedException {
+        List<RegNode> brokers = new LinkedList<>();//备选brokers
+        int size = availableBrokers.size();
         Random random = new Random();
         for (int i = 0; i < size; i++) {
-            int index = random.nextInt(availableFollows.size());//随机生成的随机数范围就变成[0,size)。注意这里size会动态变动。
-            String ret = availableFollows.get(index);
+            int index = random.nextInt(availableBrokers.size());//随机生成的随机数范围就变成[0,size)。注意这里size会动态变动。
+            String ret = availableBrokers.get(index);
             RegBroker regNode2 = LeaderService.BROKER_REGISTER_CENTER.get(ret);
-            RegNode newFollow =new RegNode(regNode2);
-            availableFollows.remove(index);
-            if (follows.size() < count) {
-                follows.add(newFollow);//这里一定要用新对象。否则对象重用会导致属性值也被公用了
+            RegNode newFollow = new RegNode(regNode2);
+            availableBrokers.remove(index);
+            if (brokers.size() < count) {
+                brokers.add(newFollow);//这里一定要用新对象。否则对象重用会导致属性值也被公用了
             } else break;//已选数量够了就跳出
         }
-        if (follows.size() < count)
-           TimeUnit.SECONDS.sleep(1L); //此处防止不满足条件时重复高频递归本方法
-        return follows;
+        if (brokers.size() < count)
+            TimeUnit.SECONDS.sleep(1L); //此处防止不满足条件时重复高频递归本方法
+        return brokers;
     }
 
 
@@ -173,7 +173,7 @@ public class VoteSlave {
         while (items.hasNext()) {
             Map.Entry<String, RegNode> item = items.next();
             RegNode node = item.getValue();
-            RegBroker followRegnode= LeaderService.BROKER_REGISTER_CENTER.get(node.getAddress());
+            RegBroker followRegnode = LeaderService.BROKER_REGISTER_CENTER.get(node.getAddress());
             followRegnode.getMasters().put(regNode.getAddress(), new RegNode(regNode));
         }
     }
@@ -188,7 +188,7 @@ public class VoteSlave {
         regNode.getSlaves().remove(oldFollow);
         newFollow.setDataStatus(NodeSyncDataStatusEnum.UNSYNC);//选举成功，将新follow数据同步状态标记为未同步
         regNode.getSlaves().put(newFollow.getAddress(), newFollow);
-        RegBroker newFollowRegNode= LeaderService.BROKER_REGISTER_CENTER.get(newFollow.getAddress());
-        newFollowRegNode.getMasters().put(regNode.getAddress(),new RegNode(regNode));
-   }
+        RegBroker newFollowRegNode = LeaderService.BROKER_REGISTER_CENTER.get(newFollow.getAddress());
+        newFollowRegNode.getMasters().put(regNode.getAddress(), new RegNode(regNode));
+    }
 }

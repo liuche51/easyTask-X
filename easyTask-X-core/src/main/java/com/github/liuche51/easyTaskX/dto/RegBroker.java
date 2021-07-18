@@ -9,13 +9,13 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 注册表用服务端节点对象
  */
-public class RegBroker extends BaseNode{
+public class RegBroker extends RegNode {
     /**
      * 最近一次心跳时间
      */
-    @JSONField(format="yyyy-MM-dd HH:mm:ss")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private ZonedDateTime lastHeartbeat;
-    @JSONField(format="yyyy-MM-dd HH:mm:ss")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private ZonedDateTime createTime;
     /**
      * 当前节点的所有follows
@@ -28,13 +28,24 @@ public class RegBroker extends BaseNode{
     /**
      * 重新分配任务至新Client数据同步状态
      */
-    private Short ReDispatchTaskStatus= NodeSyncDataStatusEnum.SUCCEEDED ;
-    public RegBroker(BaseNode baseNode){
+    private Short ReDispatchTaskStatus = NodeSyncDataStatusEnum.SUCCEEDED;
+
+    public RegBroker(BaseNode baseNode) {
         super(baseNode.getHost(), baseNode.getPort());
     }
+
+    public RegBroker(RegNode regNode) {
+        super(regNode.getHost(), regNode.getPort(), regNode.getDataStatus());
+    }
+
     public RegBroker(String host, int port) {
         super(host, port);
     }
+
+    public RegBroker(String host, int port, Short dataStatus) {
+        super(host, port, dataStatus);
+    }
+
     public RegBroker(String address) {
         super(address);
     }
