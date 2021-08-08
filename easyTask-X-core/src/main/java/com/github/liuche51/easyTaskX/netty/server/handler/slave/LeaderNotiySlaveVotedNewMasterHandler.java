@@ -19,9 +19,9 @@ public class LeaderNotiySlaveVotedNewMasterHandler extends BaseHandler {
         if(NodeService.CURRENTNODE.getAddress().equals(items[1])){
             MasterService.submitNewTaskByOldMaster(items[0]);
         }
-        //如果自己不是新master。则删除旧master的备份数据
+        //如果自己不是新master。则直接删除旧master的备份数据。新Master删除备份数据逻辑放到上面的异步任务里去
         else {
-            MasterService.deleteOldLeaderBackTask(items[0]);
+            MasterService.deleteOldMasterBackTask(items[0]);
         }
         return null;
     }

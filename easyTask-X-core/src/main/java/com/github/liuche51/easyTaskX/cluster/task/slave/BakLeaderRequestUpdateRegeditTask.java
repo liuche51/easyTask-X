@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.task.slave;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.leader.BakLeaderService;
 import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
@@ -19,7 +20,7 @@ public class BakLeaderRequestUpdateRegeditTask extends TimerTask {
                 BaseNode node = NodeService.CURRENTNODE.getMasters().get(leader);
                 //如果当前的leader同时也是自己的master，则需要定时同步注册表信息
                 if (node != null)
-                    SlaveService.requestUpdateClusterRegedit();
+                    BakLeaderService.requestUpdateClusterRegedit();
             } catch (Exception e) {
                 log.error("", e);
             }

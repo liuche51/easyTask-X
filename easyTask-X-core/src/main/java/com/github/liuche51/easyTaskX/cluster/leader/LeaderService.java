@@ -32,9 +32,10 @@ public class LeaderService {
     public static ConcurrentHashMap<String, RegClient> CLIENT_REGISTER_CENTER = new ConcurrentHashMap<>(10);
 
     /**
-     * 通知节点更新注册表信息
+     * 通知follows节点更新注册表信息
      *
      * @param nodes
+     * @param type  节点类型  broker和client
      */
     public static void notifyFollowsUpdateRegedit(List<RegNode> nodes, String type) {
 
@@ -47,6 +48,7 @@ public class LeaderService {
      * 通知follows更新注册表信息
      *
      * @param nodes
+     * @param type  节点类型  broker和client
      */
     public static void notifyFollowsUpdateRegedit(Map<String, RegNode> nodes, String type) {
         Iterator<Map.Entry<String, RegNode>> items = nodes.entrySet().iterator();

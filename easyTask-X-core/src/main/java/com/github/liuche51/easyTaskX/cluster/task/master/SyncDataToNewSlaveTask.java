@@ -37,7 +37,7 @@ public class SyncDataToNewSlaveTask extends OnceTask {
                 //获取批次数据
                 List<ScheduleSync> list = ScheduleSyncDao.selectBySlaveAndStatusWithCount(newSlave.getAddress(), ScheduleSyncStatusEnum.UNSYNC, 5);
                 if (list.size() == 0) {//如果已经同步完，通知leader更新注册表状态并则跳出循环
-                    MasterService.notifyClusterLeaderUpdateRegeditForDataStatus(newSlave.getAddress(),String.valueOf(NodeSyncDataStatusEnum.SUCCEEDED));
+                    MasterService.notifyLeaderUpdateRegeditForDataStatus(newSlave.getAddress(),String.valueOf(NodeSyncDataStatusEnum.SUCCEEDED));
                     setExit(true);
                     break;
                 }

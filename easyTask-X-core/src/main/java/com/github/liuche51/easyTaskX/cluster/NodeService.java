@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster;
 
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
+import com.github.liuche51.easyTaskX.cluster.leader.BakLeaderService;
 import com.github.liuche51.easyTaskX.cluster.master.DeleteTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.master.SaveTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
@@ -118,7 +119,7 @@ public class NodeService {
         timerTasks.add(BrokerService.startRetryCancelSaveTransactionTask());
         timerTasks.add(BrokerService.startRetryDelTransactionTask());
         timerTasks.add(BrokerService.startUpdateRegeditTask());
-        timerTasks.add(SlaveService.startBakLeaderRequestUpdateRegeditTask());
+        timerTasks.add(BakLeaderService.startBakLeaderRequestUpdateRegeditTask());
         timerTasks.add(BrokerService.startBrokerUpdateClientsTask());
         ZKService.listenLeaderDataNode();
     }

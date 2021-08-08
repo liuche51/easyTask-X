@@ -24,14 +24,14 @@ public class MasterService {
     private static final Logger log = LoggerFactory.getLogger(MasterService.class);
 
     /**
-     * 将失效的leader的备份任务数据删除掉
+     * 新Master将失效的旧Master的备份任务数据删除掉
      *
-     * @param oldLeaderAddress
+     * @param oldMasterAddress
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public static void deleteOldLeaderBackTask(String oldLeaderAddress) throws SQLException, ClassNotFoundException {
-        ScheduleBakDao.deleteBySource(oldLeaderAddress);
+    public static void deleteOldMasterBackTask(String oldMasterAddress) throws SQLException, ClassNotFoundException {
+        ScheduleBakDao.deleteBySource(oldMasterAddress);
     }
 
     /**
@@ -68,16 +68,16 @@ public class MasterService {
     }
 
     /**
-     * master通知leader，已经完成对新follow的数据同步。请求更新数据同步状态
+     * master通知leader，已经完成对新slave的数据同步。请求更新数据同步状态
      */
-    public static void notifyClusterLeaderUpdateRegeditForDataStatus(String followAddress, String dataStatus) {
+    public static void notifyLeaderUpdateRegeditForDataStatus(String slaveAddress, String dataStatus) {
         NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setBody(NettyInterfaceEnum.MasterNotifyLeaderUpdateRegeditForDataStatus)
-                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(followAddress + StringConstant.CHAR_SPRIT_STRING + dataStatus);
+                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(slaveAddress + StringConstant.CHAR_SPRIT_STRING + dataStatus);
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret)
                         log.info("normally exception!notifyClusterLeaderUpdateRegeditForDataStatus() failed.");
