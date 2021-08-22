@@ -1,4 +1,4 @@
-package com.github.liuche51.easyTaskX.cluster.task.follow;
+package com.github.liuche51.easyTaskX.cluster.task.broker;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;

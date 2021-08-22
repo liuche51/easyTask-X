@@ -1,4 +1,4 @@
-package com.github.liuche51.easyTaskX.cluster.task.follow;
+package com.github.liuche51.easyTaskX.cluster.task.broker;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
@@ -7,9 +7,9 @@ import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Follow节点定时从leader获取注册表更新
+ * Broker节点定时从leader获取注册表更新
  */
-public class FollowRequestUpdateRegeditTask extends TimerTask {
+public class BrokerRequestUpdateRegeditTask extends TimerTask {
     @Override
     public void run() {
         while (!isExit()) {

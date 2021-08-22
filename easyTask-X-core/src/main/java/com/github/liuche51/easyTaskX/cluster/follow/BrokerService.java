@@ -1,14 +1,12 @@
 package com.github.liuche51.easyTaskX.cluster.follow;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
-import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
-import com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil;
 import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
 import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerUpdateClientsTask;
 import com.github.liuche51.easyTaskX.cluster.task.broker.ReDispatchToClientTask;
-import com.github.liuche51.easyTaskX.cluster.task.follow.HeartbeatsTask;
+import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerRequestUpdateRegeditTask;
+import com.github.liuche51.easyTaskX.cluster.task.broker.HeartbeatsTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
-import com.github.liuche51.easyTaskX.cluster.task.follow.FollowRequestUpdateRegeditTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.*;
 import com.github.liuche51.easyTaskX.dto.*;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
@@ -22,9 +20,7 @@ import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -35,7 +31,7 @@ public class BrokerService {
 
 
     /**
-     * 启动批量事务数据提交任务
+         * 启动批量事务数据提交任务
      */
     public static TimerTask startCommitSaveTransactionTask() {
         CommitSaveTransactionTask task = new CommitSaveTransactionTask();
@@ -98,7 +94,7 @@ public class BrokerService {
      * 启动点定时从leader获取注册表更新任务
      */
     public static TimerTask startUpdateRegeditTask() {
-        FollowRequestUpdateRegeditTask task = new FollowRequestUpdateRegeditTask();
+        BrokerRequestUpdateRegeditTask task = new BrokerRequestUpdateRegeditTask();
         task.start();
         NodeService.timerTasks.add(task);
         return task;
@@ -144,7 +140,7 @@ public class BrokerService {
             if (ret) {
                 NodeDto.Node node = NodeDto.Node.parseFrom(respPack.getRespbody());
                 NodeService.CURRENTNODE.setBakLeader(node.getBakleader());
-                dealUpdate(node);
+                BrokerUtil.dealUpdate(node);
                 return true;
             } else {
                 log.info("normally exception!requestUpdateRegedit() failed.");
@@ -153,26 +149,6 @@ public class BrokerService {
             log.error("", e);
         }
         return false;
-    }
-
-    /**
-     * 处理注册表更新
-     *
-     * @param node
-     */
-    public static void dealUpdate(NodeDto.Node node) {
-        NodeDto.NodeList slaveNodes = node.getSalves();
-        ConcurrentHashMap<String, BaseNode> follows = new ConcurrentHashMap<>();
-        slaveNodes.getNodesList().forEach(x -> {
-            follows.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
-        });
-        NodeDto.NodeList masterNodes = node.getMasters();
-        ConcurrentHashMap<String, BaseNode> leaders = new ConcurrentHashMap<>();
-        masterNodes.getNodesList().forEach(x -> {
-            leaders.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
-        });
-        NodeService.CURRENTNODE.setSlaves(follows);
-        NodeService.CURRENTNODE.setMasters(leaders);
     }
 
     /**
