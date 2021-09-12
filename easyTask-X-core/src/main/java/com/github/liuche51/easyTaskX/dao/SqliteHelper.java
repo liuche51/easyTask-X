@@ -19,7 +19,7 @@ import org.sqlite.SQLiteException;
  *
  * @author haoqipeng
  */
-class SqliteHelper {
+public class SqliteHelper {
     final static Logger logger = LoggerFactory.getLogger(SqliteHelper.class);
 
     private Connection connection;

@@ -6,7 +6,7 @@ import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.master.DeleteTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
-import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
+import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.TransactionLog;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionTableEnum;
@@ -34,7 +34,7 @@ public class RetryDelTransactionTask extends TimerTask {
             setLastRunTime(new Date());
             List<TransactionLog> scheduleList = null;
             try {
-                list = TransactionLogDao.selectByStatusAndReTryCount(TransactionStatusEnum.TRIED, TransactionTypeEnum.DELETE, new Short("3"), 100);
+                list = TranlogScheduleDao.selectByStatusAndReTryCount(TransactionStatusEnum.TRIED, TransactionTypeEnum.DELETE, new Short("3"), 100);
                 scheduleList = list.stream().filter(x -> TransactionTableEnum.SCHEDULE.equals(x.getTableName())).collect(Collectors.toList());
                 if (scheduleList != null && scheduleList.size() > 0) {
                     for (TransactionLog x : scheduleList) {
@@ -60,7 +60,7 @@ public class RetryDelTransactionTask extends TimerTask {
                             }
                         } catch (Exception e) {
                             log.error("RetryDelTransactionTask item exception!", e);
-                            TransactionLogDao.updateRetryInfoById(x.getId(), (short) (x.getRetryCount() + 1), DateUtils.getCurrentDateTime());
+                            TranlogScheduleDao.updateRetryInfoById(x.getId(), (short) (x.getRetryCount() + 1), DateUtils.getCurrentDateTime());
                         }
                     }
                 }

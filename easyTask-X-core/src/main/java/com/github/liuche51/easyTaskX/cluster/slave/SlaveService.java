@@ -1,24 +1,14 @@
 package com.github.liuche51.easyTaskX.cluster.slave;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
-import com.github.liuche51.easyTaskX.cluster.NodeService;
-import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
-import com.github.liuche51.easyTaskX.cluster.master.MasterService;
-import com.github.liuche51.easyTaskX.cluster.task.slave.BakLeaderRequestUpdateRegeditTask;
-import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
-import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
+import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.*;
-import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
-import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionTableEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
-import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.StringConstant;
-import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sqlite.SQLiteException;
@@ -27,7 +17,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Slave服务入口
@@ -49,7 +38,7 @@ public class SlaveService {
         transactionLog.setType(TransactionTypeEnum.SAVE);
         transactionLog.setTableName(TransactionTableEnum.SCHEDULE_BAK);
         transactionLog.setSlaves(StringConstant.EMPTY);
-        TransactionLogDao.saveBatch(Arrays.asList(transactionLog));
+        TranlogScheduleDao.saveBatch(Arrays.asList(transactionLog));
     }
 
     /**
@@ -60,7 +49,7 @@ public class SlaveService {
      * @throws ClassNotFoundException
      */
     public static void confirmSaveTask(String transactionId) throws SQLException, ClassNotFoundException {
-        TransactionLogDao.updateStatusById(transactionId, TransactionStatusEnum.CONFIRM);
+        TranlogScheduleDao.updateStatusById(transactionId, TransactionStatusEnum.CONFIRM);
     }
 
     /**
@@ -71,7 +60,7 @@ public class SlaveService {
      * @throws ClassNotFoundException
      */
     public static void cancelSaveTask(String transactionId) throws SQLException, ClassNotFoundException {
-        TransactionLogDao.updateStatusById(transactionId, TransactionStatusEnum.CANCEL);
+        TranlogScheduleDao.updateStatusById(transactionId, TransactionStatusEnum.CANCEL);
     }
 
     /**
@@ -87,7 +76,7 @@ public class SlaveService {
         transactionLog.setType(TransactionTypeEnum.DELETE);
         transactionLog.setTableName(TransactionTableEnum.SCHEDULE_BAK);
         try {
-            TransactionLogDao.saveBatch(Arrays.asList(transactionLog));
+            TranlogScheduleDao.saveBatch(Arrays.asList(transactionLog));
         } catch (SQLiteException e) {
             //如果遇到主键冲突异常，则略过。主要原因是Netty重试造成，不影响系统功能
             if (e.getMessage() != null && e.getMessage().contains("SQLITE_CONSTRAINT_PRIMARYKEY")) {
@@ -110,7 +99,7 @@ public class SlaveService {
         transactionLog.setType(TransactionTypeEnum.UPDATE);
         transactionLog.setTableName(TransactionTableEnum.SCHEDULE_BAK);
         try {
-            TransactionLogDao.saveBatch(Arrays.asList(transactionLog));
+            TranlogScheduleDao.saveBatch(Arrays.asList(transactionLog));
         } catch (SQLiteException e) {
             //如果遇到主键冲突异常，则略过。主要原因是Netty重试造成，不影响系统功能
             if (e.getMessage() != null && e.getMessage().contains("SQLITE_CONSTRAINT_PRIMARYKEY")) {
@@ -141,7 +130,7 @@ public class SlaveService {
             logs.add(transactionLog);
         });
         try {
-            TransactionLogDao.saveBatch(logs);
+            TranlogScheduleDao.saveBatch(logs);
         } catch (SQLiteException e) {
             //如果遇到主键冲突异常，则略过。主要原因是Netty重试造成，不影响系统功能
             if (e.getMessage() != null && e.getMessage().contains("SQLITE_CONSTRAINT_PRIMARYKEY")) {

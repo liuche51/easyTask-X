@@ -7,7 +7,7 @@ import com.github.liuche51.easyTaskX.dto.*;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
-import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
+import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.*;
@@ -37,7 +37,7 @@ public class SaveTaskTCC {
         transactionLog.setStatus(TransactionStatusEnum.TRIED);
         transactionLog.setType(TransactionTypeEnum.SAVE);
         transactionLog.setSlaves(JSONObject.toJSONString(cancelHost));
-        TransactionLogDao.saveBatch(Arrays.asList(transactionLog));
+        TranlogScheduleDao.saveBatch(Arrays.asList(transactionLog));
         Iterator<BaseNode> items = follows.iterator();
         while (items.hasNext()) {
             BaseNode follow = items.next();
@@ -81,7 +81,7 @@ public class SaveTaskTCC {
             } else
                 throw new Exception("sendSyncMsgWithCount() exception！");
         }
-        TransactionLogDao.updateStatusById(transactionId,TransactionStatusEnum.CONFIRM);
+        TranlogScheduleDao.updateStatusById(transactionId,TransactionStatusEnum.CONFIRM);
     }
 
     /**
@@ -91,7 +91,7 @@ public class SaveTaskTCC {
      * @throws Exception
      */
     public static void cancel(String transactionId,List<BaseNode> follows) throws Exception {
-        TransactionLogDao.updateStatusById(transactionId,TransactionStatusEnum.CANCEL);//自己优先标记需回滚
+        TranlogScheduleDao.updateStatusById(transactionId,TransactionStatusEnum.CANCEL);//自己优先标记需回滚
         retryCancel( transactionId, follows);
     }
     public static void retryCancel(String transactionId, List<BaseNode> follows) throws Exception {

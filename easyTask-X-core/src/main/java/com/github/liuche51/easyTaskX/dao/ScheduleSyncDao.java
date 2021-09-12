@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.dao;
 import com.github.liuche51.easyTaskX.dto.ScheduleSync;
 import com.github.liuche51.easyTaskX.util.DateUtils;
+import com.github.liuche51.easyTaskX.util.DbTableName;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.sqlite.SQLiteException;
 
@@ -12,13 +13,13 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class ScheduleSyncDao {
     /**访问的db名称*/
-    private static final String dbName= StringConstant.SCHEDULE_SYNC;
+    private static final String dbName= DbTableName.SCHEDULE_SYNC;
     /**可重入锁*/
     private static ReentrantLock lock=new ReentrantLock();
     public static boolean existTable() throws SQLException, ClassNotFoundException {
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
-            ResultSet resultSet = helper.executeQuery("SELECT COUNT(*) FROM sqlite_master where type='table' and name='schedule_sync';");
+            ResultSet resultSet = helper.executeQuery("SELECT COUNT(*) FROM sqlite_master where type='table' and name='"+DbTableName.SCHEDULE_SYNC+"';");
             while (resultSet.next()) {
                 int count = resultSet.getInt(1);
                 if (count > 0)

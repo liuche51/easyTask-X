@@ -7,7 +7,7 @@ import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.master.SaveTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
-import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
+import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.TransactionLog;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionTableEnum;
@@ -34,7 +34,7 @@ public class RetryCancelSaveTransactionTask extends TimerTask {
             setLastRunTime(new Date());
             List<TransactionLog> scheduleList = null, scheduleBakList = null;
             try {
-                list = TransactionLogDao.selectByStatusAndReTryCount(TransactionStatusEnum.CANCEL, TransactionTypeEnum.SAVE, new Short("3"), 100);
+                list = TranlogScheduleDao.selectByStatusAndReTryCount(TransactionStatusEnum.CANCEL, TransactionTypeEnum.SAVE, new Short("3"), 100);
                 scheduleList = list.stream().filter(x -> TransactionTableEnum.SCHEDULE.equals(x.getTableName())).collect(Collectors.toList());
                 scheduleBakList = list.stream().filter(x -> TransactionTableEnum.SCHEDULE_BAK.equals(x.getTableName())).collect(Collectors.toList());
                 if (scheduleList != null && scheduleList.size() > 0) {
@@ -59,17 +59,17 @@ public class RetryCancelSaveTransactionTask extends TimerTask {
                                 log.info("RetryDelTransactionTask()->retryCancel():transactionId="+x.getId()+" retryCount="+x.getRetryCount()+",retryTime="+x.getRetryTime());
                                 SaveTaskTCC.retryCancel(x.getId(), cancelFollows);
                             }
-                            TransactionLogDao.updateStatusById(x.getId(), TransactionStatusEnum.FINISHED);
+                            TranlogScheduleDao.updateStatusById(x.getId(), TransactionStatusEnum.FINISHED);
                         } catch (Exception e) {
                             log.error("RetryCancelSaveTransactionTask() item exception!", e);
-                            TransactionLogDao.updateRetryInfoById(x.getId(), (short) (x.getRetryCount() + 1), DateUtils.getCurrentDateTime());
+                            TranlogScheduleDao.updateRetryInfoById(x.getId(), (short) (x.getRetryCount() + 1), DateUtils.getCurrentDateTime());
                         }
                     }
                 }
                 if (scheduleBakList != null && scheduleBakList.size() > 0) {
                     String[] scheduleBakIds = scheduleList.stream().map(TransactionLog::getId).toArray(String[]::new);
                     ScheduleDao.deleteByTransactionIds(scheduleBakIds);
-                    TransactionLogDao.updateStatusByIds(scheduleBakIds, TransactionStatusEnum.FINISHED);
+                    TranlogScheduleDao.updateStatusByIds(scheduleBakIds, TransactionStatusEnum.FINISHED);
                 }
 
             } catch (Exception e) {

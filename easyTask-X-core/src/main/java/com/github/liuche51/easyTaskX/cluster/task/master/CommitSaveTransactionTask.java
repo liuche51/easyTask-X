@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
-import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
+import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.Schedule;
 import com.github.liuche51.easyTaskX.dto.ScheduleBak;
 import com.github.liuche51.easyTaskX.dto.TransactionLog;
@@ -32,7 +32,7 @@ public class CommitSaveTransactionTask extends TimerTask {
             List<Schedule> scheduleList1 =new LinkedList<>();
             List<ScheduleBak> scheduleBakList1 = new LinkedList<>();
             try {
-                list = TransactionLogDao.selectByStatusAndType(TransactionStatusEnum.CONFIRM, TransactionTypeEnum.SAVE,100);
+                list = TranlogScheduleDao.selectByStatusAndType(TransactionStatusEnum.CONFIRM, TransactionTypeEnum.SAVE,100);
                 scheduleList = list.stream().filter(x -> TransactionTableEnum.SCHEDULE.equals(x.getTableName())).collect(Collectors.toList());
                 scheduleBakList = list.stream().filter(x -> TransactionTableEnum.SCHEDULE_BAK.equals(x.getTableName())).collect(Collectors.toList());
                 if (scheduleList != null&&scheduleList.size()>0) {
@@ -41,7 +41,7 @@ public class CommitSaveTransactionTask extends TimerTask {
                     });
                     ScheduleDao.saveBatch(scheduleList1);
                     String[] scheduleIds=scheduleList.stream().map(TransactionLog::getId).toArray(String[]::new);
-                    TransactionLogDao.updateStatusByIds(scheduleIds,TransactionStatusEnum.FINISHED);
+                    TranlogScheduleDao.updateStatusByIds(scheduleIds,TransactionStatusEnum.FINISHED);
                 }
                 if (scheduleBakList != null&&scheduleBakList.size()>0) {
                     scheduleBakList.forEach(x->{
@@ -49,7 +49,7 @@ public class CommitSaveTransactionTask extends TimerTask {
                     });
                     ScheduleBakDao.saveBatch(scheduleBakList1);
                     String[] scheduleBakIds=scheduleBakList.stream().map(TransactionLog::getId).toArray(String[]::new);
-                    TransactionLogDao.updateStatusByIds(scheduleBakIds,TransactionStatusEnum.FINISHED);
+                    TranlogScheduleDao.updateStatusByIds(scheduleBakIds,TransactionStatusEnum.FINISHED);
                 }
 
             } catch (Exception e) {

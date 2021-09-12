@@ -5,7 +5,7 @@ import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
 import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
-import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
+import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.TransactionLog;
 import com.github.liuche51.easyTaskX.enume.ScheduleSyncStatusEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
@@ -32,7 +32,7 @@ public class CommitUpdateTransactionTask extends TimerTask {
             setLastRunTime(new Date());
             List<TransactionLog> scheduleList = null, scheduleBakList = null;
             try {
-                list = TransactionLogDao.selectByStatusAndType(new short[]{TransactionStatusEnum.CONFIRM,TransactionStatusEnum.TRIED}, TransactionTypeEnum.DELETE,100);
+                list = TranlogScheduleDao.selectByStatusAndType(new short[]{TransactionStatusEnum.CONFIRM,TransactionStatusEnum.TRIED}, TransactionTypeEnum.DELETE,100);
                 //对于master来说，只能处理被标记为CONFIRM的事务。TRIED表示还需要重试通知slave标记更新TRIED状态
                 scheduleList = list.stream().filter(x -> TransactionTableEnum.SCHEDULE.equals(x.getTableName())&&TransactionStatusEnum.CONFIRM==x.getStatus()).collect(Collectors.toList());
                 //对于slave来说。只需要事务被标记为TRIED状态，就可以执行更新操作了
@@ -65,14 +65,14 @@ public class CommitUpdateTransactionTask extends TimerTask {
                     String[] scheduleIds=scheduleList.stream().map(TransactionLog::getContent).toArray(String[]::new);
                     ScheduleDao.deleteByIds(scheduleIds);
                     String[] scheduleTranIds=scheduleList.stream().map(TransactionLog::getId).toArray(String[]::new);
-                    TransactionLogDao.updateStatusByIds(scheduleTranIds,TransactionStatusEnum.FINISHED);
+                    TranlogScheduleDao.updateStatusByIds(scheduleTranIds,TransactionStatusEnum.FINISHED);
                     ScheduleSyncDao.updateStatusByTransactionIds(scheduleTranIds, ScheduleSyncStatusEnum.DELETED);
                 }
                 if (scheduleBakList != null&&scheduleBakList.size()>0) {
                     String[] scheduleBakIds=scheduleBakList.stream().map(TransactionLog::getContent).toArray(String[]::new);
                     ScheduleBakDao.deleteByIds(scheduleBakIds);
                     String[] scheduleBakTranIds=scheduleBakList.stream().map(TransactionLog::getId).toArray(String[]::new);
-                    TransactionLogDao.updateStatusByIds(scheduleBakTranIds,TransactionStatusEnum.FINISHED);
+                    TranlogScheduleDao.updateStatusByIds(scheduleBakTranIds,TransactionStatusEnum.FINISHED);
                 }
 
             } catch (Exception e) {

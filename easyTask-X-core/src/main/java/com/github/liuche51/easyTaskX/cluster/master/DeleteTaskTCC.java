@@ -9,7 +9,7 @@ import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
-import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
+import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.TransactionLog;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.*;
@@ -40,7 +40,7 @@ public class DeleteTaskTCC {
         transactionLog.setStatus(TransactionStatusEnum.TRIED);
         transactionLog.setType(TransactionTypeEnum.DELETE);
         transactionLog.setSlaves(JSONObject.toJSONString(cancelHost));
-        TransactionLogDao.saveBatch(Arrays.asList(transactionLog));
+        TranlogScheduleDao.saveBatch(Arrays.asList(transactionLog));
         try {
             retryDel( transactionId, taskId,  slaves);
         }catch (Exception e){
@@ -65,7 +65,7 @@ public class DeleteTaskTCC {
             }
         }
         //删除操作，如果slave都被通知标记为TRIED了，就不走后面的第二阶段CONFIRM了，可以直接删除任务。只需要master标记即可
-        TransactionLogDao.updateStatusById(transactionId,TransactionStatusEnum.CONFIRM);
+        TranlogScheduleDao.updateStatusById(transactionId,TransactionStatusEnum.CONFIRM);
     }
     /**
      * 确认删除任务。第二阶段

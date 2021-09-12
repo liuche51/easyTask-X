@@ -1,8 +1,10 @@
 package com.github.liuche51.easyTaskX.dao;
 
 
+import com.github.liuche51.easyTaskX.dao.dbinit.DbInit;
 import com.github.liuche51.easyTaskX.dto.Schedule;
 import com.github.liuche51.easyTaskX.util.DateUtils;
+import com.github.liuche51.easyTaskX.util.DbTableName;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.sqlite.SQLiteException;
 
@@ -14,14 +16,23 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ScheduleDao {
-    /**访问的db名称*/
-    private static final String dbName= StringConstant.SCHEDULE;
-    /**可重入锁*/
-    private static ReentrantLock lock=new ReentrantLock();
+    /**
+     * 访问的db名称
+     */
+    private static final String dbName = DbTableName.SCHEDULE;
+    /**
+     * 访问的表名称
+     */
+    private static final String tableName = DbTableName.SCHEDULE;
+    /**
+     * 可重入锁
+     */
+    private static ReentrantLock lock = new ReentrantLock();
+
     public static boolean existTable() throws SQLException, ClassNotFoundException {
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
-            ResultSet resultSet = helper.executeQuery("SELECT COUNT(*) FROM sqlite_master where type='table' and name='schedule';");
+            ResultSet resultSet = helper.executeQuery("SELECT COUNT(*) FROM sqlite_master where type='table' and name='" + tableName + "';");
             while (resultSet.next()) {
                 int count = resultSet.getInt(1);
                 if (count > 0)
@@ -37,27 +48,27 @@ public class ScheduleDao {
         if (!DbInit.hasInit)
             DbInit.init();
         String sql = contactSaveSql(Arrays.asList(schedule));
-        SqliteHelper.executeUpdateForSync(sql,dbName,lock);
+        SqliteHelper.executeUpdateForSync(sql, dbName, lock);
     }
 
     public static void saveBatch(List<Schedule> schedules) throws Exception {
         if (!DbInit.hasInit)
             DbInit.init();
         String sql = contactSaveSql(schedules);
-        SqliteHelper.executeUpdateForSync(sql,dbName,lock);
+        SqliteHelper.executeUpdateForSync(sql, dbName, lock);
     }
 
     public static List<Schedule> selectAll() throws SQLException, ClassNotFoundException {
         List<Schedule> list = new LinkedList<>();
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
-            ResultSet resultSet = helper.executeQuery("SELECT * FROM schedule;");
+            ResultSet resultSet = helper.executeQuery("SELECT * FROM " + tableName + ";");
             while (resultSet.next()) {
                 Schedule schedule = getSchedule(resultSet);
                 list.add(schedule);
             }
-        }catch (SQLiteException e){
-            SqliteHelper.writeDatabaseLockedExceptionLog(e,"ScheduleDao->selectAll");
+        } catch (SQLiteException e) {
+            SqliteHelper.writeDatabaseLockedExceptionLog(e, "ScheduleDao->selectAll");
         } finally {
             helper.destroyed();
         }
@@ -69,61 +80,63 @@ public class ScheduleDao {
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
             String instr = SqliteHelper.getInConditionStr(ids);
-            ResultSet resultSet = helper.executeQuery("SELECT * FROM schedule where id in " + instr + ";");
+            ResultSet resultSet = helper.executeQuery("SELECT * FROM " + tableName + " where id in " + instr + ";");
             while (resultSet.next()) {
                 Schedule schedule = getSchedule(resultSet);
                 list.add(schedule);
             }
-        }catch (SQLiteException e){
-            SqliteHelper.writeDatabaseLockedExceptionLog(e,"ScheduleDao->selectByIds");
+        } catch (SQLiteException e) {
+            SqliteHelper.writeDatabaseLockedExceptionLog(e, "ScheduleDao->selectByIds");
         } finally {
             helper.destroyed();
         }
         return list;
     }
+
     public static List<Schedule> selectByTaskId(String taskId) throws SQLException, ClassNotFoundException {
         List<Schedule> list = new LinkedList<>();
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
-            ResultSet resultSet = helper.executeQuery("SELECT * FROM schedule where id = '" + taskId + "';");
+            ResultSet resultSet = helper.executeQuery("SELECT * FROM " + tableName + " where id = '" + taskId + "';");
             while (resultSet.next()) {
                 Schedule schedule = getSchedule(resultSet);
                 list.add(schedule);
             }
-        }catch (SQLiteException e){
-            SqliteHelper.writeDatabaseLockedExceptionLog(e,"ScheduleDao->selectByTaskId");
+        } catch (SQLiteException e) {
+            SqliteHelper.writeDatabaseLockedExceptionLog(e, "ScheduleDao->selectByTaskId");
         } finally {
             helper.destroyed();
         }
         return list;
     }
+
     public static boolean isExistByExecuter(String executer) throws SQLException, ClassNotFoundException {
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
-            ResultSet resultSet = helper.executeQuery("SELECT count(0) as count FROM schedule where executer ='"+executer+"';");
+            ResultSet resultSet = helper.executeQuery("SELECT count(0) as count FROM " + tableName + " where executer ='" + executer + "';");
             while (resultSet.next()) {
                 int count = resultSet.getInt("count");
-                if(count>0) return true;
+                if (count > 0) return true;
             }
-        }catch (SQLiteException e){
-            SqliteHelper.writeDatabaseLockedExceptionLog(e,"ScheduleDao->isExistByExecuter");
-        }
-        finally {
+        } catch (SQLiteException e) {
+            SqliteHelper.writeDatabaseLockedExceptionLog(e, "ScheduleDao->isExistByExecuter");
+        } finally {
             helper.destroyed();
         }
         return false;
     }
-    public static List<Schedule> selectByExecuter(String executer,int count) throws SQLException, ClassNotFoundException {
+
+    public static List<Schedule> selectByExecuter(String executer, int count) throws SQLException, ClassNotFoundException {
         List<Schedule> list = new LinkedList<>();
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
-            ResultSet resultSet = helper.executeQuery("SELECT * FROM schedule where executer = '" + executer + " limit " + count + ";");
+            ResultSet resultSet = helper.executeQuery("SELECT * FROM " + tableName + " where executer = '" + executer + " limit " + count + ";");
             while (resultSet.next()) {
                 Schedule schedule = getSchedule(resultSet);
                 list.add(schedule);
             }
-        }catch (SQLiteException e){
-            SqliteHelper.writeDatabaseLockedExceptionLog(e,"ScheduleDao->selectIdsByExecuter");
+        } catch (SQLiteException e) {
+            SqliteHelper.writeDatabaseLockedExceptionLog(e, "ScheduleDao->selectIdsByExecuter");
         } finally {
             helper.destroyed();
         }
@@ -132,42 +145,46 @@ public class ScheduleDao {
 
     /**
      * 通用更新
+     *
      * @param ids
      * @param updateStr
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public static void updateByIds(String[] ids,String updateStr) throws SQLException, ClassNotFoundException {
+    public static void updateByIds(String[] ids, String updateStr) throws SQLException, ClassNotFoundException {
         List<Schedule> list = new LinkedList<>();
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
             String instr = SqliteHelper.getInConditionStr(ids);
-            int count = helper.executeUpdate("UPDATE schedule set " + updateStr + ",modify_time='"+DateUtils.getCurrentDateTime()+"' where id in " + instr + ";");
-        }catch (SQLiteException e){
-            SqliteHelper.writeDatabaseLockedExceptionLog(e,"ScheduleDao->updateByIds");
+            int count = helper.executeUpdate("UPDATE " + tableName + " set " + updateStr + ",modify_time='" + DateUtils.getCurrentDateTime() + "' where id in " + instr + ";");
+        } catch (SQLiteException e) {
+            SqliteHelper.writeDatabaseLockedExceptionLog(e, "ScheduleDao->updateByIds");
         } finally {
             helper.destroyed();
         }
     }
+
     public static void deleteByIds(String[] ids) throws SQLException, ClassNotFoundException {
-        String instr=SqliteHelper.getInConditionStr(ids);
-        String sql = "delete FROM schedule where id in" + instr + ";";
-        SqliteHelper.executeUpdateForSync(sql,dbName,lock);
+        String instr = SqliteHelper.getInConditionStr(ids);
+        String sql = "delete FROM " + tableName + " where id in" + instr + ";";
+        SqliteHelper.executeUpdateForSync(sql, dbName, lock);
     }
+
     public static void deleteByTransactionIds(String[] ids) throws SQLException, ClassNotFoundException {
-        String instr=SqliteHelper.getInConditionStr(ids);
-        String sql = "delete FROM schedule where transaction_id in" + instr + ";";
-        SqliteHelper.executeUpdateForSync(sql,dbName,lock);
+        String instr = SqliteHelper.getInConditionStr(ids);
+        String sql = "delete FROM " + tableName + " where transaction_id in" + instr + ";";
+        SqliteHelper.executeUpdateForSync(sql, dbName, lock);
     }
+
     public static void deleteAll() throws SQLException, ClassNotFoundException {
-        String sql = "delete FROM schedule;";
-        SqliteHelper.executeUpdateForSync(sql,dbName,lock);
+        String sql = "delete FROM " + tableName + ";";
+        SqliteHelper.executeUpdateForSync(sql, dbName, lock);
     }
 
     public static int getAllCount() throws SQLException, ClassNotFoundException {
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
-            ResultSet resultSet = helper.executeQuery("SELECT COUNT(*) FROM schedule;");
+            ResultSet resultSet = helper.executeQuery("SELECT COUNT(*) FROM " + tableName + ";");
             while (resultSet.next()) {
                 return resultSet.getInt(1);
             }
@@ -205,7 +222,7 @@ public class ScheduleDao {
     }
 
     private static String contactSaveSql(List<Schedule> schedules) {
-        StringBuilder sql1 = new StringBuilder("insert into schedule(id,class_path,execute_time,task_type,period,unit,param,transaction_id,create_time,modify_time,source) values");
+        StringBuilder sql1 = new StringBuilder("insert into " + tableName + "(id,class_path,execute_time,task_type,period,unit,param,transaction_id,create_time,modify_time,source) values");
         for (Schedule schedule : schedules) {
             schedule.setCreateTime(DateUtils.getCurrentDateTime());
             schedule.setModifyTime(DateUtils.getCurrentDateTime());

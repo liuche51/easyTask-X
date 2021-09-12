@@ -6,35 +6,27 @@ import com.github.liuche51.easyTaskX.cluster.master.DeleteTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.master.SaveTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
 import com.github.liuche51.easyTaskX.cluster.master.UpdateTaskTCC;
-import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.ClearDataTask;
 import com.github.liuche51.easyTaskX.dao.*;
+import com.github.liuche51.easyTaskX.dao.dbinit.DbInit;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.dto.Schedule;
-import com.github.liuche51.easyTaskX.dto.proto.Dto;
-import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
-import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.netty.server.NettyServer;
 import com.github.liuche51.easyTaskX.socket.CmdServer;
-import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.zk.ZKService;
-import io.netty.channel.ChannelFuture;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class NodeService {
@@ -167,7 +159,7 @@ public class NodeService {
                 SaveTaskTCC.cancel(transactionId, slaves);
             } catch (Exception e1) {
                 log.error("", e);
-                TransactionLogDao.updateRetryInfoById(transactionId, new Short("1"), DateUtils.getCurrentDateTime());
+                TranlogScheduleDao.updateRetryInfoById(transactionId, new Short("1"), DateUtils.getCurrentDateTime());
             }
             throw new Exception("task submit failed!");
         }
@@ -234,7 +226,7 @@ public class NodeService {
             ScheduleBakDao.deleteAll();
             ScheduleSyncDao.deleteAll();
             //目前不清除删除类型的事务。因为这样系统重启后可以继续删除操作。最大限度保障从集群中删除
-            TransactionLogDao.deleteByTypes(new short[]{TransactionTypeEnum.SAVE, TransactionTypeEnum.UPDATE});
+            TranlogScheduleDao.deleteByTypes(new short[]{TransactionTypeEnum.SAVE, TransactionTypeEnum.UPDATE});
         } catch (Exception e) {
             log.error("deleteAllData exception!", e);
         }

@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.dao;
 
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.util.DbTableName;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,23 +42,19 @@ public class SQLliteMultiPool {
      * 初始化连接池
      */
     private SQLliteMultiPool() {
-        pools.put(StringConstant.SCHEDULE, new ConcurrentLinkedQueue<Connection>());
-        pools.put(StringConstant.SCHEDULE_BAK, new ConcurrentLinkedQueue<Connection>());
-        pools.put(StringConstant.SCHEDULE_SYNC, new ConcurrentLinkedQueue<Connection>());
-        pools.put(StringConstant.TRANSACTION_LOG, new ConcurrentLinkedQueue<Connection>());
+        pools.put(DbTableName.SCHEDULE, new ConcurrentLinkedQueue<Connection>());
+        pools.put(DbTableName.SCHEDULE_BAK, new ConcurrentLinkedQueue<Connection>());
+        pools.put(DbTableName.SCHEDULE_SYNC, new ConcurrentLinkedQueue<Connection>());
         for (int i = 0; i < NodeService.getConfig().getAdvanceConfig().getsQLlitePoolSize(); i++) {
-            Connection con1 = createConnection(StringConstant.SCHEDULE);
-            Connection con2 = createConnection(StringConstant.SCHEDULE_BAK);
-            Connection con3 = createConnection(StringConstant.SCHEDULE_SYNC);
-            Connection con4 = createConnection(StringConstant.TRANSACTION_LOG);
+            Connection con1 = createConnection(DbTableName.SCHEDULE);
+            Connection con2 = createConnection(DbTableName.SCHEDULE_BAK);
+            Connection con3 = createConnection(DbTableName.SCHEDULE_SYNC);
             if (con1 != null)
-                pools.get(StringConstant.SCHEDULE).add(con1);
+                pools.get(DbTableName.SCHEDULE).add(con1);
             if (con2 != null)
-                pools.get(StringConstant.SCHEDULE_BAK).add(con2);
+                pools.get(DbTableName.SCHEDULE_BAK).add(con2);
             if (con3 != null)
-                pools.get(StringConstant.SCHEDULE_SYNC).add(con3);
-            if (con4 != null)
-                pools.get(StringConstant.TRANSACTION_LOG).add(con4);
+                pools.get(DbTableName.SCHEDULE_SYNC).add(con3);
         }
     }
     /**

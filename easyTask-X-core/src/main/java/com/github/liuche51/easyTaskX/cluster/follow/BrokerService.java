@@ -31,7 +31,7 @@ public class BrokerService {
 
 
     /**
-         * 启动批量事务数据提交任务
+     * 启动批量事务数据提交任务
      */
     public static TimerTask startCommitSaveTransactionTask() {
         CommitSaveTransactionTask task = new CommitSaveTransactionTask();
@@ -140,7 +140,7 @@ public class BrokerService {
             if (ret) {
                 NodeDto.Node node = NodeDto.Node.parseFrom(respPack.getRespbody());
                 NodeService.CURRENTNODE.setBakLeader(node.getBakleader());
-                BrokerUtil.dealUpdate(node);
+                dealUpdate(node);
                 return true;
             } else {
                 log.info("normally exception!requestUpdateRegedit() failed.");
@@ -149,6 +149,28 @@ public class BrokerService {
             log.error("", e);
         }
         return false;
+    }
+
+    /**
+     * 处理注册表更新。
+     * 1、leader重新选举了master或slave时，leader主动通知broker。
+     * 2、broker会定时从leader请求最新的注册表信息同步到本地。防止期间数据不一致性问题，做到最终一致性
+     *
+     * @param node
+     */
+    public static void dealUpdate(NodeDto.Node node) {
+        NodeDto.NodeList slaveNodes = node.getSalves();
+        ConcurrentHashMap<String, BaseNode> slaves = new ConcurrentHashMap<>();
+        slaveNodes.getNodesList().forEach(x -> {
+            slaves.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
+        });
+        NodeDto.NodeList masterNodes = node.getMasters();
+        ConcurrentHashMap<String, BaseNode> masters = new ConcurrentHashMap<>();
+        masterNodes.getNodesList().forEach(x -> {
+            masters.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
+        });
+        NodeService.CURRENTNODE.setSlaves(slaves);
+        NodeService.CURRENTNODE.setMasters(masters);
     }
 
     /**

@@ -2,8 +2,7 @@ package com.github.liuche51.easyTaskX.cluster.master;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
-import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
-import com.github.liuche51.easyTaskX.dao.TransactionLogDao;
+import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.dto.TransactionLog;
@@ -43,7 +42,7 @@ public class UpdateTaskTCC {
         transactionLog.setStatus(TransactionStatusEnum.TRIED);
         transactionLog.setType(TransactionTypeEnum.UPDATE);
         transactionLog.setSlaves(JSONObject.toJSONString(cancelHost));
-        TransactionLogDao.saveBatch(Arrays.asList(transactionLog));
+        TranlogScheduleDao.saveBatch(Arrays.asList(transactionLog));
         try {
             retryUpdate( transactionId, taskIds2,  slaves,json);
         }catch (Exception e){
@@ -66,7 +65,7 @@ public class UpdateTaskTCC {
             }
         }
         //更新操作，如果slave都被通知标记为TRIED了，就不走后面的第二阶段CONFIRM了，可以直接更新任务。只需要master标记即可
-        TransactionLogDao.updateStatusById(transactionId,TransactionStatusEnum.CONFIRM);
+        TranlogScheduleDao.updateStatusById(transactionId,TransactionStatusEnum.CONFIRM);
     }
     /**
      * 确认更新任务。第二阶段
