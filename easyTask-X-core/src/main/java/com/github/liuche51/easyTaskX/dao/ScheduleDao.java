@@ -25,9 +25,13 @@ public class ScheduleDao {
      */
     private static final String tableName = DbTableName.SCHEDULE;
     /**
-     * 可重入锁
+     * 可重入锁。避免Schedule库多线程写操作。同一个库不同表也不能同时写。
      */
     private static ReentrantLock lock = new ReentrantLock();
+
+    public static ReentrantLock getLock() {
+        return lock;
+    }
 
     public static boolean existTable() throws SQLException, ClassNotFoundException {
         SqliteHelper helper = new SqliteHelper(dbName);
@@ -51,11 +55,11 @@ public class ScheduleDao {
         SqliteHelper.executeUpdateForSync(sql, dbName, lock);
     }
 
-    public static void saveBatch(List<Schedule> schedules) throws Exception {
+    public static void saveBatch(List<Schedule> schedules, SqliteHelper helper) throws Exception {
         if (!DbInit.hasInit)
             DbInit.init();
         String sql = contactSaveSql(schedules);
-        SqliteHelper.executeUpdateForSync(sql, dbName, lock);
+        helper.executeUpdate(sql);
     }
 
     public static List<Schedule> selectAll() throws SQLException, ClassNotFoundException {
@@ -152,16 +156,9 @@ public class ScheduleDao {
      * @throws ClassNotFoundException
      */
     public static void updateByIds(String[] ids, String updateStr) throws SQLException, ClassNotFoundException {
-        List<Schedule> list = new LinkedList<>();
-        SqliteHelper helper = new SqliteHelper(dbName);
-        try {
-            String instr = SqliteHelper.getInConditionStr(ids);
-            int count = helper.executeUpdate("UPDATE " + tableName + " set " + updateStr + ",modify_time='" + DateUtils.getCurrentDateTime() + "' where id in " + instr + ";");
-        } catch (SQLiteException e) {
-            SqliteHelper.writeDatabaseLockedExceptionLog(e, "ScheduleDao->updateByIds");
-        } finally {
-            helper.destroyed();
-        }
+        String instr = SqliteHelper.getInConditionStr(ids);
+        String sql = "UPDATE " + tableName + " set " + updateStr + ",modify_time='" + DateUtils.getCurrentDateTime() + "' where id in " + instr + ";";
+        SqliteHelper.executeUpdateForSync(sql, dbName, lock);
     }
 
     public static void deleteByIds(String[] ids) throws SQLException, ClassNotFoundException {
@@ -179,19 +176,6 @@ public class ScheduleDao {
     public static void deleteAll() throws SQLException, ClassNotFoundException {
         String sql = "delete FROM " + tableName + ";";
         SqliteHelper.executeUpdateForSync(sql, dbName, lock);
-    }
-
-    public static int getAllCount() throws SQLException, ClassNotFoundException {
-        SqliteHelper helper = new SqliteHelper(dbName);
-        try {
-            ResultSet resultSet = helper.executeQuery("SELECT COUNT(*) FROM " + tableName + ";");
-            while (resultSet.next()) {
-                return resultSet.getInt(1);
-            }
-        } finally {
-            helper.destroyed();
-        }
-        return 0;
     }
 
     private static Schedule getSchedule(ResultSet resultSet) throws SQLException {

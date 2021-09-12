@@ -4,7 +4,7 @@ import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
 import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
-import com.github.liuche51.easyTaskX.dto.TransactionLog;
+import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionTableEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
@@ -21,21 +21,21 @@ import java.util.stream.Collectors;
 public class CancelSaveTransactionTask extends TimerTask {
     @Override
     public void run() {
-        List<TransactionLog> list = null;
+        List<TranlogSchedule> list = null;
         while (!isExit()) {
             setLastRunTime(new Date());
-            List<TransactionLog> scheduleList = null, scheduleBakList = null;
+            List<TranlogSchedule> scheduleList = null, scheduleBakList = null;
             try {
                 list = TranlogScheduleDao.selectByStatusAndType(TransactionStatusEnum.CANCEL, TransactionTypeEnum.SAVE,100);
                 scheduleList = list.stream().filter(x -> TransactionTableEnum.SCHEDULE.equals(x.getTableName())).collect(Collectors.toList());
                 scheduleBakList = list.stream().filter(x -> TransactionTableEnum.SCHEDULE_BAK.equals(x.getTableName())).collect(Collectors.toList());
                 if (scheduleList != null&&scheduleList.size()>0) {
-                    String[] scheduleIds=scheduleList.stream().map(TransactionLog::getContent).toArray(String[]::new);
+                    String[] scheduleIds=scheduleList.stream().map(TranlogSchedule::getContent).toArray(String[]::new);
                     ScheduleDao.deleteByIds(scheduleIds);
                     TranlogScheduleDao.updateStatusByIds(scheduleIds,TransactionStatusEnum.FINISHED);
                 }
                 if (scheduleBakList != null&&scheduleBakList.size()>0) {
-                    String[] scheduleBakIds=scheduleBakList.stream().map(TransactionLog::getContent).toArray(String[]::new);
+                    String[] scheduleBakIds=scheduleBakList.stream().map(TranlogSchedule::getContent).toArray(String[]::new);
                     ScheduleBakDao.deleteByIds(scheduleBakIds);
                     TranlogScheduleDao.updateStatusByIds(scheduleBakIds,TransactionStatusEnum.FINISHED);
                 }

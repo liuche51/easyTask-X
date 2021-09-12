@@ -8,7 +8,7 @@ import com.github.liuche51.easyTaskX.cluster.master.SaveTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
 import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
-import com.github.liuche51.easyTaskX.dto.TransactionLog;
+import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionTableEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
@@ -29,18 +29,18 @@ import java.util.stream.Collectors;
 public class RetryCancelSaveTransactionTask extends TimerTask {
     @Override
     public void run() {
-        List<TransactionLog> list = null;
+        List<TranlogSchedule> list = null;
         while (!isExit()) {
             setLastRunTime(new Date());
-            List<TransactionLog> scheduleList = null, scheduleBakList = null;
+            List<TranlogSchedule> scheduleList = null, scheduleBakList = null;
             try {
                 list = TranlogScheduleDao.selectByStatusAndReTryCount(TransactionStatusEnum.CANCEL, TransactionTypeEnum.SAVE, new Short("3"), 100);
                 scheduleList = list.stream().filter(x -> TransactionTableEnum.SCHEDULE.equals(x.getTableName())).collect(Collectors.toList());
                 scheduleBakList = list.stream().filter(x -> TransactionTableEnum.SCHEDULE_BAK.equals(x.getTableName())).collect(Collectors.toList());
                 if (scheduleList != null && scheduleList.size() > 0) {
-                    String[] scheduleTranIds = scheduleList.stream().map(TransactionLog::getId).toArray(String[]::new);
+                    String[] scheduleTranIds = scheduleList.stream().map(TranlogSchedule::getId).toArray(String[]::new);
                     ScheduleDao.deleteByTransactionIds(scheduleTranIds);//先清掉自己已经提交的事务
-                    for (TransactionLog x : scheduleList) {
+                    for (TranlogSchedule x : scheduleList) {
                         try {
                             //如果距离上次重试时间不足5分钟，则跳过重试
                             if (!StringUtils.isNullOrEmpty(x.getRetryTime())) {
@@ -67,7 +67,7 @@ public class RetryCancelSaveTransactionTask extends TimerTask {
                     }
                 }
                 if (scheduleBakList != null && scheduleBakList.size() > 0) {
-                    String[] scheduleBakIds = scheduleList.stream().map(TransactionLog::getId).toArray(String[]::new);
+                    String[] scheduleBakIds = scheduleList.stream().map(TranlogSchedule::getId).toArray(String[]::new);
                     ScheduleDao.deleteByTransactionIds(scheduleBakIds);
                     TranlogScheduleDao.updateStatusByIds(scheduleBakIds, TransactionStatusEnum.FINISHED);
                 }

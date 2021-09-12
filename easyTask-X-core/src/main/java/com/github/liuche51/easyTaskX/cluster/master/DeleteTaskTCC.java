@@ -10,7 +10,7 @@ import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
 import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
-import com.github.liuche51.easyTaskX.dto.TransactionLog;
+import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.*;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
@@ -33,7 +33,7 @@ public class DeleteTaskTCC {
      */
     public static void tryDel(String transactionId,String taskId, List<BaseNode> slaves) throws Exception {
         List<String> cancelHost=slaves.stream().map(BaseNode::getAddress).collect(Collectors.toList());
-        TransactionLog transactionLog = new TransactionLog();
+        TranlogSchedule transactionLog = new TranlogSchedule();
         transactionLog.setId(transactionId);
         transactionLog.setContent(taskId);
         transactionLog.setTableName(TransactionTableEnum.SCHEDULE);

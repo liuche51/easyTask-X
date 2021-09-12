@@ -4,13 +4,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
+import com.github.liuche51.easyTaskX.dao.SqliteHelper;
 import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.Schedule;
 import com.github.liuche51.easyTaskX.dto.ScheduleBak;
-import com.github.liuche51.easyTaskX.dto.TransactionLog;
+import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionTableEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
+import com.github.liuche51.easyTaskX.util.DbTableName;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -25,10 +27,10 @@ import java.util.stream.Collectors;
 public class CommitSaveTransactionTask extends TimerTask {
     @Override
     public void run() {
-        List<TransactionLog> list = null;
+        List<TranlogSchedule> list = null;
         while (!isExit()) {
             setLastRunTime(new Date());
-            List<TransactionLog> scheduleList = null, scheduleBakList = null;
+            List<TranlogSchedule> scheduleList = null, scheduleBakList = null;
             List<Schedule> scheduleList1 =new LinkedList<>();
             List<ScheduleBak> scheduleBakList1 = new LinkedList<>();
             try {
@@ -39,16 +41,24 @@ public class CommitSaveTransactionTask extends TimerTask {
                     scheduleList.forEach(x->{
                         scheduleList1.add(JSONObject.parseObject(x.getContent(),Schedule.class));
                     });
-                    ScheduleDao.saveBatch(scheduleList1);
-                    String[] scheduleIds=scheduleList.stream().map(TransactionLog::getId).toArray(String[]::new);
-                    TranlogScheduleDao.updateStatusByIds(scheduleIds,TransactionStatusEnum.FINISHED);
+                    SqliteHelper helper=new SqliteHelper(DbTableName.SCHEDULE,ScheduleDao.getLock());
+                    helper.beginTran();
+                    try {
+                        ScheduleDao.saveBatch(scheduleList1,helper);
+                        String[] scheduleIds=scheduleList.stream().map(TranlogSchedule::getId).toArray(String[]::new);
+                        TranlogScheduleDao.updateStatusByIds(scheduleIds,TransactionStatusEnum.FINISHED,helper);
+                        helper.commitTran();
+                    } finally {
+                        helper.destroyed();
+                    }
+
                 }
                 if (scheduleBakList != null&&scheduleBakList.size()>0) {
                     scheduleBakList.forEach(x->{
                         scheduleBakList1.add(JSONObject.parseObject(x.getContent(),ScheduleBak.class));
                     });
                     ScheduleBakDao.saveBatch(scheduleBakList1);
-                    String[] scheduleBakIds=scheduleBakList.stream().map(TransactionLog::getId).toArray(String[]::new);
+                    String[] scheduleBakIds=scheduleBakList.stream().map(TranlogSchedule::getId).toArray(String[]::new);
                     TranlogScheduleDao.updateStatusByIds(scheduleBakIds,TransactionStatusEnum.FINISHED);
                 }
 

@@ -98,7 +98,8 @@ public class SQLliteMultiPool {
      * @param conn
      * @param dbName
      */
-    public void freeConnection(Connection conn,String dbName) {
+    public void freeConnection(Connection conn,String dbName) throws SQLException {
+        conn.setAutoCommit(true);//此链接可能操作事务而打开。所以放回连接池前重新设置为自动事务
         ConcurrentLinkedQueue<Connection> pool = pools.get(dbName);
         if (pool.size() < NodeService.getConfig().getAdvanceConfig().getsQLlitePoolSize()) {
             pool.add(conn);

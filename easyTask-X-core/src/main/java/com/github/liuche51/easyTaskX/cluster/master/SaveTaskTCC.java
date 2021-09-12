@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.*;
 
+import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
@@ -30,7 +31,7 @@ public class SaveTaskTCC {
         List<String> cancelHost=follows.stream().map(BaseNode::getAddress).collect(Collectors.toList());
         schedule.setTransactionId(transactionId);
         schedule.setSource(Util.getSource(schedule.getSource()));
-        TransactionLog transactionLog = new TransactionLog();
+        TranlogSchedule transactionLog = new TranlogSchedule();
         transactionLog.setId(transactionId);
         transactionLog.setContent(JSONObject.toJSONString(schedule));
         transactionLog.setTableName(TransactionTableEnum.SCHEDULE);

@@ -5,7 +5,7 @@ import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;
-import com.github.liuche51.easyTaskX.dto.TransactionLog;
+import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.*;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
@@ -33,7 +33,7 @@ public class UpdateTaskTCC {
      */
     public static void tryUpdate(String transactionId, String[] taskIds, List<BaseNode> slaves, Map<String,String> values) throws Exception {
         List<String> cancelHost=slaves.stream().map(BaseNode::getAddress).collect(Collectors.toList());
-        TransactionLog transactionLog = new TransactionLog();
+        TranlogSchedule transactionLog = new TranlogSchedule();
         transactionLog.setId(transactionId);
         String json=JSONObject.toJSONString(values);
         String taskIds2=String.join(",",taskIds);

@@ -46,7 +46,6 @@ public class ScheduleInit {
             String sql4 = "CREATE TABLE \"" + DbTableName.TRANLOG_SCHEDULE + "\" (\n" +
                     "\"id\"  TEXT NOT NULL,\n" +
                     "\"content\"  TEXT,\n" +
-                    "\"table_name\"  TEXT,\n" +
                     "\"type\"  INTEGER,\n" +
                     "\"status\"  INTEGER,\n" +
                     "\"slaves\"  TEXT,\n" +

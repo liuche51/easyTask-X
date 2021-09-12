@@ -7,7 +7,7 @@ import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.master.DeleteTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
-import com.github.liuche51.easyTaskX.dto.TransactionLog;
+import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionTableEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
@@ -29,15 +29,15 @@ import java.util.stream.Collectors;
 public class RetryDelTransactionTask extends TimerTask {
     @Override
     public void run() {
-        List<TransactionLog> list = null;
+        List<TranlogSchedule> list = null;
         while (!isExit()) {
             setLastRunTime(new Date());
-            List<TransactionLog> scheduleList = null;
+            List<TranlogSchedule> scheduleList = null;
             try {
                 list = TranlogScheduleDao.selectByStatusAndReTryCount(TransactionStatusEnum.TRIED, TransactionTypeEnum.DELETE, new Short("3"), 100);
                 scheduleList = list.stream().filter(x -> TransactionTableEnum.SCHEDULE.equals(x.getTableName())).collect(Collectors.toList());
                 if (scheduleList != null && scheduleList.size() > 0) {
-                    for (TransactionLog x : scheduleList) {
+                    for (TranlogSchedule x : scheduleList) {
                         try {
                             //如果距离上次重试时间不足5分钟，则跳过重试
                             if (!StringUtils.isNullOrEmpty(x.getRetryTime())) {

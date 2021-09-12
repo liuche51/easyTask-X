@@ -3,6 +3,7 @@ package com.github.liuche51.easyTaskX.cluster.slave;
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.*;
+import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionTableEnum;
@@ -31,7 +32,7 @@ public class SlaveService {
      */
     public static void trySaveTask(ScheduleDto.Schedule schedule) throws Exception {
         ScheduleBak bak = ScheduleBak.valueOf(schedule);
-        TransactionLog transactionLog = new TransactionLog();
+        TranlogSchedule transactionLog = new TranlogSchedule();
         transactionLog.setId(schedule.getTransactionId());
         transactionLog.setContent(JSONObject.toJSONString(bak));
         transactionLog.setStatus(TransactionStatusEnum.TRIED);
@@ -69,7 +70,7 @@ public class SlaveService {
      */
     public static void tryDelTask(String transactionId, String scheduleId) throws Exception {
         System.out.println(DateUtils.getCurrentDateTime() + "  transactionId=" + transactionId + " scheduleId=" + scheduleId);
-        TransactionLog transactionLog = new TransactionLog();
+        TranlogSchedule transactionLog = new TranlogSchedule();
         transactionLog.setId(transactionId);
         transactionLog.setContent(scheduleId);
         transactionLog.setStatus(TransactionStatusEnum.TRIED);
@@ -92,7 +93,7 @@ public class SlaveService {
      */
     public static void tryUpdateTask(String transactionId, String taskIds,String values) throws Exception {
         System.out.println(DateUtils.getCurrentDateTime() + "  transactionId=" + transactionId + " taskIds=" + taskIds);
-        TransactionLog transactionLog = new TransactionLog();
+        TranlogSchedule transactionLog = new TranlogSchedule();
         transactionLog.setId(transactionId);
         transactionLog.setContent(taskIds+StringConstant.CHAR_SPRIT_STRING+values);
         transactionLog.setStatus(TransactionStatusEnum.TRIED);
@@ -117,10 +118,10 @@ public class SlaveService {
     public static void saveScheduleBakBatchByTran(ScheduleDto.ScheduleList scheduleList) throws Exception {
         List<ScheduleDto.Schedule> list = scheduleList.getSchedulesList();
         if (list == null) return;
-        List<TransactionLog> logs = new ArrayList<>(list.size());
+        List<TranlogSchedule> logs = new ArrayList<>(list.size());
         list.forEach(x -> {
             ScheduleBak bak = ScheduleBak.valueOf(x);
-            TransactionLog transactionLog = new TransactionLog();
+            TranlogSchedule transactionLog = new TranlogSchedule();
             transactionLog.setId(bak.getTransactionId());
             transactionLog.setContent(JSONObject.toJSONString(bak));
             transactionLog.setStatus(TransactionStatusEnum.CONFIRM);

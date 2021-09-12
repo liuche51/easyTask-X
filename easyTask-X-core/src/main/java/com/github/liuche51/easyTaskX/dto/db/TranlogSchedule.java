@@ -1,9 +1,8 @@
-package com.github.liuche51.easyTaskX.dto;
+package com.github.liuche51.easyTaskX.dto.db;
 
-public class TransactionLog {
+public class TranlogSchedule {
     private String id;
     private String content;
-    private String tableName;
     private short type;
     private short status;
     private String slaves;//重试事务所需的slave地址
@@ -26,14 +25,6 @@ public class TransactionLog {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
     }
 
     public short getType() {

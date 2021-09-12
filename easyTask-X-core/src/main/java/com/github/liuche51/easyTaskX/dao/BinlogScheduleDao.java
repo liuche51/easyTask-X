@@ -20,10 +20,6 @@ public class BinlogScheduleDao {
      * 访问的表名称
      */
     private static final String tableName = DbTableName.BINLOG_SCHEDULE;
-    /**
-     * 可重入锁
-     */
-    private static ReentrantLock lock = new ReentrantLock();
 
     public static boolean existTable() throws SQLException, ClassNotFoundException {
         SqliteHelper helper = new SqliteHelper(dbName);
@@ -44,14 +40,14 @@ public class BinlogScheduleDao {
         if (!DbInit.hasInit)
             DbInit.init();
         String sql = contactSaveSql(Arrays.asList(binlogSchedule));
-        SqliteHelper.executeUpdateForSync(sql, dbName, lock);
+        SqliteHelper.executeUpdateForSync(sql, dbName, ScheduleDao.getLock());
     }
 
     public static void saveBatch(List<BinlogSchedule> binlogSchedules) throws Exception {
         if (!DbInit.hasInit)
             DbInit.init();
         String sql = contactSaveSql(binlogSchedules);
-        SqliteHelper.executeUpdateForSync(sql, dbName, lock);
+        SqliteHelper.executeUpdateForSync(sql, dbName, ScheduleDao.getLock());
     }
 
     private static BinlogSchedule getBinlogSchedule(ResultSet resultSet) throws SQLException {
