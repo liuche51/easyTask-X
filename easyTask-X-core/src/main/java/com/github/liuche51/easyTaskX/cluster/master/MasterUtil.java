@@ -3,7 +3,7 @@ package com.github.liuche51.easyTaskX.cluster.master;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.dto.Node;
-import com.github.liuche51.easyTaskX.dto.Schedule;
+import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;

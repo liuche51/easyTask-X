@@ -1,7 +1,7 @@
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
-import com.github.liuche51.easyTaskX.dto.Schedule;
+import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.junit.Test;
 import org.slf4j.Logger;

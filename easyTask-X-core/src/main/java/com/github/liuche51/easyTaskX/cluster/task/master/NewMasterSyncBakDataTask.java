@@ -4,8 +4,8 @@ package com.github.liuche51.easyTaskX.cluster.task.master;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
-import com.github.liuche51.easyTaskX.dto.Schedule;
-import com.github.liuche51.easyTaskX.dto.ScheduleBak;
+import com.github.liuche51.easyTaskX.dto.db.Schedule;
+import com.github.liuche51.easyTaskX.dto.db.ScheduleBak;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
 
 import java.util.List;

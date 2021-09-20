@@ -1,4 +1,4 @@
-package com.github.liuche51.easyTaskX.dto;
+package com.github.liuche51.easyTaskX.dto.db;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;

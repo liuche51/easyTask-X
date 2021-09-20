@@ -2,7 +2,7 @@ package com.github.liuche51.easyTaskX.cluster.slave;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
-import com.github.liuche51.easyTaskX.dto.*;
+import com.github.liuche51.easyTaskX.dto.db.ScheduleBak;
 import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;

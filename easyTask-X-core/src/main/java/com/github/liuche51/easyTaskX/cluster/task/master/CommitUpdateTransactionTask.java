@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
-import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
 import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.enume.ScheduleSyncStatusEnum;

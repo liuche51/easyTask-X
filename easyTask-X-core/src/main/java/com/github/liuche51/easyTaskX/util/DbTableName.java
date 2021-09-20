@@ -6,5 +6,6 @@ public class DbTableName {
     public static final String BINLOG_SCHEDULE="binlog_schedule";
 
     public static final String SCHEDULE_BAK="schedule_bak";
+    public static final String TRANLOG_SCHEDULE_BAK="tranlog_schedule_bak";
     public static final String SCHEDULE_SYNC="schedule_sync";
 }

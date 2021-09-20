@@ -2,7 +2,7 @@ package com.github.liuche51.easyTaskX.netty.server.handler.broker;
 
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
-import com.github.liuche51.easyTaskX.dto.Schedule;
+import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;

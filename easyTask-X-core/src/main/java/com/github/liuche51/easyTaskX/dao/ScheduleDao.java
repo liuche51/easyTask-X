@@ -2,10 +2,9 @@ package com.github.liuche51.easyTaskX.dao;
 
 
 import com.github.liuche51.easyTaskX.dao.dbinit.DbInit;
-import com.github.liuche51.easyTaskX.dto.Schedule;
+import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.DbTableName;
-import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.sqlite.SQLiteException;
 
 import java.sql.ResultSet;

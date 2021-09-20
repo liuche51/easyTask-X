@@ -5,9 +5,7 @@ import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.cluster.master.MasterUtil;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
-import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
-import com.github.liuche51.easyTaskX.dto.Schedule;
-import com.github.liuche51.easyTaskX.dto.ScheduleSync;
+import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 import com.github.liuche51.easyTaskX.enume.ScheduleSyncStatusEnum;
 

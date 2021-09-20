@@ -5,6 +5,7 @@ import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
 import com.github.liuche51.easyTaskX.dto.*;
+import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 
 import java.util.*;

@@ -2,11 +2,9 @@ package com.github.liuche51.easyTaskX.monitor;
 
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
-import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
 import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
-import com.github.liuche51.easyTaskX.dto.Schedule;
-import com.github.liuche51.easyTaskX.dto.ScheduleBak;
-import com.github.liuche51.easyTaskX.dto.ScheduleSync;
+import com.github.liuche51.easyTaskX.dto.db.Schedule;
+import com.github.liuche51.easyTaskX.dto.db.ScheduleBak;
 import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.util.DbTableName;
 

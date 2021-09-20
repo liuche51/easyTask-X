@@ -8,7 +8,6 @@ import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
-import com.github.liuche51.easyTaskX.dao.ScheduleSyncDao;
 import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;

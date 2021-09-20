@@ -13,7 +13,7 @@ import com.github.liuche51.easyTaskX.dao.*;
 import com.github.liuche51.easyTaskX.dao.dbinit.DbInit;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;
-import com.github.liuche51.easyTaskX.dto.Schedule;
+import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.server.NettyServer;
 import com.github.liuche51.easyTaskX.socket.CmdServer;

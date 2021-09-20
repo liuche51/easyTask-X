@@ -9,6 +9,7 @@ import com.github.liuche51.easyTaskX.cluster.task.broker.HeartbeatsTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.*;
 import com.github.liuche51.easyTaskX.dto.*;
+import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
@@ -34,7 +35,7 @@ public class BrokerService {
      * 启动批量事务数据提交任务
      */
     public static TimerTask startCommitSaveTransactionTask() {
-        CommitSaveTransactionTask task = new CommitSaveTransactionTask();
+        CommitSaveTranForScheduleTask task = new CommitSaveTranForScheduleTask();
         task.start();
         NodeService.timerTasks.add(task);
         return task;
