@@ -3,7 +3,6 @@ package com.github.liuche51.easyTaskX.cluster.master;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.task.broker.ReDispatchToClientTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.NewMasterSyncBakDataTask;
-import com.github.liuche51.easyTaskX.cluster.task.master.SyncDataToNewSlaveTask;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
@@ -32,23 +31,6 @@ public class MasterService {
      */
     public static void deleteOldMasterBackTask(String oldMasterAddress) throws SQLException, ClassNotFoundException {
         ScheduleBakDao.deleteBySource(oldMasterAddress);
-    }
-
-    /**
-     * master同步数据到新Slave
-     * 目前设计为只有一个线程同步给某个Slave
-     *
-     * @param oldSlave
-     * @param newSlave
-     */
-    public static synchronized OnceTask syncDataToNewSlave(Node oldSlave, Node newSlave) {
-        SyncDataToNewSlaveTask task = new SyncDataToNewSlaveTask(oldSlave, newSlave);
-        String key = task.getClass().getName() + "," + oldSlave.getAddress();
-        if (ReDispatchToClientTask.runningTask.contains(key)) return null;
-        ReDispatchToClientTask.runningTask.put(key, null);
-        task.start();
-        NodeService.onceTasks.add(task);
-        return task;
     }
 
     /**

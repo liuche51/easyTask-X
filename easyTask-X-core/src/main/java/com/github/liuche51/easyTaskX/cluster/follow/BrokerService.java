@@ -1,6 +1,9 @@
 package com.github.liuche51.easyTaskX.cluster.follow;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
+import com.github.liuche51.easyTaskX.cluster.master.SaveTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
 import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerUpdateClientsTask;
 import com.github.liuche51.easyTaskX.cluster.task.broker.ReDispatchToClientTask;
@@ -8,21 +11,28 @@ import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerRequestUpdateRege
 import com.github.liuche51.easyTaskX.cluster.task.broker.HeartbeatsTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.*;
+import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.*;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
+import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
+import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
+import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
+import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
+import com.github.liuche51.easyTaskX.util.exception.VotingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Broker
@@ -30,6 +40,99 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BrokerService {
     private static final Logger log = LoggerFactory.getLogger(BrokerService.class);
 
+    /**
+     * 客户端提交任务。允许线程等待，直到easyTask组件启动完成
+     *
+     * @param schedule
+     * @return
+     * @throws Exception
+     */
+    public void submitTaskAllowWait(Schedule schedule) throws Exception {
+        //集群未启动或正在选举follow中，则继续等待完成
+        while (!NodeService.isStarted || VoteSlave.isSelecting()) {
+            TimeUnit.SECONDS.sleep(1L);
+        }
+        this.submitTask(schedule);
+    }
+
+    /**
+     * 任务数据持久化。并同步至备份库
+     * 1、使用TCC机制实现事务，达到数据最终一致性
+     * 2、只需要取第一个slave做事务同步即可。其他的slave使用binlog异步同步
+     *
+     * @throws Exception
+     */
+    public static void submitTask(Schedule schedule) throws Exception {
+        if (!NodeService.isStarted)
+            throw new Exception("normally exception!the easyTask has not started,please wait a moment!");
+        if (VoteSlave.isSelecting())
+            throw new VotingException("normally exception!leader is voting slave,please wait a moment.");
+        Object[] slaves = NodeService.CURRENTNODE.getSlaves().values().toArray();
+        String transactionId = Util.generateTransactionId();
+        try {
+            SaveTaskTCC.trySave(transactionId, schedule, (BaseNode) slaves[0]);
+            SaveTaskTCC.confirm(transactionId, (BaseNode) slaves[0]);
+        } catch (Exception e) {
+            log.error("", e);
+            try {
+                SaveTaskTCC.cancel(transactionId, (BaseNode) slaves[0]);
+            } catch (Exception e1) {
+                log.error("", e);
+                TranlogScheduleDao.updateRetryInfoById(transactionId, new Short("1"), DateUtils.getCurrentDateTime());
+            }
+            throw new Exception("task submit failed!");
+        }
+    }
+
+    /**
+     * 删除任务。
+     * 1、slaves通过异步复制binlog同步删除
+     *
+     * @param taskId
+     * @return
+     */
+    public static boolean deleteTask(String taskId) {
+        String transactionId = Util.generateTransactionId();
+        try {
+            TranlogSchedule transactionLog = new TranlogSchedule();
+            transactionLog.setId(transactionId);
+            transactionLog.setContent(taskId);
+            transactionLog.setStatus(TransactionStatusEnum.CONFIRM);
+            transactionLog.setType(TransactionTypeEnum.DELETE);
+            TranlogScheduleDao.saveBatch(Arrays.asList(transactionLog));
+            return true;
+        } catch (Exception e) {
+            //如果写本地删除日志都失败了，那么就认为删除失败
+            log.error("", e);
+            return false;
+        }
+    }
+
+    /**
+     * 更新任务。含同步至备份库
+     * 1、slaves通过异步复制binlog同步更新
+     *
+     * @param taskIds
+     * @return
+     */
+    public static boolean updateTask(String[] taskIds, Map<String, String> values) {
+        String transactionId = Util.generateTransactionId();
+        try {
+            TranlogSchedule transactionLog = new TranlogSchedule();
+            transactionLog.setId(transactionId);
+            String json = JSONObject.toJSONString(values);
+            String taskIds2 = String.join(",", taskIds);
+            transactionLog.setContent(taskIds2 + StringConstant.CHAR_SPRIT_STRING + json);
+            transactionLog.setStatus(TransactionStatusEnum.CONFIRM);
+            transactionLog.setType(TransactionTypeEnum.UPDATE);
+            TranlogScheduleDao.saveBatch(Arrays.asList(transactionLog));
+            return true;
+        } catch (Exception e) {
+            //如果写本地更新日志都失败了，那么就认为删除失败
+            log.error("", e);
+            return false;
+        }
+    }
 
     /**
      * 启动批量事务数据提交任务
@@ -66,16 +169,6 @@ public class BrokerService {
      */
     public static TimerTask startRetryCancelSaveTransactionTask() {
         RetryCancelSaveTransactionTask task = new RetryCancelSaveTransactionTask();
-        task.start();
-        NodeService.timerTasks.add(task);
-        return task;
-    }
-
-    /**
-     * 启动重试删除任务
-     */
-    public static TimerTask startRetryDelTransactionTask() {
-        RetryDelTransactionTask task = new RetryDelTransactionTask();
         task.start();
         NodeService.timerTasks.add(task);
         return task;

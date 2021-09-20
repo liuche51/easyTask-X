@@ -1,9 +1,11 @@
 package com.github.liuche51.easyTaskX.cluster.slave;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.liuche51.easyTaskX.dao.TranlogScheduleBakDao;
 import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.db.ScheduleBak;
 import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
+import com.github.liuche51.easyTaskX.dto.db.TranlogScheduleBak;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionTableEnum;
@@ -32,14 +34,12 @@ public class SlaveService {
      */
     public static void trySaveTask(ScheduleDto.Schedule schedule) throws Exception {
         ScheduleBak bak = ScheduleBak.valueOf(schedule);
-        TranlogSchedule transactionLog = new TranlogSchedule();
+        TranlogScheduleBak transactionLog = new TranlogScheduleBak();
         transactionLog.setId(schedule.getTransactionId());
         transactionLog.setContent(JSONObject.toJSONString(bak));
         transactionLog.setStatus(TransactionStatusEnum.TRIED);
         transactionLog.setType(TransactionTypeEnum.SAVE);
-        transactionLog.setTableName(TransactionTableEnum.SCHEDULE_BAK);
-        transactionLog.setSlaves(StringConstant.EMPTY);
-        TranlogScheduleDao.saveBatch(Arrays.asList(transactionLog));
+        TranlogScheduleBakDao.saveBatch(Arrays.asList(transactionLog));
     }
 
     /**
@@ -50,7 +50,7 @@ public class SlaveService {
      * @throws ClassNotFoundException
      */
     public static void confirmSaveTask(String transactionId) throws SQLException, ClassNotFoundException {
-        TranlogScheduleDao.updateStatusById(transactionId, TransactionStatusEnum.CONFIRM);
+        TranlogScheduleBakDao.updateStatusById(transactionId, TransactionStatusEnum.CONFIRM);
     }
 
     /**
@@ -61,82 +61,6 @@ public class SlaveService {
      * @throws ClassNotFoundException
      */
     public static void cancelSaveTask(String transactionId) throws SQLException, ClassNotFoundException {
-        TranlogScheduleDao.updateStatusById(transactionId, TransactionStatusEnum.CANCEL);
-    }
-
-    /**
-     * 接受master同步删除任务
-     * 本地环境偶尔会出现多次重复瞬时调用现象。导致transactionId冲突了。目前认为是Netty重试造成的。暂不需要加锁处理，
-     */
-    public static void tryDelTask(String transactionId, String scheduleId) throws Exception {
-        System.out.println(DateUtils.getCurrentDateTime() + "  transactionId=" + transactionId + " scheduleId=" + scheduleId);
-        TranlogSchedule transactionLog = new TranlogSchedule();
-        transactionLog.setId(transactionId);
-        transactionLog.setContent(scheduleId);
-        transactionLog.setStatus(TransactionStatusEnum.TRIED);
-        transactionLog.setType(TransactionTypeEnum.DELETE);
-        transactionLog.setTableName(TransactionTableEnum.SCHEDULE_BAK);
-        try {
-            TranlogScheduleDao.saveBatch(Arrays.asList(transactionLog));
-        } catch (SQLiteException e) {
-            //如果遇到主键冲突异常，则略过。主要原因是Netty重试造成，不影响系统功能
-            if (e.getMessage() != null && e.getMessage().contains("SQLITE_CONSTRAINT_PRIMARYKEY")) {
-                log.info("tryDelTask():transactionId=" + transactionId + " scheduleId=" + scheduleId);
-                log.info("normally exception!! tryDelTask():" + e.getMessage());
-            }
-        }
-
-    }
-    /**
-     * 接受master同步更新任务
-     * 本地环境偶尔会出现多次重复瞬时调用现象。导致transactionId冲突了。目前认为是Netty重试造成的。暂不需要加锁处理，
-     */
-    public static void tryUpdateTask(String transactionId, String taskIds,String values) throws Exception {
-        System.out.println(DateUtils.getCurrentDateTime() + "  transactionId=" + transactionId + " taskIds=" + taskIds);
-        TranlogSchedule transactionLog = new TranlogSchedule();
-        transactionLog.setId(transactionId);
-        transactionLog.setContent(taskIds+StringConstant.CHAR_SPRIT_STRING+values);
-        transactionLog.setStatus(TransactionStatusEnum.TRIED);
-        transactionLog.setType(TransactionTypeEnum.UPDATE);
-        transactionLog.setTableName(TransactionTableEnum.SCHEDULE_BAK);
-        try {
-            TranlogScheduleDao.saveBatch(Arrays.asList(transactionLog));
-        } catch (SQLiteException e) {
-            //如果遇到主键冲突异常，则略过。主要原因是Netty重试造成，不影响系统功能
-            if (e.getMessage() != null && e.getMessage().contains("SQLITE_CONSTRAINT_PRIMARYKEY")) {
-                log.info("tryDelTask():transactionId=" + transactionId + " taskIds=" + taskIds);
-                log.info("normally exception!! tryUpdateTask():" + e.getMessage());
-            }
-        }
-
-    }
-    /**
-     * 接受master批量同步任务入备库
-     *
-     * @param scheduleList
-     */
-    public static void saveScheduleBakBatchByTran(ScheduleDto.ScheduleList scheduleList) throws Exception {
-        List<ScheduleDto.Schedule> list = scheduleList.getSchedulesList();
-        if (list == null) return;
-        List<TranlogSchedule> logs = new ArrayList<>(list.size());
-        list.forEach(x -> {
-            ScheduleBak bak = ScheduleBak.valueOf(x);
-            TranlogSchedule transactionLog = new TranlogSchedule();
-            transactionLog.setId(bak.getTransactionId());
-            transactionLog.setContent(JSONObject.toJSONString(bak));
-            transactionLog.setStatus(TransactionStatusEnum.CONFIRM);
-            transactionLog.setType(TransactionTypeEnum.SAVE);
-            transactionLog.setTableName(TransactionTableEnum.SCHEDULE_BAK);
-            transactionLog.setSlaves(StringConstant.EMPTY);
-            logs.add(transactionLog);
-        });
-        try {
-            TranlogScheduleDao.saveBatch(logs);
-        } catch (SQLiteException e) {
-            //如果遇到主键冲突异常，则略过。主要原因是Netty重试造成，不影响系统功能
-            if (e.getMessage() != null && e.getMessage().contains("SQLITE_CONSTRAINT_PRIMARYKEY")) {
-                log.info("normally exception!! tryDelTask():" + e.getMessage());
-            }
-        }
+        TranlogScheduleBakDao.updateStatusById(transactionId, TransactionStatusEnum.CANCEL);
     }
 }

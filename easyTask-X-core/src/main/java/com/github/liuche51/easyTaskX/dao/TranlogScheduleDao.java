@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class TranlogScheduleDao {
     /**
@@ -21,7 +22,10 @@ public class TranlogScheduleDao {
      * 访问的表名称
      */
     private static final String tableName = DbTableName.TRANLOG_SCHEDULE;
-
+    /**
+     * 可重入锁
+     */
+    private static ReentrantLock lock = new ReentrantLock();
 
     public static boolean existTable() throws SQLException, ClassNotFoundException {
         SqliteHelper helper = new SqliteHelper(dbName);
@@ -187,7 +191,10 @@ public class TranlogScheduleDao {
         }
         return false;
     }
-
+    public static void deleteAll() throws SQLException, ClassNotFoundException {
+        String sql = "delete FROM " + tableName + ";";
+        SqliteHelper.executeUpdateForSync(sql, dbName, lock);
+    }
     private static TranlogSchedule getTransaction(ResultSet resultSet) throws SQLException {
         String id = resultSet.getString("id");
         String content = resultSet.getString("content");

@@ -50,7 +50,7 @@ public class ReDispatchToClientTask extends OnceTask {
                         Map<String, String> values = new HashMap<>();
                         values.put("executer", newClient.getAddress());
                         String[] scheduleIds = list.stream().map(Schedule::getId).toArray(String[]::new);
-                        NodeService.updateTask(scheduleIds, values);
+                        BrokerService.updateTask(scheduleIds, values);
                     }
 
                 }

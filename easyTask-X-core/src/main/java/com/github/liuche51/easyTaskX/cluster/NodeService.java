@@ -2,10 +2,6 @@ package com.github.liuche51.easyTaskX.cluster;
 
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.leader.BakLeaderService;
-import com.github.liuche51.easyTaskX.cluster.master.DeleteTaskTCC;
-import com.github.liuche51.easyTaskX.cluster.master.SaveTaskTCC;
-import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
-import com.github.liuche51.easyTaskX.cluster.master.UpdateTaskTCC;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.ClearDataTask;
@@ -13,27 +9,22 @@ import com.github.liuche51.easyTaskX.dao.*;
 import com.github.liuche51.easyTaskX.dao.dbinit.DbInit;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;
-import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.server.NettyServer;
 import com.github.liuche51.easyTaskX.socket.CmdServer;
 import com.github.liuche51.easyTaskX.util.Util;
-import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
-import com.github.liuche51.easyTaskX.util.exception.VotingException;
-import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.zk.ZKService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 public class NodeService {
     private static Logger log = LoggerFactory.getLogger(NodeService.class);
     private static EasyTaskConfig config = null;
-    private static volatile boolean isStarted = false;//是否已经启动
-    public static volatile boolean isFirstStarted=true;//当前节点是否属于首次启动注册到leader。默认是
+    public static volatile boolean isStarted = false;//是否已经启动
+    public static volatile boolean isFirstStarted = true;//当前节点是否属于首次启动注册到leader。默认是
     /**
      * 集群所有可用的clients
      */
@@ -109,111 +100,10 @@ public class NodeService {
         timerTasks.add(BrokerService.startCommitDelTransactionTask());
         timerTasks.add(BrokerService.startCancelSaveTransactionTask());
         timerTasks.add(BrokerService.startRetryCancelSaveTransactionTask());
-        timerTasks.add(BrokerService.startRetryDelTransactionTask());
         timerTasks.add(BrokerService.startUpdateRegeditTask());
         timerTasks.add(BakLeaderService.startBakLeaderRequestUpdateRegeditTask());
         timerTasks.add(BrokerService.startBrokerUpdateClientsTask());
         ZKService.listenLeaderDataNode();
-    }
-
-    /**
-     * 客户端提交任务。允许线程等待，直到easyTask组件启动完成
-     *
-     * @param schedule
-     * @return
-     * @throws Exception
-     */
-    public void submitTaskAllowWait(Schedule schedule) throws Exception {
-        //集群未启动或正在选举follow中，则继续等待完成
-        while (!isStarted || VoteSlave.isSelecting()) {
-            TimeUnit.SECONDS.sleep(1L);
-        }
-        this.submitTask(schedule);
-    }
-
-    /**
-     * 任务数据持久化。并同步至备份库
-     * 使用TCC机制实现事务，达到数据最终一致性
-     *
-     * @throws Exception
-     */
-    public static void submitTask(Schedule schedule) throws Exception {
-        if (!isStarted) throw new Exception("normally exception!the easyTask has not started,please wait a moment!");
-        if (VoteSlave.isSelecting())
-            throw new VotingException("normally exception!leader is voting slave,please wait a moment.");
-        //防止多线程下，follow元素操作竞争问题。确保参与提交的follow不受集群选举影响
-        List<BaseNode> slaves = new ArrayList<>(CURRENTNODE.getSlaves().size());
-        Iterator<Map.Entry<String, BaseNode>> items = CURRENTNODE.getSlaves().entrySet().iterator();
-        while (items.hasNext()) {
-            slaves.add(items.next().getValue());
-        }
-        if (slaves.size() != NodeService.getConfig().getBackupCount())
-            throw new Exception("slaves.size()!=backupCount");
-        String transactionId = Util.generateTransactionId();
-        try {
-            SaveTaskTCC.trySave(transactionId, schedule, slaves);
-            SaveTaskTCC.confirm(transactionId, schedule.getId(), slaves);
-        } catch (Exception e) {
-            log.error("", e);
-            try {
-                SaveTaskTCC.cancel(transactionId, slaves);
-            } catch (Exception e1) {
-                log.error("", e);
-                TranlogScheduleDao.updateRetryInfoById(transactionId, new Short("1"), DateUtils.getCurrentDateTime());
-            }
-            throw new Exception("task submit failed!");
-        }
-    }
-
-    /**
-     * 删除任务。含同步至备份库
-     * 使用最大努力通知机制实现事务，达到数据最终一致性
-     * 由于删除操作不需要回滚，不需要执行完整的TCC操作。必须要执行第一阶段即可
-     *
-     * @param taskId
-     * @return
-     */
-    public static boolean deleteTask(String taskId) {
-        //防止多线程下，slave元素操作竞争问题。确保参与提交的slave不受集群选举影响
-        List<BaseNode> slaves = new ArrayList<>(CURRENTNODE.getSlaves().size());
-        Iterator<Map.Entry<String, BaseNode>> items = CURRENTNODE.getSlaves().entrySet().iterator();
-        while (items.hasNext()) {
-            slaves.add(items.next().getValue());
-        }
-        String transactionId = Util.generateTransactionId();
-        try {
-            DeleteTaskTCC.tryDel(transactionId, taskId, slaves);
-            return true;
-        } catch (Exception e) {
-            //如果写本地删除日志都失败了，那么就认为删除失败
-            log.error("", e);
-            return false;
-        }
-    }
-
-    /**
-     * 更新任务。含同步至备份库
-     * 使用最大努力通知机制实现事务，达到数据最终一致性
-     * 由于更新操作不需要回滚，不需要执行完整的TCC操作。必须要执行第一阶段即可
-     *
-     * @param taskIds
-     * @return
-     */
-    public static boolean updateTask(String[] taskIds, Map<String, String> values) {
-        List<BaseNode> slaves = new ArrayList<>(CURRENTNODE.getSlaves().size());
-        Iterator<Map.Entry<String, BaseNode>> items = CURRENTNODE.getSlaves().entrySet().iterator();
-        while (items.hasNext()) {
-            slaves.add(items.next().getValue());
-        }
-        String transactionId = Util.generateTransactionId();
-        try {
-            UpdateTaskTCC.tryUpdate(transactionId, taskIds, slaves, values);
-            return true;
-        } catch (Exception e) {
-            //如果写本地更新日志都失败了，那么就认为删除失败
-            log.error("", e);
-            return false;
-        }
     }
 
     /**
@@ -224,16 +114,11 @@ public class NodeService {
         try {
             ScheduleDao.deleteAll();
             ScheduleBakDao.deleteAll();
-            ScheduleSyncDao.deleteAll();
-            //目前不清除删除类型的事务。因为这样系统重启后可以继续删除操作。最大限度保障从集群中删除
-            TranlogScheduleDao.deleteByTypes(new short[]{TransactionTypeEnum.SAVE, TransactionTypeEnum.UPDATE});
+            TranlogScheduleDao.deleteAll();
+            TranlogScheduleBakDao.deleteAll();
         } catch (Exception e) {
             log.error("deleteAllData exception!", e);
         }
-    }
-
-    public static void changeTaskClient(String oldClinet) {
-
     }
 
     public static TimerTask clearDataTask() {

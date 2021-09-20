@@ -5,9 +5,6 @@ public class TranlogScheduleBak {
     private String content;
     private short type;
     private short status;
-    private String slaves;//重试事务所需的slave地址
-    private String retryTime;
-    private short retryCount;
     private String createTime;
     private String modifyTime;
 
@@ -41,30 +38,6 @@ public class TranlogScheduleBak {
 
     public void setStatus(short status) {
         this.status = status;
-    }
-
-    public String getSlaves() {
-        return slaves;
-    }
-
-    public void setSlaves(String slaves) {
-        this.slaves = slaves;
-    }
-
-    public String getRetryTime() {
-        return retryTime;
-    }
-
-    public void setRetryTime(String retryTime) {
-        this.retryTime = retryTime;
-    }
-
-    public short getRetryCount() {
-        return retryCount;
-    }
-
-    public void setRetryCount(short retryCount) {
-        this.retryCount = retryCount;
     }
 
     public String getCreateTime() {
