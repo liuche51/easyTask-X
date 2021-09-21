@@ -97,8 +97,6 @@ public class NodeService {
         timerTasks.add(BrokerService.startHeartBeat());
         timerTasks.add(clearDataTask());
         timerTasks.add(BrokerService.startCommitSaveTransactionTask());
-        timerTasks.add(BrokerService.startCancelSaveTransactionTask());
-        timerTasks.add(BrokerService.startRetryCancelSaveTransactionTask());
         timerTasks.add(BrokerService.startUpdateRegeditTask());
         timerTasks.add(BakLeaderService.startBakLeaderRequestUpdateRegeditTask());
         timerTasks.add(BrokerService.startBrokerUpdateClientsTask());

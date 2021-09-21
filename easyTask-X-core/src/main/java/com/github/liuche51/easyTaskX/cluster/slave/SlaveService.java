@@ -42,15 +42,4 @@ public class SlaveService {
     public static void confirmSaveTask(String transactionId) throws SQLException, ClassNotFoundException {
         TranlogScheduleBakDao.updateStatusById(transactionId, TransactionStatusEnum.CONFIRM);
     }
-
-    /**
-     * 取消备份任务
-     *
-     * @param transactionId
-     * @throws SQLException
-     * @throws ClassNotFoundException
-     */
-    public static void cancelSaveTask(String transactionId) throws SQLException, ClassNotFoundException {
-        TranlogScheduleBakDao.updateStatusById(transactionId, TransactionStatusEnum.CANCEL);
-    }
 }

@@ -26,7 +26,6 @@ public abstract class BaseHandler {
                 //Master to Slave
                 put(NettyInterfaceEnum.MasterNotifySlaveTranTrySaveTask,new MasterNotifySlaveTranTrySaveTaskHandler());
                 put(NettyInterfaceEnum.MasterNotifySlaveTranConfirmSaveTask,new MasterNotifySlaveTranConfirmSaveTaskHandler());
-                put(NettyInterfaceEnum.MasterNotifySlaveTranCancelSaveTask,new MasterNotifySlaveTranCancelSaveTaskHandler());
                 //Master to Leader
                 put(NettyInterfaceEnum.MasterNotifyLeaderUpdateRegeditForDataStatus,new MasterNotifyLeaderUpdateRegeditForDataStatusHandler());
 

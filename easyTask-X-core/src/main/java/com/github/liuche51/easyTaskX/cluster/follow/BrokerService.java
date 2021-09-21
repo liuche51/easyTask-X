@@ -12,6 +12,7 @@ import com.github.liuche51.easyTaskX.cluster.task.broker.HeartbeatsTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.*;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
+import com.github.liuche51.easyTaskX.dao.SqliteHelper;
 import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.*;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
@@ -24,6 +25,7 @@ import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.DateUtils;
+import com.github.liuche51.easyTaskX.util.DbTableName;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
@@ -48,7 +50,7 @@ public class BrokerService {
      * @throws Exception
      */
     public void submitTaskAllowWait(Schedule schedule) throws Exception {
-        //集群未启动或正在选举follow中，则继续等待完成
+        //集群未启动或正在选举salve中，则继续等待完成
         while (!NodeService.isStarted || VoteSlave.isSelecting()) {
             TimeUnit.SECONDS.sleep(1L);
         }
@@ -75,7 +77,7 @@ public class BrokerService {
         } catch (Exception e) {
             log.error("", e);
             try {
-                SaveTaskTCC.cancel(transactionId);
+                SaveTaskTCC.cancel(transactionId, schedule.getId());
             } catch (Exception e1) {
                 log.error("", e);
                 TranlogScheduleDao.updateRetryInfoById(transactionId, new Short("1"), DateUtils.getCurrentDateTime());
@@ -92,13 +94,17 @@ public class BrokerService {
      * @return
      */
     public static boolean deleteTask(String taskId) {
+        SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE, ScheduleDao.getLock());
         try {
-            ScheduleDao.deleteByIds(new String[]{taskId});
+            helper.beginTran();
+            ScheduleDao.deleteByIds(new String[]{taskId}, helper);
+            helper.commitTran();
             return true;
         } catch (Exception e) {
-            //如果写本地删除日志都失败了，那么就认为删除失败
             log.error("", e);
             return false;
+        } finally {
+            helper.destroyed();
         }
     }
 
@@ -132,27 +138,6 @@ public class BrokerService {
      */
     public static TimerTask startCommitSaveTransactionTask() {
         CommitSaveTranForScheduleTask task = new CommitSaveTranForScheduleTask();
-        task.start();
-        NodeService.timerTasks.add(task);
-        return task;
-    }
-
-
-    /**
-     * 启动批量事务数据取消提交任务
-     */
-    public static TimerTask startCancelSaveTransactionTask() {
-        CancelSaveTransactionTask task = new CancelSaveTransactionTask();
-        task.start();
-        NodeService.timerTasks.add(task);
-        return task;
-    }
-
-    /**
-     * 启动重试取消保持任务
-     */
-    public static TimerTask startRetryCancelSaveTransactionTask() {
-        RetryCancelSaveTransactionTask task = new RetryCancelSaveTransactionTask();
         task.start();
         NodeService.timerTasks.add(task);
         return task;

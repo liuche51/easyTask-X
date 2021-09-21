@@ -13,10 +13,6 @@ public class TransactionStatusEnum {
      */
     public static final short CONFIRM=2;
     /**
-     * 取消阶段
-     */
-    public static final short CANCEL=3;
-    /**
      * 已完成
      */
     public static final short FINISHED=4;

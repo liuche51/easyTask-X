@@ -2,11 +2,15 @@ package com.github.liuche51.easyTaskX.cluster.master;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.dao.BinlogScheduleDao;
+import com.github.liuche51.easyTaskX.dao.ScheduleDao;
+import com.github.liuche51.easyTaskX.dao.SqliteHelper;
 import com.github.liuche51.easyTaskX.dto.*;
 
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
+import com.github.liuche51.easyTaskX.util.DbTableName;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
@@ -72,12 +76,21 @@ public class SaveTaskTCC {
 
     /**
      * 事务回滚阶段。
+     * 1、将事务标记为已完成，且删除主表的任务（实际上主表此时还没有任务，因为事务状态还处于Try。
+     * 主要是为了生生成一条删除的binlog日志。方便slave异步复制，实现删除slave上已提交的任务。达到数据最终一致性）
      *
      * @param transactionId
      * @throws Exception
      */
-    public static void cancel(String transactionId) throws Exception {
-        TranlogScheduleDao.updateStatusById(transactionId, TransactionStatusEnum.CANCEL);//自己优先标记需回滚
-        //网binglog写一条删除日志
+    public static void cancel(String transactionId, String scheduleId) throws Exception {
+        SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE, ScheduleDao.getLock());
+        helper.beginTran();
+        try {
+            TranlogScheduleDao.updateStatusById(transactionId, TransactionStatusEnum.FINISHED, helper);
+            ScheduleDao.deleteByIds(new String[]{scheduleId}, helper);
+            helper.commitTran();
+        } finally {
+            helper.destroyed();
+        }
     }
 }

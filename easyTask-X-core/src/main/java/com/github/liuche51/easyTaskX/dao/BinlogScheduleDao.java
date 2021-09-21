@@ -36,18 +36,11 @@ public class BinlogScheduleDao {
         return false;
     }
 
-    public static void save(BinlogSchedule binlogSchedule) throws SQLException, ClassNotFoundException {
-        if (!DbInit.hasInit)
-            DbInit.init();
+    public static void save(String schedulesql, SqliteHelper helper) throws SQLException {
+        BinlogSchedule binlogSchedule=new BinlogSchedule();
+        binlogSchedule.setSql(schedulesql);
         String sql = contactSaveSql(Arrays.asList(binlogSchedule));
-        SqliteHelper.executeUpdateForSync(sql, dbName, ScheduleDao.getLock());
-    }
-
-    public static void saveBatch(List<BinlogSchedule> binlogSchedules) throws Exception {
-        if (!DbInit.hasInit)
-            DbInit.init();
-        String sql = contactSaveSql(binlogSchedules);
-        SqliteHelper.executeUpdateForSync(sql, dbName, ScheduleDao.getLock());
+        helper.executeUpdate(sql);
     }
 
     private static BinlogSchedule getBinlogSchedule(ResultSet resultSet) throws SQLException {

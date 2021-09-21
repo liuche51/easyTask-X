@@ -59,8 +59,12 @@ public class TranlogScheduleDao {
         String sql = "update " + tableName + " set status=" + status + ",modify_time='" + DateUtils.getCurrentDateTime() + "' where id='" + id + "';";
         SqliteHelper.executeUpdateForSync(sql, dbName, ScheduleDao.getLock());
     }
+    public static void updateStatusById(String id, short status,SqliteHelper helper) throws SQLException, ClassNotFoundException {
+        String sql = "update " + tableName + " set status=" + status + ",modify_time='" + DateUtils.getCurrentDateTime() + "' where id='" + id + "';";
+        SqliteHelper.executeUpdateForSync(sql, dbName, ScheduleDao.getLock());
+    }
 
-    public static void updateStatusByIds(String[] ids, short status, SqliteHelper helper) throws SQLException {
+    public static void updateStatusByIds(String[] ids, short status,SqliteHelper helper ) throws SQLException {
         String str = SqliteHelper.getInConditionStr(ids);
         String sql = "update " + tableName + " set status=" + status + ",modify_time='" + DateUtils.getCurrentDateTime() + "' where id in" + str + ";";
         helper.executeUpdate(sql);
