@@ -116,20 +116,30 @@ public class BrokerService {
      * @return
      */
     public static boolean updateTask(String[] taskIds, Map<String, String> values) {
-        String transactionId = Util.generateTransactionId();
+        SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE, ScheduleDao.getLock());
         try {
-            TranlogSchedule transactionLog = new TranlogSchedule();
-            transactionLog.setId(transactionId);
-            String json = JSONObject.toJSONString(values);
-            String taskIds2 = String.join(",", taskIds);
-            transactionLog.setContent(taskIds2 + StringConstant.CHAR_SPRIT_STRING + json);
-            transactionLog.setStatus(TransactionStatusEnum.CONFIRM);
-            TranlogScheduleDao.saveBatch(Arrays.asList(transactionLog));
+            Iterator<Map.Entry<String, String>> items2 = values.entrySet().iterator();
+            //组装更新字段。目前只有一个字段。支持未来扩展成多个字段
+            StringBuilder updatestr = new StringBuilder();
+            while (items2.hasNext()) {
+                Map.Entry<String, String> item2 = items2.next();
+                switch (item2.getKey()) {
+                    case "executer":
+                        updatestr.append("executer='").append(item2.getValue()).append("'");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            helper.beginTran();
+            ScheduleDao.updateByIds(taskIds, updatestr.toString(), helper);
+            helper.commitTran();
             return true;
         } catch (Exception e) {
-            //如果写本地更新日志都失败了，那么就认为删除失败
             log.error("", e);
             return false;
+        } finally {
+            helper.destroyed();
         }
     }
 

@@ -140,10 +140,11 @@ public class ScheduleDao {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public static void updateByIds(String[] ids, String updateStr) throws SQLException, ClassNotFoundException {
+    public static void updateByIds(String[] ids, String updateStr, SqliteHelper helper) throws SQLException, ClassNotFoundException {
         String instr = SqliteHelper.getInConditionStr(ids);
         String sql = "UPDATE " + tableName + " set " + updateStr + ",modify_time='" + DateUtils.getCurrentDateTime() + "' where id in " + instr + ";";
-        SqliteHelper.executeUpdateForSync(sql, dbName, lock);
+        helper.executeUpdate(sql);
+        BinlogScheduleDao.save(sql,helper);
     }
 
     public static void deleteByIds(String[] ids, SqliteHelper helper) throws SQLException, ClassNotFoundException {
