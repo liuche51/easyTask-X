@@ -74,22 +74,10 @@ public class SaveTaskTCC {
      * 事务回滚阶段。
      *
      * @param transactionId
-     * @param slave
      * @throws Exception
      */
-    public static void cancel(String transactionId, BaseNode slave) throws Exception {
+    public static void cancel(String transactionId) throws Exception {
         TranlogScheduleDao.updateStatusById(transactionId, TransactionStatusEnum.CANCEL);//自己优先标记需回滚
-        retryCancel(transactionId, slave);
-    }
-
-    public static void retryCancel(String transactionId, BaseNode slave) throws Exception {
-        Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.MasterNotifySlaveTranCancelSaveTask).setSource(NodeService.getConfig().getAddress())
-                .setBody(transactionId);
-        NettyClient client = slave.getClientWithCount(1);
-        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, client, 1, 0, null);
-        if (!ret) {
-            throw new Exception("ret=false");
-        }
+        //网binglog写一条删除日志
     }
 }

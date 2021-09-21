@@ -97,7 +97,6 @@ public class NodeService {
         timerTasks.add(BrokerService.startHeartBeat());
         timerTasks.add(clearDataTask());
         timerTasks.add(BrokerService.startCommitSaveTransactionTask());
-        timerTasks.add(BrokerService.startCommitDelTransactionTask());
         timerTasks.add(BrokerService.startCancelSaveTransactionTask());
         timerTasks.add(BrokerService.startRetryCancelSaveTransactionTask());
         timerTasks.add(BrokerService.startUpdateRegeditTask());
@@ -115,7 +114,6 @@ public class NodeService {
             ScheduleDao.deleteAll();
             ScheduleBakDao.deleteAll();
             TranlogScheduleDao.deleteAll();
-            TranlogScheduleBakDao.deleteAll();
         } catch (Exception e) {
             log.error("deleteAllData exception!", e);
         }

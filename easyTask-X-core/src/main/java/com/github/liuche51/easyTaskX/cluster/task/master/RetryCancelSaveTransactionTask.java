@@ -45,9 +45,8 @@ public class RetryCancelSaveTransactionTask extends TimerTask {
                                     continue;
                                 }
                             }
-                            BaseNode cancelSlave = new BaseNode(x.getSlaves());
                             log.info("RetryDelTransactionTask()->retryCancel():transactionId=" + x.getId() + " retryCount=" + x.getRetryCount() + ",retryTime=" + x.getRetryTime());
-                            SaveTaskTCC.retryCancel(x.getId(), cancelSlave);
+                            SaveTaskTCC.cancel(x.getId());
                             TranlogScheduleDao.updateStatusById(x.getId(), TransactionStatusEnum.FINISHED);
                         } catch (Exception e) {
                             log.error("RetryCancelSaveTransactionTask() item exception!", e);

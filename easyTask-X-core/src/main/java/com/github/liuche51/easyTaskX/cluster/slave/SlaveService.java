@@ -1,7 +1,9 @@
 package com.github.liuche51.easyTaskX.cluster.slave;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.liuche51.easyTaskX.dao.TranlogScheduleBakDao;
 import com.github.liuche51.easyTaskX.dto.db.ScheduleBak;
+import com.github.liuche51.easyTaskX.dto.db.TranlogScheduleBak;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
 import org.slf4j.Logger;
@@ -27,7 +29,6 @@ public class SlaveService {
         transactionLog.setId(schedule.getTransactionId());
         transactionLog.setContent(JSONObject.toJSONString(bak));
         transactionLog.setStatus(TransactionStatusEnum.TRIED);
-        transactionLog.setType(TransactionTypeEnum.SAVE);
         TranlogScheduleBakDao.saveBatch(Arrays.asList(transactionLog));
     }
 

@@ -21,14 +21,7 @@ public class NettyInterfaceEnum {
      * 取消任务接口。事务回滚
      */
     public static final String MasterNotifySlaveTranCancelSaveTask="MasterNotifySlaveTranCancelSaveTask";
-    /**
-     * 预备删除任务接口。阶段一
-     */
-    public static final String MasterNotifySlaveTranTryDelTask="MasterNotifySlaveTranTryDelTask";
-    /**
-     * 预备更新任务接口。阶段一
-     */
-    public static final String MasterNotifySlaveTranTryUpdateTask="MasterNotifySlaveTranTryUpdateTask";
+
     /**
      * master同步任务数据给新slave备份接口
      */
@@ -45,10 +38,6 @@ public class NettyInterfaceEnum {
      * leader通知slaves已经选出新master
      */
     public static final String LeaderNotiySlaveVotedNewMaster="LeaderNotiySlaveVotedNewMaster";
-    /**
-     * leader通知master已经选出新Slave
-     */
-    public static final String LeaderNotifyMasterVoteNewSlave="LeaderNotifyMasterVoteNewSlave";
     /**
      * leader通知broker更新注册表信息
      */

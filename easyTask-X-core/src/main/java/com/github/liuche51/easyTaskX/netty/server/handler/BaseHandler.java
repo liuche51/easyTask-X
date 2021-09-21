@@ -7,7 +7,6 @@ import com.github.liuche51.easyTaskX.netty.server.handler.broker.*;
 import com.github.liuche51.easyTaskX.netty.server.handler.follow.*;
 import com.github.liuche51.easyTaskX.netty.server.handler.leader.*;
 import com.github.liuche51.easyTaskX.netty.server.handler.leader.MasterNotifyLeaderUpdateRegeditForDataStatusHandler;
-import com.github.liuche51.easyTaskX.netty.server.handler.master.LeaderNotifyMasterVoteNewSlaveHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.slave.*;
 import com.google.protobuf.ByteString;
 
@@ -28,9 +27,6 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.MasterNotifySlaveTranTrySaveTask,new MasterNotifySlaveTranTrySaveTaskHandler());
                 put(NettyInterfaceEnum.MasterNotifySlaveTranConfirmSaveTask,new MasterNotifySlaveTranConfirmSaveTaskHandler());
                 put(NettyInterfaceEnum.MasterNotifySlaveTranCancelSaveTask,new MasterNotifySlaveTranCancelSaveTaskHandler());
-                put(NettyInterfaceEnum.MasterNotifySlaveTranTryDelTask,new MasterNotifySlaveTranTryDelTaskHandler());
-                put(NettyInterfaceEnum.MasterNotifySlaveTranTryUpdateTask,new MasterNotifySlaveTranTryUpdateTaskHandler());
-                put(NettyInterfaceEnum.MasterSyncDataToNewSlave,new MasterSyncDataToNewSlaveHandler());
                 //Master to Leader
                 put(NettyInterfaceEnum.MasterNotifyLeaderUpdateRegeditForDataStatus,new MasterNotifyLeaderUpdateRegeditForDataStatusHandler());
 
@@ -41,8 +37,6 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.LeaderNotifyBrokerUpdateRegedit,new LeaderNotifyBrokerUpdateRegeditHandler());
                 put(NettyInterfaceEnum.LeaderNotifyBrokerClientChanged,new LeaderNotifyBrokerClientChangedHandler());
                 put(NettyInterfaceEnum.LeaderNotifyBrokerRegisterSucceeded,new LeaderNotifyBrokerRegisterSucceededHandler());
-                //Leader to Master
-                put(NettyInterfaceEnum.LeaderNotifyMasterVoteNewSlave,new LeaderNotifyMasterVoteNewSlaveHandler());
                 //Leader to Slave
                 put(NettyInterfaceEnum.LeaderNotiySlaveVotedNewMaster,new LeaderNotiySlaveVotedNewMasterHandler());
                 //Leader to Follow

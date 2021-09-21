@@ -103,8 +103,10 @@ public class CheckFollowsAliveTask extends TimerTask {
                                     if (regSlave == null || DateUtils.isGreaterThanLoseTime(regSlave.getLastHeartbeat())) {
                                         try {
                                             RegNode newSlave = VoteSlave.voteNewSlave(regNode, slave);
-                                            LeaderService.notifyMasterVoteNewSlave(regNode, newSlave.getAddress(), slave.getAddress());
-                                            LeaderService.notifyFollowsUpdateRegedit(Collections.singletonList(newSlave), StringConstant.BROKER);
+                                            List<RegNode> nodes=new ArrayList<>(2);
+                                            nodes.add(regNode);
+                                            nodes.add(newSlave);
+                                            LeaderService.notifyFollowsUpdateRegedit(nodes, StringConstant.BROKER);
                                             LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), Arrays.asList(regNode, brokers.get(newSlave.getAddress())), StringConstant.UPDATE);
                                             //如果当前节点是Leader自己变更slave，则需要通知所有其他所有Follows更新备用Leader信息
                                             if (regNode.getAddress().equals(NodeService.CURRENTNODE.getClusterLeader().getAddress())) {

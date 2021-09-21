@@ -200,31 +200,6 @@ public class LeaderService {
     }
 
     /**
-     * leader通知master，已经选出新Slave。
-     *
-     * @param master
-     * @param newSlaveAddress
-     * @param oldSlaveAddress
-     */
-    public static void notifyMasterVoteNewSlave(RegBroker master, String newSlaveAddress, String oldSlaveAddress) {
-        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyMasterVoteNewSlave)
-                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(newSlaveAddress + StringConstant.CHAR_SPRIT_STRING + oldSlaveAddress);
-                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, master.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
-                    if (!ret)
-                        log.info("normally exception!notifyMasterVoteNewSlave() failed.");
-                } catch (Exception e) {
-                    log.error("", e);
-                }
-            }
-        });
-    }
-
-    /**
      * 启动leader检查所有follows是否存活任务
      */
     public static TimerTask startCheckFollowAliveTask() {

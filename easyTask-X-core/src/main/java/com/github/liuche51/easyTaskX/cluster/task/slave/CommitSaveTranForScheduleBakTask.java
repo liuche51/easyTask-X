@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.*;
 import com.github.liuche51.easyTaskX.dto.db.ScheduleBak;
+import com.github.liuche51.easyTaskX.dto.db.TranlogScheduleBak;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
 import com.github.liuche51.easyTaskX.util.DbTableName;
 
@@ -24,7 +25,7 @@ public class CommitSaveTranForScheduleBakTask extends TimerTask {
             setLastRunTime(new Date());
             List<ScheduleBak> scheduleBakList = new LinkedList<>();
             try {
-                tranlogScheduleBakList = TranlogScheduleBakDao.selectByStatusAndType(TransactionStatusEnum.CONFIRM, TransactionTypeEnum.SAVE, 100);
+                tranlogScheduleBakList = TranlogScheduleBakDao.selectByStatusAndType(TransactionStatusEnum.CONFIRM, 100);
                 if (tranlogScheduleBakList != null && tranlogScheduleBakList.size() > 0) {
                     tranlogScheduleBakList.forEach(x -> {
                         scheduleBakList.add(JSONObject.parseObject(x.getContent(), ScheduleBak.class));

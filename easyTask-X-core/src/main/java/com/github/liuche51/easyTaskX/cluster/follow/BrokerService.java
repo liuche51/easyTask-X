@@ -75,7 +75,7 @@ public class BrokerService {
         } catch (Exception e) {
             log.error("", e);
             try {
-                SaveTaskTCC.cancel(transactionId, (BaseNode) slaves[0]);
+                SaveTaskTCC.cancel(transactionId);
             } catch (Exception e1) {
                 log.error("", e);
                 TranlogScheduleDao.updateRetryInfoById(transactionId, new Short("1"), DateUtils.getCurrentDateTime());
