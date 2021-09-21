@@ -17,11 +17,9 @@ public class DBMonitor {
         Map<String,List> map=new HashMap<>(3);
         List<TranlogSchedule> tranlogs= TranlogScheduleDao.selectByTaskId(taskId);
         List<Schedule> schedules= ScheduleDao.selectByTaskId(taskId);
-        List<ScheduleSync> scheduleSyncs= ScheduleSyncDao.selectByTaskId(taskId);
         List<ScheduleBak> scheduleBaks= ScheduleBakDao.selectByTaskId(taskId);
         map.put(DbTableName.TRANLOG_SCHEDULE,tranlogs);
         map.put(DbTableName.SCHEDULE,schedules);
-        map.put(DbTableName.SCHEDULE_SYNC,scheduleSyncs);
         map.put(DbTableName.SCHEDULE_BAK,scheduleBaks);
         return map;
     }

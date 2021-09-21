@@ -31,7 +31,6 @@ public class ClearDataTask extends TimerTask {
                 }
                 ScheduleBakDao.deleteBySources(sources.toArray(new String[sources.size()]));
                 TranlogScheduleDao.deleteByStatus(TransactionStatusEnum.FINISHED);
-                ScheduleSyncDao.deleteByStatus(ScheduleSyncStatusEnum.DELETED);
                 List<String> deleteids = new LinkedList<>();
                 List<TranlogSchedule> tranlogList = TranlogScheduleDao.selectByStatus(TransactionStatusEnum.TRIED);
                 tranlogList.forEach(x -> {

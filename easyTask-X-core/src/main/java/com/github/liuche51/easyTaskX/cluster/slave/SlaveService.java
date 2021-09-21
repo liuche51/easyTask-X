@@ -1,25 +1,14 @@
 package com.github.liuche51.easyTaskX.cluster.slave;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.dao.TranlogScheduleBakDao;
-import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.db.ScheduleBak;
-import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
-import com.github.liuche51.easyTaskX.dto.db.TranlogScheduleBak;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
-import com.github.liuche51.easyTaskX.enume.TransactionTableEnum;
-import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
-import com.github.liuche51.easyTaskX.util.DateUtils;
-import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sqlite.SQLiteException;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Slave服务入口

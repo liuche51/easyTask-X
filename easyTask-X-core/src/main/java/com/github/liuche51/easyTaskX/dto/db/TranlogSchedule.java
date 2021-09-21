@@ -3,8 +3,10 @@ package com.github.liuche51.easyTaskX.dto.db;
 public class TranlogSchedule {
     private String id;
     private String content;
-    private short type;
     private short status;
+    private String retryTime;
+    private short retryCount;
+    private String slaves;//重试事务所需的slave地址
     private String createTime;
     private String modifyTime;
 
@@ -24,20 +26,36 @@ public class TranlogSchedule {
         this.content = content;
     }
 
-    public short getType() {
-        return type;
-    }
-
-    public void setType(short type) {
-        this.type = type;
-    }
-
     public short getStatus() {
         return status;
     }
 
     public void setStatus(short status) {
         this.status = status;
+    }
+
+    public String getRetryTime() {
+        return retryTime;
+    }
+
+    public void setRetryTime(String retryTime) {
+        this.retryTime = retryTime;
+    }
+
+    public short getRetryCount() {
+        return retryCount;
+    }
+
+    public void setRetryCount(short retryCount) {
+        this.retryCount = retryCount;
+    }
+
+    public String getSlaves() {
+        return slaves;
+    }
+
+    public void setSlaves(String slaves) {
+        this.slaves = slaves;
     }
 
     public String getCreateTime() {

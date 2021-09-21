@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.cluster.task.master;
 
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
@@ -39,7 +40,7 @@ public class NewMasterSyncBakDataTask extends OnceTask {
                 baks.forEach(x -> {
                     try {
                         Schedule schedule = Schedule.valueOf(x);
-                        NodeService.submitTask(schedule);//模拟客户端重新提交任务
+                        BrokerService.submitTask(schedule);//模拟客户端重新提交任务
                         ScheduleBakDao.delete(x.getId());
                     }
                     //遇到正在选举follow时，需要休眠500毫秒。防止短时间内反复提交失败

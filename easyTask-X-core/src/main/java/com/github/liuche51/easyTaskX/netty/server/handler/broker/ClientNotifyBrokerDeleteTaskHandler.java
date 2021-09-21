@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.netty.server.handler.broker;
 
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.google.protobuf.ByteString;
@@ -15,7 +16,7 @@ public class ClientNotifyBrokerDeleteTaskHandler extends BaseHandler {
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {
         String taskId = frame.getBody();
-        boolean ret= NodeService.deleteTask(taskId);
+        boolean ret= BrokerService.deleteTask(taskId);
         if(!ret) throw new Exception("ret=false");
         return ByteString.copyFromUtf8(taskId);
     }

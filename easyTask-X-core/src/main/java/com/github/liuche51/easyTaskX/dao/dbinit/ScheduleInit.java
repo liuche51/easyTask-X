@@ -46,7 +46,6 @@ public class ScheduleInit {
             String sql4 = "CREATE TABLE \"" + DbTableName.TRANLOG_SCHEDULE + "\" (\n" +
                     "\"id\"  TEXT NOT NULL,\n" +
                     "\"content\"  TEXT,\n" +
-                    "\"type\"  INTEGER,\n" +
                     "\"status\"  INTEGER,\n" +
                     "\"slaves\"  TEXT,\n" +
                     "\"retry_time\"  TEXT,\n" +
@@ -57,7 +56,7 @@ public class ScheduleInit {
                     ");";
             SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE);
             helper.executeUpdate(sql4);
-            String indexsql = "CREATE INDEX index_status_type ON " + DbTableName.TRANLOG_SCHEDULE + " (status,type);";
+            String indexsql = "CREATE INDEX index_status ON " + DbTableName.TRANLOG_SCHEDULE + " (status);";
             SqliteHelper helper2 = new SqliteHelper(DbTableName.SCHEDULE);
             helper2.executeUpdate(indexsql);
         }

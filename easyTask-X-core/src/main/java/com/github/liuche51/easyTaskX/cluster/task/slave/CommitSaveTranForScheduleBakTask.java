@@ -3,20 +3,14 @@ package com.github.liuche51.easyTaskX.cluster.task.slave;
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dao.*;
-import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.dto.db.ScheduleBak;
-import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
-import com.github.liuche51.easyTaskX.dto.db.TranlogScheduleBak;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
-import com.github.liuche51.easyTaskX.enume.TransactionTableEnum;
-import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
 import com.github.liuche51.easyTaskX.util.DbTableName;
 
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * 新增备份任务提交定时任务

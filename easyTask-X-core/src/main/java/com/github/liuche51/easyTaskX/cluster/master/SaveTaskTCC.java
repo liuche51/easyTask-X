@@ -35,7 +35,7 @@ public class SaveTaskTCC {
         transactionLog.setId(transactionId);
         transactionLog.setContent(JSONObject.toJSONString(schedule));
         transactionLog.setStatus(TransactionStatusEnum.TRIED);
-        transactionLog.setType(TransactionTypeEnum.SAVE);
+        transactionLog.setSlaves(slave.getAddress());
         TranlogScheduleDao.saveBatch(Arrays.asList(transactionLog));
         ScheduleDto.Schedule s = schedule.toScheduleDto();
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();

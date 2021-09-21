@@ -11,7 +11,6 @@ import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionTableEnum;
-import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.StringUtils;
 
@@ -29,18 +28,15 @@ import java.util.stream.Collectors;
 public class RetryCancelSaveTransactionTask extends TimerTask {
     @Override
     public void run() {
-        List<TranlogSchedule> list = null;
+        List<TranlogSchedule> tranlogScheduleList = null;
         while (!isExit()) {
             setLastRunTime(new Date());
-            List<TranlogSchedule> scheduleList = null, scheduleBakList = null;
             try {
-                list = TranlogScheduleDao.selectByStatusAndReTryCount(TransactionStatusEnum.CANCEL, TransactionTypeEnum.SAVE, new Short("3"), 100);
-                scheduleList = list.stream().filter(x -> TransactionTableEnum.SCHEDULE.equals(x.getTableName())).collect(Collectors.toList());
-                scheduleBakList = list.stream().filter(x -> TransactionTableEnum.SCHEDULE_BAK.equals(x.getTableName())).collect(Collectors.toList());
-                if (scheduleList != null && scheduleList.size() > 0) {
-                    String[] scheduleTranIds = scheduleList.stream().map(TranlogSchedule::getId).toArray(String[]::new);
+                tranlogScheduleList = TranlogScheduleDao.selectByStatusAndReTryCount(TransactionStatusEnum.CANCEL, new Short("3"), 100);
+                if (tranlogScheduleList != null && tranlogScheduleList.size() > 0) {
+                    String[] scheduleTranIds = tranlogScheduleList.stream().map(TranlogSchedule::getId).toArray(String[]::new);
                     ScheduleDao.deleteByTransactionIds(scheduleTranIds);//先清掉自己已经提交的事务
-                    for (TranlogSchedule x : scheduleList) {
+                    for (TranlogSchedule x : tranlogScheduleList) {
                         try {
                             //如果距离上次重试时间不足5分钟，则跳过重试
                             if (!StringUtils.isNullOrEmpty(x.getRetryTime())) {
@@ -49,16 +45,9 @@ public class RetryCancelSaveTransactionTask extends TimerTask {
                                     continue;
                                 }
                             }
-                            List<String> cancelFollowsHost = JSONObject.parseObject(x.getSlaves(), new TypeReference<List<String>>() {});
-                            List<BaseNode> cancelFollows = new ArrayList<>(cancelFollowsHost.size());
-                            if (cancelFollowsHost != null) {
-                                cancelFollowsHost.forEach(y -> {
-                                    String[] hp = y.split(":");
-                                    cancelFollows.add(new Node(hp[0], Integer.parseInt(hp[1])));
-                                });
-                                log.info("RetryDelTransactionTask()->retryCancel():transactionId="+x.getId()+" retryCount="+x.getRetryCount()+",retryTime="+x.getRetryTime());
-                                SaveTaskTCC.retryCancel(x.getId(), cancelFollows);
-                            }
+                            BaseNode cancelSlave = new BaseNode(x.getSlaves());
+                            log.info("RetryDelTransactionTask()->retryCancel():transactionId=" + x.getId() + " retryCount=" + x.getRetryCount() + ",retryTime=" + x.getRetryTime());
+                            SaveTaskTCC.retryCancel(x.getId(), cancelSlave);
                             TranlogScheduleDao.updateStatusById(x.getId(), TransactionStatusEnum.FINISHED);
                         } catch (Exception e) {
                             log.error("RetryCancelSaveTransactionTask() item exception!", e);
@@ -66,17 +55,12 @@ public class RetryCancelSaveTransactionTask extends TimerTask {
                         }
                     }
                 }
-                if (scheduleBakList != null && scheduleBakList.size() > 0) {
-                    String[] scheduleBakIds = scheduleList.stream().map(TranlogSchedule::getId).toArray(String[]::new);
-                    ScheduleDao.deleteByTransactionIds(scheduleBakIds);
-                    TranlogScheduleDao.updateStatusByIds(scheduleBakIds, TransactionStatusEnum.FINISHED);
-                }
 
             } catch (Exception e) {
                 log.error("", e);
             }
             try {
-                if (new Date().getTime()-getLastRunTime().getTime()<500)//防止频繁空转
+                if (new Date().getTime() - getLastRunTime().getTime() < 500)//防止频繁空转
                     TimeUnit.MILLISECONDS.sleep(500L);
             } catch (InterruptedException e) {
                 log.error("", e);

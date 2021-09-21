@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.netty.server.handler.broker;
 
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
@@ -17,7 +18,7 @@ public class ClientNotifyBrokerSubmitTaskHandler extends BaseHandler {
     public ByteString process(Dto.Frame frame) throws Exception {
         ScheduleDto.Schedule dto = ScheduleDto.Schedule.parseFrom(frame.getBodyBytes());
         Schedule schedule=Schedule.valueOf(dto);
-        NodeService.submitTask(schedule);
+        BrokerService.submitTask(schedule);
         return null;
     }
 }

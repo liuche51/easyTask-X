@@ -11,6 +11,7 @@ import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerRequestUpdateRege
 import com.github.liuche51.easyTaskX.cluster.task.broker.HeartbeatsTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.*;
+import com.github.liuche51.easyTaskX.dao.ScheduleDao;
 import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.*;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
@@ -20,7 +21,6 @@ import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
-import com.github.liuche51.easyTaskX.enume.TransactionTypeEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.DateUtils;
@@ -92,14 +92,8 @@ public class BrokerService {
      * @return
      */
     public static boolean deleteTask(String taskId) {
-        String transactionId = Util.generateTransactionId();
         try {
-            TranlogSchedule transactionLog = new TranlogSchedule();
-            transactionLog.setId(transactionId);
-            transactionLog.setContent(taskId);
-            transactionLog.setStatus(TransactionStatusEnum.CONFIRM);
-            transactionLog.setType(TransactionTypeEnum.DELETE);
-            TranlogScheduleDao.saveBatch(Arrays.asList(transactionLog));
+            ScheduleDao.deleteByIds(new String[]{taskId});
             return true;
         } catch (Exception e) {
             //如果写本地删除日志都失败了，那么就认为删除失败
@@ -124,7 +118,6 @@ public class BrokerService {
             String taskIds2 = String.join(",", taskIds);
             transactionLog.setContent(taskIds2 + StringConstant.CHAR_SPRIT_STRING + json);
             transactionLog.setStatus(TransactionStatusEnum.CONFIRM);
-            transactionLog.setType(TransactionTypeEnum.UPDATE);
             TranlogScheduleDao.saveBatch(Arrays.asList(transactionLog));
             return true;
         } catch (Exception e) {
@@ -144,15 +137,6 @@ public class BrokerService {
         return task;
     }
 
-    /**
-     * 启动批量事务数据删除任务
-     */
-    public static TimerTask startCommitDelTransactionTask() {
-        CommitDelTransactionTask task = new CommitDelTransactionTask();
-        task.start();
-        NodeService.timerTasks.add(task);
-        return task;
-    }
 
     /**
      * 启动批量事务数据取消提交任务

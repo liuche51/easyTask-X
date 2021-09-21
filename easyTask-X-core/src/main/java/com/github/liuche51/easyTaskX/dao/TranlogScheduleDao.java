@@ -46,10 +46,10 @@ public class TranlogScheduleDao {
         if (!DbInit.hasInit)
             DbInit.init();
         transactionLogs.forEach(x -> {
-            x.setCreateTime(DateUtils.getCurrentDateTime());
-            x.setModifyTime(DateUtils.getCurrentDateTime());
             x.setRetryCount(new Short("0"));
             x.setRetryTime(StringConstant.EMPTY);
+            x.setCreateTime(DateUtils.getCurrentDateTime());
+            x.setModifyTime(DateUtils.getCurrentDateTime());
         });
         String sql = contactSaveSql(transactionLogs);
         SqliteHelper.executeUpdateForSync(sql, dbName, ScheduleDao.getLock());
@@ -66,34 +66,29 @@ public class TranlogScheduleDao {
         helper.executeUpdate(sql);
     }
 
-    public static void updateRetryInfoById(String id, short retryCount, String retryTime) throws SQLException, ClassNotFoundException {
-        String sql = "update " + tableName + " set retry_count=" + retryCount + ",modify_time='" + retryTime + "',modify_time='" + DateUtils.getCurrentDateTime() + "' where id='" + id + "';";
-        SqliteHelper.executeUpdateForSync(sql, dbName, ScheduleDao.getLock());
-    }
-
-    public static List<TranlogSchedule> selectByStatusAndType(short status, short type, int count) throws SQLException, ClassNotFoundException {
+    public static List<TranlogSchedule> selectByStatusAndType(short status,int count) throws SQLException, ClassNotFoundException {
         List<TranlogSchedule> list = new LinkedList<>();
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
-            ResultSet resultSet = helper.executeQuery("SELECT * FROM " + tableName + " where status = " + status + " and type=" + type + " limit " + count + ";");
+            ResultSet resultSet = helper.executeQuery("SELECT * FROM " + tableName + " where status = " + status + " limit " + count + ";");
             while (resultSet.next()) {
                 TranlogSchedule transactionLog = getTransaction(resultSet);
                 list.add(transactionLog);
             }
         } catch (SQLiteException e) {
-            SqliteHelper.writeDatabaseLockedExceptionLog(e, "TransactionLogDao->selectByStatusAndType");
+            SqliteHelper.writeDatabaseLockedExceptionLog(e, "TranlogScheduleDao->selectByStatusAndType");
         } finally {
             helper.destroyed();
         }
         return list;
     }
 
-    public static List<TranlogSchedule> selectByStatusAndType(short[] status, short type, int count) throws SQLException, ClassNotFoundException {
+    public static List<TranlogSchedule> selectByStatusAndType(short[] status, int count) throws SQLException, ClassNotFoundException {
         List<TranlogSchedule> list = new LinkedList<>();
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
             String instr = SqliteHelper.getInConditionStr(status);
-            ResultSet resultSet = helper.executeQuery("SELECT * FROM " + tableName + " where status in " + instr + " and type=" + type + " limit " + count + ";");
+            ResultSet resultSet = helper.executeQuery("SELECT * FROM " + tableName + " where status in " + instr +" limit " + count + ";");
             while (resultSet.next()) {
                 TranlogSchedule transactionLog = getTransaction(resultSet);
                 list.add(transactionLog);
@@ -106,11 +101,11 @@ public class TranlogScheduleDao {
         return list;
     }
 
-    public static List<TranlogSchedule> selectByStatusAndReTryCount(short status, short type, short lessThanCancelReTryCount, int count) throws SQLException, ClassNotFoundException {
+    public static List<TranlogSchedule> selectByStatusAndReTryCount(short status,  short lessThanCancelReTryCount, int count) throws SQLException, ClassNotFoundException {
         List<TranlogSchedule> list = new LinkedList<>();
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
-            ResultSet resultSet = helper.executeQuery("SELECT * FROM " + tableName + " where status = " + status + " and type=" + type + " and retry_count<" + lessThanCancelReTryCount + " limit " + count + ";");
+            ResultSet resultSet = helper.executeQuery("SELECT * FROM " + tableName + " where status = " + status + " and retry_count<" + lessThanCancelReTryCount + " limit " + count + ";");
             while (resultSet.next()) {
                 TranlogSchedule transactionLog = getTransaction(resultSet);
                 list.add(transactionLog);
@@ -123,7 +118,7 @@ public class TranlogScheduleDao {
         return list;
     }
 
-    public static List<TranlogSchedule> selectByStatus(short status) throws SQLException, ClassNotFoundException {
+    public static List<TranlogSchedule> selectByStatus(short status) throws SQLException {
         List<TranlogSchedule> list = new LinkedList<>();
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
@@ -156,14 +151,10 @@ public class TranlogScheduleDao {
         }
         return list;
     }
-
-    public static void deleteByTypes(short[] types) throws SQLException, ClassNotFoundException {
-        if (types == null || types.length == 0) return;
-        String instr = SqliteHelper.getInConditionStr(types);
-        String sql = "delete FROM " + tableName + " where type in " + instr + ";";
+    public static void updateRetryInfoById(String id, short retryCount, String retryTime) throws SQLException, ClassNotFoundException {
+        String sql = "update " + tableName + " set retry_count=" + retryCount + ",modify_time='" + retryTime + "',modify_time='" + DateUtils.getCurrentDateTime() + "' where id='" + id + "';";
         SqliteHelper.executeUpdateForSync(sql, dbName, ScheduleDao.getLock());
     }
-
     public static void deleteByStatus(short status) throws SQLException, ClassNotFoundException {
         String sql = "delete FROM " + tableName + " where status = " + status + ";";
         SqliteHelper.executeUpdateForSync(sql, dbName, ScheduleDao.getLock());
@@ -175,22 +166,6 @@ public class TranlogScheduleDao {
         String sql = "delete FROM " + tableName + " where id in " + instr + ";";
         SqliteHelper.executeUpdateForSync(sql, dbName, ScheduleDao.getLock());
     }
-
-    public static boolean isExistById(String id) throws SQLException, ClassNotFoundException {
-        SqliteHelper helper = new SqliteHelper(dbName);
-        try {
-            ResultSet resultSet = helper.executeQuery("SELECT count(0) as count FROM " + tableName + " where id ='" + id + "';");
-            while (resultSet.next()) {
-                int count = resultSet.getInt("count");
-                if (count > 0) return true;
-            }
-        } catch (SQLiteException e) {
-            SqliteHelper.writeDatabaseLockedExceptionLog(e, "TransactionLogDao->isExistById");
-        } finally {
-            helper.destroyed();
-        }
-        return false;
-    }
     public static void deleteAll() throws SQLException, ClassNotFoundException {
         String sql = "delete FROM " + tableName + ";";
         SqliteHelper.executeUpdateForSync(sql, dbName, lock);
@@ -198,21 +173,19 @@ public class TranlogScheduleDao {
     private static TranlogSchedule getTransaction(ResultSet resultSet) throws SQLException {
         String id = resultSet.getString("id");
         String content = resultSet.getString("content");
-        short type = resultSet.getShort("type");
         short status = resultSet.getShort("status");
-        String follows = resultSet.getString("follows");
         String retryTime = resultSet.getString("retry_time");
         short retryCount = resultSet.getShort("retry_count");
+        String slaves = resultSet.getString("slaves");
         String modifyTime = resultSet.getString("modify_time");
         String createTime = resultSet.getString("create_time");
         TranlogSchedule transactionLog = new TranlogSchedule();
         transactionLog.setId(id);
-        transactionLog.setType(type);
         transactionLog.setStatus(status);
         transactionLog.setContent(content);
-        transactionLog.setSlaves(follows);
         transactionLog.setRetryTime(retryTime);
         transactionLog.setRetryCount(retryCount);
+        transactionLog.setSlaves(slaves);
         transactionLog.setModifyTime(modifyTime);
         transactionLog.setCreateTime(createTime);
         return transactionLog;
@@ -224,11 +197,10 @@ public class TranlogScheduleDao {
             sql1.append("('");
             sql1.append(log.getId()).append("','");
             sql1.append(log.getContent()).append("','");
-            sql1.append(log.getType()).append("',");
             sql1.append(log.getStatus()).append(",'");
-            sql1.append(log.getSlaves()).append("','");
             sql1.append(log.getRetryTime()).append("',");
             sql1.append(log.getRetryCount()).append(",'");
+            sql1.append(log.getSlaves()).append("','");
             sql1.append(log.getCreateTime()).append("','");
             sql1.append(log.getModifyTime()).append("')").append(',');
         }
