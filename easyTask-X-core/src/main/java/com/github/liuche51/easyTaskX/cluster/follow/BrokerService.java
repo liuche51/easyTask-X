@@ -244,6 +244,7 @@ public class BrokerService {
         });
         NodeService.CURRENTNODE.setSlaves(slaves);
         NodeService.CURRENTNODE.setMasters(masters);
+        BrokerUtil.updateMasterBinlogInfo(masters);
     }
 
     /**
