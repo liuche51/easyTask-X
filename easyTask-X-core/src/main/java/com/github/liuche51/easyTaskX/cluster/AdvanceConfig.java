@@ -5,6 +5,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class AdvanceConfig {
     /**
+     * 任务提交成功模式。1、数据不丢失模式（master和其中一个slave保存了任务才算提交成功）。0、高性能模式（master保存了任务就算提交成功）。
+     */
+    private int submitSuccessModel = 1;
+    /**
      * sqlite连接池大小设置。默认3
      */
     private int dbPoolSize = 3;
@@ -35,7 +39,7 @@ public class AdvanceConfig {
     /**
      * Client的失效Broker将任务重新分配给新Client的批次大小。默认5个任务一批次
      */
-    private int reDispatchBatchCount=5;
+    private int reDispatchBatchCount = 5;
     /**
      * 清理任务备份表中失效的leader备份。默认1小时一次。
      */
@@ -43,15 +47,15 @@ public class AdvanceConfig {
     /**
      * Folow节点从leader更新注册表信息间隔时间。单位分钟。
      */
-    private int followUpdateRegeditTime=5;
+    private int followUpdateRegeditTime = 5;
     /**
      * bakleader节点从leader更新注册表信息间隔时间。单位分钟。
      */
-    private int bakLeaderUpdateRegeditTime=10;
+    private int bakLeaderUpdateRegeditTime = 10;
     /**
      * 从leader更新Clients列表间隔时间。单位小时。
      */
-    private int updateClientsTime=1;
+    private int updateClientsTime = 1;
     /**
      * 集群公用程池
      */
@@ -59,9 +63,21 @@ public class AdvanceConfig {
     private String clusterPool_corePoolSize;
     private String clusterPool_maximumPoolSize;
     private String clusterPool_keepAliveTime;
+
     public int getsQLlitePoolSize() {
         return dbPoolSize;
     }
+
+    public int getSubmitSuccessModel() {
+        return submitSuccessModel;
+    }
+
+    public void setSubmitSuccessModel(int submitSuccessModel) throws Exception {
+        if (submitSuccessModel != 0 && submitSuccessModel != 1)
+            throw new Exception("submitSuccessModel must in (0,1)");
+        this.submitSuccessModel = submitSuccessModel;
+    }
+
     /**
      * set SQLlitePool Size，default qty
      *
@@ -83,6 +99,7 @@ public class AdvanceConfig {
             throw new Exception("nettyPoolSize must >1");
         this.nettyPoolSize = nettyPoolSize;
     }
+
     public int getTimeOut() {
         return timeOut;
     }

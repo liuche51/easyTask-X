@@ -59,8 +59,8 @@ public class BrokerService {
 
     /**
      * 任务数据持久化。并同步至备份库
-     * 1、使用TCC机制实现事务，达到数据最终一致性
-     * 2、只需要取第一个slave做事务同步即可。其他的slave使用binlog异步同步
+     * 1、提交模式为0，则只需要master保存成功即可。
+     * 2、模式为1，则使用TCC机制实现事务，只需要取第一个slave做事务同步即可。其他的slave使用binlog异步同步
      *
      * @throws Exception
      */
@@ -71,19 +71,29 @@ public class BrokerService {
             throw new VotingException("normally exception!leader is voting slave,please wait a moment.");
         Object[] slaves = NodeService.CURRENTNODE.getSlaves().values().toArray();
         String transactionId = Util.generateTransactionId();
-        try {
-            SaveTaskTCC.trySave(transactionId, schedule, (BaseNode) slaves[0]);
-            SaveTaskTCC.confirm(transactionId, (BaseNode) slaves[0]);
-        } catch (Exception e) {
-            log.error("", e);
+        if (NodeService.getConfig().getAdvanceConfig().getSubmitSuccessModel() == 0) {
+            TranlogSchedule transactionLog = new TranlogSchedule();
+            transactionLog.setId(transactionId);
+            transactionLog.setContent(JSONObject.toJSONString(schedule));
+            transactionLog.setStatus(TransactionStatusEnum.CONFIRM);
+            transactionLog.setSlaves(StringConstant.EMPTY);
+            TranlogScheduleDao.saveBatch(Arrays.asList(transactionLog));
+        } else {
             try {
-                SaveTaskTCC.cancel(transactionId, schedule.getId());
-            } catch (Exception e1) {
+                SaveTaskTCC.trySave(transactionId, schedule, (BaseNode) slaves[0]);
+                SaveTaskTCC.confirm(transactionId, (BaseNode) slaves[0]);
+            } catch (Exception e) {
                 log.error("", e);
-                TranlogScheduleDao.updateRetryInfoById(transactionId, new Short("1"), DateUtils.getCurrentDateTime());
+                try {
+                    SaveTaskTCC.cancel(transactionId, schedule.getId());
+                } catch (Exception e1) {
+                    log.error("", e);
+                    TranlogScheduleDao.updateRetryInfoById(transactionId, new Short("1"), DateUtils.getCurrentDateTime());
+                }
+                throw new Exception("task submit failed!");
             }
-            throw new Exception("task submit failed!");
         }
+
     }
 
     /**
