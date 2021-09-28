@@ -3,9 +3,11 @@ package com.github.liuche51.easyTaskX.cluster.master;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.task.broker.ReDispatchToClientTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.NewMasterSyncBakDataTask;
+import com.github.liuche51.easyTaskX.dao.BinlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
+import com.github.liuche51.easyTaskX.dto.db.BinlogSchedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
@@ -15,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * master服务入口
@@ -50,24 +53,13 @@ public class MasterService {
     }
 
     /**
-     * master通知leader，已经完成对新slave的数据同步。请求更新数据同步状态
+     * 查询指定数据的binlog数据
+     * @param index
+     * @return
+     * @throws SQLException
      */
-    public static void notifyLeaderUpdateRegeditForDataStatus(String slaveAddress, String dataStatus) {
-        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                    builder.setIdentity(Util.generateIdentityId()).setBody(NettyInterfaceEnum.MasterNotifyLeaderUpdateRegeditForDataStatus)
-                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(slaveAddress + StringConstant.CHAR_SPRIT_STRING + dataStatus);
-                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
-                    if (!ret)
-                        log.info("normally exception!notifyClusterLeaderUpdateRegeditForDataStatus() failed.");
-                } catch (Exception e) {
-                    log.error("", e);
-                }
-            }
-        });
+    public static List<BinlogSchedule> getScheduleBinlogByIndex(long index) throws SQLException {
+        return BinlogScheduleDao.getScheduleBinlogByIndex(index, NodeService.getConfig().getAdvanceConfig().getBinlogCount());
     }
 
 }

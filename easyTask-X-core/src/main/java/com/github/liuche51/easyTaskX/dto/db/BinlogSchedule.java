@@ -4,15 +4,15 @@ package com.github.liuche51.easyTaskX.dto.db;
  * 任务表BinLog
  */
 public class BinlogSchedule {
-    private String id;
+    private Long id;
     private String sql;
     private String createTime;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

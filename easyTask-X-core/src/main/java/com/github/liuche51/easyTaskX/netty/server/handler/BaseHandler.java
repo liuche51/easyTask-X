@@ -7,6 +7,7 @@ import com.github.liuche51.easyTaskX.netty.server.handler.broker.*;
 import com.github.liuche51.easyTaskX.netty.server.handler.follow.*;
 import com.github.liuche51.easyTaskX.netty.server.handler.leader.*;
 import com.github.liuche51.easyTaskX.netty.server.handler.leader.MasterNotifyLeaderUpdateRegeditForDataStatusHandler;
+import com.github.liuche51.easyTaskX.netty.server.handler.master.SlaveRequestMasterGetScheduleBinlogDataHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.slave.*;
 import com.google.protobuf.ByteString;
 
@@ -28,7 +29,8 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.MasterNotifySlaveTranConfirmSaveTask,new MasterNotifySlaveTranConfirmSaveTaskHandler());
                 //Master to Leader
                 put(NettyInterfaceEnum.MasterNotifyLeaderUpdateRegeditForDataStatus,new MasterNotifyLeaderUpdateRegeditForDataStatusHandler());
-
+                //slave to master
+                put(NettyInterfaceEnum.SlaveRequestMasterGetScheduleBinlogData,new SlaveRequestMasterGetScheduleBinlogDataHandler());
                 //Follow to  leader
                 put(NettyInterfaceEnum.FollowHeartbeatToLeader,new FollowHeartbeatToLeaderHandler());
                 put(NettyInterfaceEnum.FollowRequestLeaderSendRegedit,new FollowRequestLeaderSendRegeditHandler());

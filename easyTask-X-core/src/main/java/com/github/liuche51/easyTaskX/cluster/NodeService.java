@@ -8,6 +8,7 @@ import com.github.liuche51.easyTaskX.cluster.task.master.ClearDataTask;
 import com.github.liuche51.easyTaskX.dao.*;
 import com.github.liuche51.easyTaskX.dao.dbinit.DbInit;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
+import com.github.liuche51.easyTaskX.dto.MasterNode;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.server.NettyServer;
@@ -33,6 +34,11 @@ public class NodeService {
      * 当前集群节点的Node对象
      */
     public static Node CURRENTNODE;
+    /**
+     * 作为slave，异步同步其各个masterbinlog位置。
+     * 每次都重新开始同步
+     */
+    public static ConcurrentHashMap<String, MasterNode> masterBinlogIndex;
     /**
      * 集群一次性任务线程集合。
      * 系统没有重启只是初始化了集群initCurrentNode()。此时也需要立即停止运行的一次性后台任务

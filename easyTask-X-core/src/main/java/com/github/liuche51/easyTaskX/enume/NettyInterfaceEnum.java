@@ -17,10 +17,6 @@ public class NettyInterfaceEnum {
      * 确认提交任务接口。阶段二
      */
     public static final String MasterNotifySlaveTranConfirmSaveTask="MasterNotifySlaveTranConfirmSaveTask";
-    /**
-     * 取消任务接口。事务回滚
-     */
-    public static final String MasterNotifySlaveTranCancelSaveTask="MasterNotifySlaveTranCancelSaveTask";
 
     /**
      * master同步任务数据给新slave备份接口
@@ -70,6 +66,10 @@ public class NettyInterfaceEnum {
      * master通知leader，已经完成对新follow的数据同步。请求更新数据同步状态
      */
     public static final String MasterNotifyLeaderUpdateRegeditForDataStatus="MasterNotifyLeaderUpdateRegeditForDataStatus";
+    /**
+     * slave请求master获取ScheduleBinlog数据
+     */
+    public static final String SlaveRequestMasterGetScheduleBinlogData="SlaveRequestMasterGetScheduleBinlogData";
     /**
      * broker或client通过定时任务获取leader最新注册表信息
      */

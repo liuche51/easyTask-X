@@ -2,12 +2,16 @@ package com.github.liuche51.easyTaskX.dao;
 
 import com.github.liuche51.easyTaskX.dao.dbinit.DbInit;
 import com.github.liuche51.easyTaskX.dto.db.BinlogSchedule;
+import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.DbTableName;
+import org.sqlite.SQLiteException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -37,14 +41,32 @@ public class BinlogScheduleDao {
     }
 
     public static void save(String schedulesql, SqliteHelper helper) throws SQLException {
-        BinlogSchedule binlogSchedule=new BinlogSchedule();
+        BinlogSchedule binlogSchedule = new BinlogSchedule();
         binlogSchedule.setSql(schedulesql);
         String sql = contactSaveSql(Arrays.asList(binlogSchedule));
         helper.executeUpdate(sql);
     }
 
+    public static List<BinlogSchedule> getScheduleBinlogByIndex(long index, int count) throws SQLException {
+        List<BinlogSchedule> list = new LinkedList<>();
+        String sql = "SELECT * FROM " + tableName + " where id > " + index + " limit " + count + ";";
+        SqliteHelper helper = new SqliteHelper(dbName);
+        try {
+            ResultSet resultSet = helper.executeQuery(sql);
+            while (resultSet.next()) {
+                BinlogSchedule binlogSchedule = getBinlogSchedule(resultSet);
+                list.add(binlogSchedule);
+            }
+        } catch (SQLiteException e) {
+            SqliteHelper.writeDatabaseLockedExceptionLog(e, "ScheduleDao->getScheduleBinlogByIndex");
+        } finally {
+            helper.destroyed();
+        }
+        return list;
+    }
+
     private static BinlogSchedule getBinlogSchedule(ResultSet resultSet) throws SQLException {
-        String id = resultSet.getString("id");
+        long id = resultSet.getLong("id");
         String sql = resultSet.getString("sql");
         String createTime = resultSet.getString("create_time");
         BinlogSchedule binlogSchedule = new BinlogSchedule();
@@ -55,7 +77,7 @@ public class BinlogScheduleDao {
     }
 
     private static String contactSaveSql(List<BinlogSchedule> binlogSchedules) {
-        StringBuilder sql1 = new StringBuilder("insert into "+tableName+"(id,sql,create_time) values");
+        StringBuilder sql1 = new StringBuilder("insert into " + tableName + "(id,sql,create_time) values");
         for (BinlogSchedule binlogSchedule : binlogSchedules) {
             binlogSchedule.setCreateTime(DateUtils.getCurrentDateTime());
             sql1.append("('");

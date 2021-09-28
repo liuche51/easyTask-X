@@ -29,6 +29,10 @@ public class AdvanceConfig {
      */
     private int tryCount = 2;
     /**
+     * binlog同步一次数据量。
+     */
+    private int binlogCount = 100;
+    /**
      * Client的失效Broker将任务重新分配给新Client的批次大小。默认5个任务一批次
      */
     private int reDispatchBatchCount=5;
@@ -109,6 +113,14 @@ public class AdvanceConfig {
 
     public void setTryCount(int tryCount) {
         this.tryCount = tryCount;
+    }
+
+    public int getBinlogCount() {
+        return binlogCount;
+    }
+
+    public void setBinlogCount(int binlogCount) {
+        this.binlogCount = binlogCount;
     }
 
     public int getReDispatchBatchCount() {

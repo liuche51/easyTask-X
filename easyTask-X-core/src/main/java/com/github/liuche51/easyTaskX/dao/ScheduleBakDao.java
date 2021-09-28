@@ -42,6 +42,10 @@ public class ScheduleBakDao {
         return false;
     }
 
+    public static void executeSql(String sql) throws SQLException, ClassNotFoundException {
+        SqliteHelper.executeUpdateForSync(sql, tableName, lock);
+    }
+
     public static void save(ScheduleBak scheduleBak) throws SQLException, ClassNotFoundException {
         if (!DbInit.hasInit)
             DbInit.init();
