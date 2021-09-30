@@ -21,6 +21,7 @@ import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sqlite.SQLiteException;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -82,11 +83,19 @@ public class SlaveService {
                 String sql = x.getSql().replace(DbTableName.SCHEDULE, DbTableName.SCHEDULE_BAK);
                 try {
                     ScheduleBakDao.executeSql(sql);
-                    MasterNode masterNode = NodeService.masterBinlogIndex.get(master.getAddress());
+                    MasterNode masterNode = NodeService.masterBinlogInfo.get(master.getAddress());
                     masterNode.setCurrentIndex(x.getId());
+                } catch (SQLiteException e) {
+
                 } catch (SQLException e) {
-                    log.error("sql=" + x.getSql(), e);
-                    throw e;
+                    String message = e.getMessage();
+                    //因为开启了数据不丢失模式，导致其中一个slave 通过tcc机制已经与master的新增任务保持一致了，异步复制binlog时会导致主键冲突。故需要忽略此类冲突
+                    if (message != null && message.contains("SQLITE_CONSTRAINT_PRIMARYKEY")) {
+                        log.info("normally exception!slave sync master's ScheduleBinLog primarykey repeated.");
+                    } else {
+                        log.error("sql=" + x.getSql(), e);
+                        throw e;
+                    }
                 }
             }
         }
