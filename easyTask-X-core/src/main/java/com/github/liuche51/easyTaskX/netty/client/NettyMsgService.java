@@ -2,15 +2,19 @@ package com.github.liuche51.easyTaskX.netty.client;
 
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.dao.LogErrorDao;
 import com.github.liuche51.easyTaskX.dto.ByteStringPack;
+import com.github.liuche51.easyTaskX.dto.db.LogError;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
+import com.github.liuche51.easyTaskX.enume.LogErrorTypeEnum;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -92,5 +96,18 @@ public class NettyMsgService {
             log.error("", e);
         }
         return sendSyncMsgWithCount(builder, client, tryCount, waiteSecond, respPack);
+    }
+
+    public static void writeRpcErrorMsgToDb(String content,String detail) {
+        LogError logError = new LogError();
+        logError.setContent(content);
+        logError.setDetail(detail);
+        logError.setType(LogErrorTypeEnum.RPC);
+        try {
+            LogErrorDao.saveBatch(Arrays.asList(logError));
+        } catch (Exception e) {
+            log.error("", e);
+        }
+
     }
 }

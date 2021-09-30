@@ -25,7 +25,6 @@ public class LogErrorDao {
      * 可重入锁
      */
     private static ReentrantLock lock = new ReentrantLock();
-
     public static boolean existTable() throws SQLException, ClassNotFoundException {
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
@@ -48,7 +47,7 @@ public class LogErrorDao {
             x.setCreateTime(DateUtils.getCurrentDateTime());
         });
         String sql = contactSaveSql(logErrors);
-        SqliteHelper.executeUpdateForSync(sql, dbName, ScheduleDao.getLock());
+        SqliteHelper.executeUpdateForSync(sql, dbName, lock);
     }
 
     private static String contactSaveSql(List<LogError> logErrors) {

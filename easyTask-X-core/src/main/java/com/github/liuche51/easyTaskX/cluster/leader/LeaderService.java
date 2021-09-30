@@ -95,8 +95,9 @@ public class LeaderService {
                         nodeBuilder.setExt(StringConstant.CLINET + StringConstant.CHAR_SPRIT_STRING + opType);
                         builder.setBodyBytes(nodeBuilder.build().toByteString());
                         boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, item.getValue().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
-                        if (!ret)
-                            log.info("normally exception!notifyBakLeaderUpdateRegedit() failed.");
+                        if (!ret) {
+                            NettyMsgService.writeRpcErrorMsgToDb("leader通知其BakLeader 更新Client类型注册表信息 失败！","com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifyBakLeaderUpdateRegedit(java.util.Map<java.lang.String,com.github.liuche51.easyTaskX.dto.BaseNode>, com.github.liuche51.easyTaskX.dto.RegClient, java.lang.String)");
+                        }
                     } catch (Exception e) {
                         log.error("", e);
                     }
@@ -136,7 +137,9 @@ public class LeaderService {
                             .setSource(NodeService.CURRENTNODE.getAddress());
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, broker.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret)
-                        log.info("normally exception!notifyBrokerRegisterSucceeded() failed.");
+                    {
+                        NettyMsgService.writeRpcErrorMsgToDb("Leader通知Broker注册成功。失败！","com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifyBrokerRegisterSucceeded");
+                    }
                 } catch (Exception e) {
                     log.error("", e);
                 }
@@ -189,8 +192,9 @@ public class LeaderService {
                 Map.Entry<String, RegNode> item = items.next();
                 RegNode node = item.getValue();
                 boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
-                if (!ret)
-                    log.info("normally exception!notifySlavesNewMaster() failed.");
+                if (!ret) {
+                    NettyMsgService.writeRpcErrorMsgToDb("leader通知slaves。旧Master失效，leader已选新Master。失败！","com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifySlaveVotedNewMaster");
+                }
             }
             return true;
         } catch (Exception e) {

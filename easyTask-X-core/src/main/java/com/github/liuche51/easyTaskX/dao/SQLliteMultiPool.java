@@ -44,13 +44,17 @@ public class SQLliteMultiPool {
     private SQLliteMultiPool() {
         pools.put(DbTableName.SCHEDULE, new ConcurrentLinkedQueue<Connection>());
         pools.put(DbTableName.SCHEDULE_BAK, new ConcurrentLinkedQueue<Connection>());
+        pools.put(DbTableName.LOG_ERROR, new ConcurrentLinkedQueue<Connection>());
         for (int i = 0; i < NodeService.getConfig().getAdvanceConfig().getsQLlitePoolSize(); i++) {
             Connection con1 = createConnection(DbTableName.SCHEDULE);
             Connection con2 = createConnection(DbTableName.SCHEDULE_BAK);
+            Connection con3 = createConnection(DbTableName.LOG_ERROR);
             if (con1 != null)
                 pools.get(DbTableName.SCHEDULE).add(con1);
             if (con2 != null)
                 pools.get(DbTableName.SCHEDULE_BAK).add(con2);
+            if (con3 != null)
+                pools.get(DbTableName.LOG_ERROR).add(con3);
         }
     }
     /**

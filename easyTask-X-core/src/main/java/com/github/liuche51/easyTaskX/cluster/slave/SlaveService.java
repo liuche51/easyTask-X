@@ -85,8 +85,6 @@ public class SlaveService {
                     ScheduleBakDao.executeSql(sql);
                     MasterNode masterNode = NodeService.masterBinlogInfo.get(master.getAddress());
                     masterNode.setCurrentIndex(x.getId());
-                } catch (SQLiteException e) {
-
                 } catch (SQLException e) {
                     String message = e.getMessage();
                     //因为开启了数据不丢失模式，导致其中一个slave 通过tcc机制已经与master的新增任务保持一致了，异步复制binlog时会导致主键冲突。故需要忽略此类冲突

@@ -222,7 +222,6 @@ public class BrokerService {
             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
             if (ret) {
                 NodeDto.Node node = NodeDto.Node.parseFrom(respPack.getRespbody());
-                NodeService.CURRENTNODE.setBakLeader(node.getBakleader());
                 dealUpdate(node);
                 return true;
             } else {
@@ -235,13 +234,15 @@ public class BrokerService {
     }
 
     /**
-     * 处理注册表更新。
+     * 处理leader推送过来的注册表更新。
      * 1、leader重新选举了master或slave时，leader主动通知broker。
      * 2、broker会定时从leader请求最新的注册表信息同步到本地。防止期间数据不一致性问题，做到最终一致性
+     * 3、更新备用leader、最新master集合、最新slave集合
      *
      * @param node
      */
     public static void dealUpdate(NodeDto.Node node) {
+        NodeService.CURRENTNODE.setBakLeader(node.getBakleader());
         NodeDto.NodeList slaveNodes = node.getSalves();
         ConcurrentHashMap<String, BaseNode> slaves = new ConcurrentHashMap<>();
         slaveNodes.getNodesList().forEach(x -> {
@@ -291,8 +292,9 @@ public class BrokerService {
                     builder.setIdentity(Util.generateIdentityId()).setBody(NettyInterfaceEnum.BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus)
                             .setSource(NodeService.CURRENTNODE.getAddress()).setBody(String.valueOf(reDispatchTaskStatus));
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
-                    if (!ret)
-                        log.info("normally exception!notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus() failed.");
+                    if (!ret) {
+                        NettyMsgService.writeRpcErrorMsgToDb("broker通知leader，已经完成重新分配任务至新client以及salve的数据同步，请求更新数据同步状态 失败！","com.github.liuche51.easyTaskX.cluster.follow.BrokerService.notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus");
+                    }
                 } catch (Exception e) {
                     log.error("", e);
                 }
