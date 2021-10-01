@@ -52,10 +52,10 @@ public class ScheduleBakInit {
                     "\"modify_time\"  TEXT,\n" +
                     "PRIMARY KEY (\"id\" ASC)\n" +
                     ");";
-            SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE);
+            SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE_BAK);
             helper.executeUpdate(sql4);
             String indexsql = "CREATE INDEX index_status_type ON " + DbTableName.TRANLOG_SCHEDULE_BAK + " (status,type);";
-            SqliteHelper helper2 = new SqliteHelper(DbTableName.SCHEDULE);
+            SqliteHelper helper2 = new SqliteHelper(DbTableName.SCHEDULE_BAK);
             helper2.executeUpdate(indexsql);
         }
     }

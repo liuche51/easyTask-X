@@ -11,7 +11,7 @@ import java.sql.SQLException;
  * 系统致命错误记录
  */
 public class LogInit {
-    public static void initlLogError() throws SQLException, ClassNotFoundException {
+    public static void initLogError() throws SQLException, ClassNotFoundException {
         boolean exist = LogErrorDao.existTable();
         if (!exist) {
             //本地待运行的任务
@@ -22,7 +22,7 @@ public class LogInit {
                     "\"type\"  TEXT,\n" +
                     "\"create_time\"  TEXT\n" +
                     ");";
-            SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE);
+            SqliteHelper helper = new SqliteHelper(DbTableName.LOG_ERROR);
             helper.executeUpdate(sql);
         }
     }

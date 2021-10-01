@@ -9,4 +9,5 @@ public class DbTableName {
     public static final String TRANLOG_SCHEDULE_BAK="tranlog_schedule_bak";
 
     public static final String LOG_ERROR="log_error";
+    public static final String LOG_CLUSTERMETA="log_clustermeta";
 }

@@ -31,7 +31,8 @@ public class DbInit {
             ScheduleInit.initBinlog();
             ScheduleBakInit.initSchedule();
             ScheduleBakInit.initTranlog();
-            LogInit.initlLogError();
+            LogInit.initLogError();
+            ClusterMetadataBinlogInit.initClusterMetadataBinlog();
             hasInit = true;
             log.info("Sqlite DB 初始化完成");
             return true;

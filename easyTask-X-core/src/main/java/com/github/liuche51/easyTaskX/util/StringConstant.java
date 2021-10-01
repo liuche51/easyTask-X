@@ -18,8 +18,4 @@ public class StringConstant {
     public static final String FALSE="false";
     public static final String SUCCESS="success";
 
-    public static final String ADD="add";
-    public static final String DELETE="delete";
-    public static final String UPDATE="update";
-
 }
