@@ -91,7 +91,7 @@ public class BinlogClusterMetaDao {
     }
 
     private static String contactSaveSql(List<BinlogClusterMeta> binlogClusterMetas) {
-        StringBuilder sql1 = new StringBuilder("insert into " + tableName + "(id,sql,create_time) values");
+        StringBuilder sql1 = new StringBuilder("insert into " + tableName + "(id,optype,regnode,key,value,create_time) values");
         for (BinlogClusterMeta binlogClusterMeta : binlogClusterMetas) {
             binlogClusterMeta.setCreateTime(DateUtils.getCurrentDateTime());
             sql1.append("('");

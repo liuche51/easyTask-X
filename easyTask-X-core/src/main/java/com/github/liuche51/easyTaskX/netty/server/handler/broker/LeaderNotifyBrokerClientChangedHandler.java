@@ -6,6 +6,7 @@ import com.github.liuche51.easyTaskX.dao.ScheduleDao;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
+import com.github.liuche51.easyTaskX.enume.OperationTypeEnum;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.google.protobuf.ByteString;
@@ -21,10 +22,10 @@ public class LeaderNotifyBrokerClientChangedHandler extends BaseHandler {
         String body = frame.getBody();
         String[] items = body.split(StringConstant.CHAR_SPRIT_STRING);//type+地址
         switch (items[0]) {
-            case StringConstant.ADD:
+            case OperationTypeEnum.ADD:
                 NodeService.CURRENTNODE.getClients().add(new BaseNode(items[1]));
                 break;
-            case StringConstant.DELETE:
+            case OperationTypeEnum.DELETE:
                 Iterator<BaseNode> temps = NodeService.CURRENTNODE.getClients().iterator();
                 while (temps.hasNext()) {
                     BaseNode bn = temps.next();

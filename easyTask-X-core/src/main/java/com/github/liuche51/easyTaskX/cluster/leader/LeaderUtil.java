@@ -6,6 +6,7 @@ import com.github.liuche51.easyTaskX.dto.*;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
+import com.github.liuche51.easyTaskX.enume.OperationTypeEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.StringUtils;
@@ -74,10 +75,10 @@ public class LeaderUtil {
                                 .setSource(NodeService.CURRENTNODE.getAddress());
                         NodeDto.Node.Builder nodeBuilder = NodeDto.Node.newBuilder();
                         switch (opType) {
-                            case StringConstant.ADD:
-                            case StringConstant.DELETE:
+                            case OperationTypeEnum.ADD:
+                            case OperationTypeEnum.DELETE:
                                 break;
-                            case StringConstant.UPDATE:
+                            case OperationTypeEnum.UPDATE:
                                 //slaves
                                 NodeDto.NodeList.Builder slavesBuilder = NodeDto.NodeList.newBuilder();
                                 Iterator<Map.Entry<String, RegNode>> items2 = broker.getSlaves().entrySet().iterator();

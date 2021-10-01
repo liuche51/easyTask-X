@@ -7,6 +7,7 @@ import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegClient;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
+import com.github.liuche51.easyTaskX.enume.OperationTypeEnum;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.google.protobuf.ByteString;
@@ -29,7 +30,7 @@ public class FollowHeartbeatToLeaderHandler extends BaseHandler {
                     registerNode=new RegBroker(node);
                     LeaderService.BROKER_REGISTER_CENTER.put(address,registerNode);
                     LeaderService.notifyBrokerRegisterSucceeded(node);
-                    LeaderService.notifyClinetsChangedBroker(registerNode.getAddress(),null, StringConstant.ADD);
+                    LeaderService.notifyClinetsChangedBroker(registerNode.getAddress(),null, OperationTypeEnum.ADD);
                 }else {
                     registerNode.setLastHeartbeat(ZonedDateTime.now());
                 }
@@ -40,11 +41,11 @@ public class FollowHeartbeatToLeaderHandler extends BaseHandler {
                     BaseNode node=new BaseNode(address);
                     clientNode=new RegClient(node);
                     LeaderService.CLIENT_REGISTER_CENTER.put(address,clientNode);
-                    LeaderService.notifyBrokersChangedClinet(clientNode.getAddress(), StringConstant.ADD);
-                    LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), clientNode, StringConstant.ADD);
+                    LeaderService.notifyBrokersChangedClinet(clientNode.getAddress(), OperationTypeEnum.ADD);
+                    LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), clientNode, OperationTypeEnum.ADD);
                 }else {
                     clientNode.setLastHeartbeat(ZonedDateTime.now());
-                    LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), clientNode, StringConstant.UPDATE);
+                    LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), clientNode, OperationTypeEnum.UPDATE);
                 }
                 break;
             default:break;

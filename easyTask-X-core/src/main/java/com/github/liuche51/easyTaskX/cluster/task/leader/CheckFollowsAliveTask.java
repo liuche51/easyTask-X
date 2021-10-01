@@ -8,6 +8,7 @@ import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegClient;
 import com.github.liuche51.easyTaskX.dto.RegNode;
+import com.github.liuche51.easyTaskX.enume.OperationTypeEnum;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
@@ -60,12 +61,12 @@ public class CheckFollowsAliveTask extends TimerTask {
                             if (regNode.getSlaves().size() > 0) {
                                 newMaster = VoteMaster.voteNewMaster(regNode.getSlaves());
                                 LeaderService.notifySlaveVotedNewMaster(regNode.getSlaves(), newMaster.getAddress(), regNode.getAddress());
-                                LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), Arrays.asList(brokers.get(newMaster.getAddress())), StringConstant.UPDATE);
+                                LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), Arrays.asList(brokers.get(newMaster.getAddress())), OperationTypeEnum.UPDATE);
                             }
                             VoteMaster.updateRegedit(regNode);
                             LeaderService.notifyFollowsUpdateRegedit(regNode.getSlaves(), StringConstant.BROKER);
-                            LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), Arrays.asList(regNode), StringConstant.DELETE);
-                            LeaderService.notifyClinetsChangedBroker(regNode.getAddress(), newMaster == null ? null : newMaster.getAddress(), StringConstant.DELETE);
+                            LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), Arrays.asList(regNode), OperationTypeEnum.DELETE);
+                            LeaderService.notifyClinetsChangedBroker(regNode.getAddress(), newMaster == null ? null : newMaster.getAddress(), OperationTypeEnum.DELETE);
 
                         }
                         //master没失效，但是Slave失效了
@@ -81,7 +82,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                                         updateRegBrokers.add(brokers.get(x.getAddress()));
                                     });
                                     updateRegBrokers.add(regNode);
-                                    LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), updateRegBrokers, StringConstant.UPDATE);// 当前master和新选的slave都需要同步注册表信息给bakleader
+                                    LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), updateRegBrokers, OperationTypeEnum.UPDATE);// 当前master和新选的slave都需要同步注册表信息给bakleader
                                     //如果当前节点是Leader自己选slave，则需要通知所有其他所有Follows更新备用Leader信息
                                     if (regNode.getAddress().equals(NodeService.CURRENTNODE.getClusterLeader().getAddress())) {
                                         LeaderService.notifyFollowsBakLeaderChanged();
@@ -107,7 +108,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                                             nodes.add(regNode);
                                             nodes.add(newSlave);
                                             LeaderService.notifyFollowsUpdateRegedit(nodes, StringConstant.BROKER);
-                                            LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), Arrays.asList(regNode, brokers.get(newSlave.getAddress())), StringConstant.UPDATE);
+                                            LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), Arrays.asList(regNode, brokers.get(newSlave.getAddress())), OperationTypeEnum.UPDATE);
                                             //如果当前节点是Leader自己变更slave，则需要通知所有其他所有Follows更新备用Leader信息
                                             if (regNode.getAddress().equals(NodeService.CURRENTNODE.getClusterLeader().getAddress())) {
                                                 LeaderService.notifyFollowsBakLeaderChanged();
@@ -147,8 +148,8 @@ public class CheckFollowsAliveTask extends TimerTask {
                         //clinet节点失效
                         if (DateUtils.isGreaterThanLoseTime(regNode.getLastHeartbeat())) {
                             LeaderService.CLIENT_REGISTER_CENTER.remove(regNode.getAddress());
-                            LeaderService.notifyBrokersChangedClinet(regNode.getAddress(), StringConstant.DELETE);
-                            LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), regNode, StringConstant.DELETE);
+                            LeaderService.notifyBrokersChangedClinet(regNode.getAddress(), OperationTypeEnum.DELETE);
+                            LeaderService.notifyBakLeaderUpdateRegedit(NodeService.CURRENTNODE.getSlaves(), regNode, OperationTypeEnum.DELETE);
                         }
                     } catch (Exception e) {
                         log.error("", e);
