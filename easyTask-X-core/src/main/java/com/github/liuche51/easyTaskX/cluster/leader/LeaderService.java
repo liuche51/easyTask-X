@@ -58,56 +58,6 @@ public class LeaderService {
     }
 
     /**
-     * leader通知其BakLeader 更新Broker类型注册表信息
-     *
-     * @param bakleaders 备用leader节点
-     * @param brokers    brokers
-     * @param opType     操作类型。新增、删除、更新
-     */
-    public static void notifyBakLeaderUpdateRegedit(Map<String, BaseNode> bakleaders, List<RegBroker> brokers, String opType) {
-        brokers.forEach(x -> {
-            LeaderUtil.notifyBakLeaderUpdateRegedit(bakleaders, x, opType);
-        });
-    }
-
-
-    /**
-     * leader通知其BakLeader 更新Client类型注册表信息
-     *
-     * @param bakleaders 备用leader节点
-     * @param client     client
-     * @param opType     操作类型。新增、删除、更新
-     */
-    public static void notifyBakLeaderUpdateRegedit(Map<String, BaseNode> bakleaders, RegClient client, String opType) {
-        Iterator<Map.Entry<String, BaseNode>> items = bakleaders.entrySet().iterator();
-        while (items.hasNext()) {
-            Map.Entry<String, BaseNode> item = items.next();
-            NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyBakLeaderUpdateRegedit)
-                                .setSource(NodeService.CURRENTNODE.getAddress());
-                        NodeDto.Node.Builder nodeBuilder = NodeDto.Node.newBuilder();
-                        nodeBuilder.setPort(client.getPort());
-                        nodeBuilder.setHost(client.getHost());
-                        nodeBuilder.setExt(StringConstant.CLINET + StringConstant.CHAR_SPRIT_STRING + opType);
-                        builder.setBodyBytes(nodeBuilder.build().toByteString());
-                        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, item.getValue().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
-                        if (!ret) {
-                            NettyMsgService.writeRpcErrorMsgToDb("leader通知其BakLeader 更新Client类型注册表信息 失败！","com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifyBakLeaderUpdateRegedit(java.util.Map<java.lang.String,com.github.liuche51.easyTaskX.dto.BaseNode>, com.github.liuche51.easyTaskX.dto.RegClient, java.lang.String)");
-                        }
-                    } catch (Exception e) {
-                        log.error("", e);
-                    }
-                }
-            });
-        }
-        ;
-    }
-
-    /**
      * 通知Follow更新备用leader信息
      */
     public static void notifyFollowsBakLeaderChanged() {

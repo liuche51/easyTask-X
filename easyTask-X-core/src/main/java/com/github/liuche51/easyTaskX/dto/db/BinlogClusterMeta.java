@@ -11,6 +11,16 @@ public class BinlogClusterMeta {
     private String value;
     private String createTime;
 
+    public BinlogClusterMeta() {
+    }
+
+    public BinlogClusterMeta(String optype, String regnode, String key, String value) {
+        this.optype = optype;
+        this.regnode = regnode;
+        this.key = key;
+        this.value = value;
+    }
+
     public Long getId() {
         return id;
     }

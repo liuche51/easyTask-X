@@ -22,7 +22,7 @@ public class RegClient extends RegNode {
     }
 
     public RegClient(RegNode regNode) {
-        super(regNode.getHost(), regNode.getPort(), regNode.getDataStatus());
+        super(regNode.getHost(), regNode.getPort());
     }
 
     public RegClient(String host, int port) {

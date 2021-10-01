@@ -23,35 +23,6 @@ public class BakLeaderService {
     private static final Logger log = LoggerFactory.getLogger(BakLeaderService.class);
 
     /**
-     * BakLeader定时从leader获取注册表最新信息
-     * 覆盖本地信息
-     *
-     * @return
-     */
-    public static void requestUpdateClusterRegedit() {
-        try {
-            Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BakLeaderRequestLeaderSendRegedit).setSource(NodeService.getConfig().getAddress());
-            ByteStringPack respPack = new ByteStringPack();
-            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
-            if (ret) {
-                String body = respPack.getRespbody().toStringUtf8();
-                String[] items = body.split(StringConstant.CHAR_SPRIT_STRING);
-                ConcurrentHashMap<String, RegBroker> broker = JSONObject.parseObject(items[0], new TypeReference<ConcurrentHashMap<String, RegBroker>>() {
-                });
-                ConcurrentHashMap<String, RegClient> clinet = JSONObject.parseObject(items[1], new TypeReference<ConcurrentHashMap<String, RegClient>>() {
-                });
-                LeaderService.BROKER_REGISTER_CENTER = broker;
-                LeaderService.CLIENT_REGISTER_CENTER = clinet;
-            } else {
-                log.info("normally exception!requestUpdateClusterRegedit() failed.");
-            }
-        } catch (Exception e) {
-            log.error("", e);
-        }
-    }
-
-    /**
      * 启动BakLeader主动通过定时任务从leader更新注册表
      */
     public static TimerTask startBakLeaderRequestUpdateRegeditTask() {

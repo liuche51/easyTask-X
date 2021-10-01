@@ -17,23 +17,14 @@ public class RegNode extends BaseNode {
 
     public RegNode(String host, int port, Short dataStatus) {
         super(host, port);
-        this.setDataStatus(dataStatus);
     }
 
     public RegNode(String host, int port) {
         super(host, port);
-        this.setDataStatus(NodeSyncDataStatusEnum.UNSYNC);
     }
 
     public RegNode(String address) {
         super(address);
     }
 
-    public Short getDataStatus() {
-        return dataStatus;
-    }
-
-    public void setDataStatus(Short dataStatus) {
-        this.dataStatus = dataStatus;
-    }
 }

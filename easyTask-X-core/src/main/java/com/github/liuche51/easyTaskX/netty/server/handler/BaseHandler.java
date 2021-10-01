@@ -42,14 +42,9 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.LeaderNotiySlaveVotedNewMaster,new LeaderNotiySlaveVotedNewMasterHandler());
                 //Leader to Follow
                 put(NettyInterfaceEnum.LeaderNotifyFollowUpdateBakLeaderInfo,new LeaderNotifyFollowUpdateBakLeaderHandler());
-                //Leader to BakLeader
-                put(NettyInterfaceEnum.LeaderNotifyBakLeaderUpdateRegedit,new LeaderNotifyBakLeaderUpdateRegeditHandler());
-                //BakLeader to Leader
-                put(NettyInterfaceEnum.BakLeaderRequestLeaderSendRegedit,new ClusterSlaveRequestLeaderSendRegeditHandler());
-                put(NettyInterfaceEnum.BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus,new BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatusHandler());
 
                 //Broker to Leader
-                //put(NettyInterfaceEnum.BrokerNotifyClientExecuteNewTask,new BrokerRequestLeaderSendClientsHandler());
+                put(NettyInterfaceEnum.BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus,new BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatusHandler());
                 put(NettyInterfaceEnum.BrokerRequestLeaderSendClients,new BrokerRequestLeaderSendClientsHandler());
                 //Monitor
                 put(NettyInterfaceEnum.GetDBInfoByTaskId,new GetDBInfoByTaskIdHandler());

@@ -35,7 +35,7 @@ public class RegBroker extends RegNode {
     }
 
     public RegBroker(RegNode regNode) {
-        super(regNode.getHost(), regNode.getPort(), regNode.getDataStatus());
+        super(regNode.getHost(), regNode.getPort());
     }
 
     public RegBroker(String host, int port) {

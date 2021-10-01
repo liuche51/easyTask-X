@@ -64,7 +64,8 @@ public class VoteSlave {
     }
 
     /**
-     * 选择新slave。旧slave失效
+     * 选择新slave。旧slave失效。
+     * 1、同时更新当前master和新slave的注册表信息
      *
      * @return
      */
@@ -82,8 +83,8 @@ public class VoteSlave {
             if (slaves.size() < 1)
                 voteNewSlave(regNode, oldSlave);//数量不够递归重新选
             else {
-                RegNode newFollow = slaves.get(0);
-                updateRegedit(regNode, oldSlave.getAddress(), newFollow);
+                RegNode newSlave = slaves.get(0);
+                updateRegedit(regNode, oldSlave.getAddress(), newSlave);
             }
 
         } finally {
@@ -182,13 +183,12 @@ public class VoteSlave {
      * 旧follow失效，选新follow。更新注册表
      *
      * @param regNode
-     * @param oldFollow
+     * @param oldSlave
      */
-    private static void updateRegedit(RegBroker regNode, String oldFollow, RegNode newFollow) {
-        regNode.getSlaves().remove(oldFollow);
-        newFollow.setDataStatus(NodeSyncDataStatusEnum.UNSYNC);//选举成功，将新follow数据同步状态标记为未同步
-        regNode.getSlaves().put(newFollow.getAddress(), newFollow);
-        RegBroker newFollowRegNode = LeaderService.BROKER_REGISTER_CENTER.get(newFollow.getAddress());
-        newFollowRegNode.getMasters().put(regNode.getAddress(), new RegNode(regNode));
+    private static void updateRegedit(RegBroker regNode, String oldSlave, RegNode newSlave) {
+        regNode.getSlaves().remove(oldSlave);
+        regNode.getSlaves().put(newSlave.getAddress(), newSlave);
+        RegBroker newSlaveRegNode = LeaderService.BROKER_REGISTER_CENTER.get(newSlave.getAddress());
+        newSlaveRegNode.getMasters().put(regNode.getAddress(), new RegNode(regNode));
     }
 }

@@ -32,27 +32,26 @@ public class VoteMaster {
         while (items.hasNext()) {
             Map.Entry<String, RegNode> item = items.next();
             RegNode node = item.getValue();
-            if (NodeSyncDataStatusEnum.SUCCEEDED == node.getDataStatus()) {
-                return node;
-            }
+            return node;
         }
         return null;
     }
 
     /**
      * 新master选举后，leader更新注册表
+     *
      * @param regBroker
      */
-    public static void updateRegedit(RegBroker regBroker){
+    public static void updateRegedit(RegBroker regBroker) {
         LeaderService.BROKER_REGISTER_CENTER.remove(regBroker.getAddress());
-        Map<String, RegNode> follows=regBroker.getSlaves();
-        if(follows.size()>0){
-            Iterator<Map.Entry<String, RegNode>> items=follows.entrySet().iterator();
-            while (items.hasNext()){
-                RegNode regNode=items.next().getValue();
-                RegBroker follow= LeaderService.BROKER_REGISTER_CENTER.get(regNode.getAddress());
-                if(follow!=null){
-                    follow.getMasters().remove(regBroker.getAddress());
+        Map<String, RegNode> slaves = regBroker.getSlaves();
+        if (slaves.size() > 0) {
+            Iterator<Map.Entry<String, RegNode>> items = slaves.entrySet().iterator();
+            while (items.hasNext()) {
+                RegNode regNode = items.next().getValue();
+                RegBroker slave = LeaderService.BROKER_REGISTER_CENTER.get(regNode.getAddress());
+                if (slave != null) {
+                    slave.getMasters().remove(regBroker.getAddress());
                 }
             }
         }

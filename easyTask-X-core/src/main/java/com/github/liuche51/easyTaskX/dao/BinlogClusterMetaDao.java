@@ -45,13 +45,10 @@ public class BinlogClusterMetaDao {
         return false;
     }
 
-    public static void save(String optype, String regnode, String key, String value) throws SQLException, ClassNotFoundException {
-        BinlogClusterMeta binlogClusterMeta = new BinlogClusterMeta();
-        binlogClusterMeta.setOptype(optype);
-        binlogClusterMeta.setRegnode(regnode);
-        binlogClusterMeta.setKey(key);
-        binlogClusterMeta.setValue(value);
-        String sql = contactSaveSql(Arrays.asList(binlogClusterMeta));
+    public static void saveBatch(List<BinlogClusterMeta> binlogClusterMetas) throws SQLException, ClassNotFoundException {
+        if (!DbInit.hasInit)
+            DbInit.init();
+        String sql = contactSaveSql(binlogClusterMetas);
         SqliteHelper.executeUpdateForSync(sql, dbName, lock);
     }
 
