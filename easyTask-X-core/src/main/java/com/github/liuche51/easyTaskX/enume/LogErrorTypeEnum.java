@@ -5,4 +5,8 @@ public class LogErrorTypeEnum {
      * RPC调用异常
      */
     public static final String RPC = "RPC";
+    /**
+     *NORMAL
+     */
+    public static final String NORMAL = "normal";
 }

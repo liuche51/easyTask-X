@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.cluster;
 
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.leader.BakLeaderService;
+import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.ClearDataTask;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class NodeService {
     private static Logger log = LoggerFactory.getLogger(NodeService.class);
@@ -104,8 +106,8 @@ public class NodeService {
         timerTasks.add(clearDataTask());
         timerTasks.add(BrokerService.startCommitSaveTransactionTask());
         timerTasks.add(BrokerService.startUpdateRegeditTask());
-        timerTasks.add(BakLeaderService.startBakLeaderRequestUpdateRegeditTask());
         timerTasks.add(BrokerService.startBrokerUpdateClientsTask());
+        timerTasks.add(SlaveService.startScheduleBinLogSyncTask());
         ZKService.listenLeaderDataNode();
     }
 

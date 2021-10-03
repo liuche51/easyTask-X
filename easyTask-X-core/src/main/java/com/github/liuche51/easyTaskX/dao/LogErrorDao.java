@@ -1,11 +1,14 @@
 package com.github.liuche51.easyTaskX.dao;
 
+import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
 import com.github.liuche51.easyTaskX.dao.dbinit.DbInit;
 import com.github.liuche51.easyTaskX.dto.db.LogError;
 import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.DbTableName;
 import com.github.liuche51.easyTaskX.util.StringConstant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class LogErrorDao {
+    private static final Logger log = LoggerFactory.getLogger(LogErrorDao.class);
     /**
      * 访问的db名称
      */
@@ -25,6 +29,7 @@ public class LogErrorDao {
      * 可重入锁
      */
     private static ReentrantLock lock = new ReentrantLock();
+
     public static boolean existTable() throws SQLException, ClassNotFoundException {
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
@@ -40,14 +45,18 @@ public class LogErrorDao {
         return false;
     }
 
-    public static void saveBatch(List<LogError> logErrors) throws Exception {
-        if (!DbInit.hasInit)
-            DbInit.init();
-        logErrors.forEach(x -> {
-            x.setCreateTime(DateUtils.getCurrentDateTime());
-        });
-        String sql = contactSaveSql(logErrors);
-        SqliteHelper.executeUpdateForSync(sql, dbName, lock);
+    public static void saveBatch(List<LogError> logErrors) {
+        try {
+            if (!DbInit.hasInit)
+                DbInit.init();
+            logErrors.forEach(x -> {
+                x.setCreateTime(DateUtils.getCurrentDateTime());
+            });
+            String sql = contactSaveSql(logErrors);
+            SqliteHelper.executeUpdateForSync(sql, dbName, lock);
+        } catch (Exception e) {
+            log.error("", e);
+        }
     }
 
     private static String contactSaveSql(List<LogError> logErrors) {

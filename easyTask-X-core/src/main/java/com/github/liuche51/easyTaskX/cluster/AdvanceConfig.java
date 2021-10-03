@@ -41,6 +41,12 @@ public class AdvanceConfig {
      */
     private int reDispatchBatchCount = 5;
     /**
+     * Leader收集集群节点心跳队列的最大容量。
+     * 1、此队列供bakleader异步同步使用。每个bakleader的队列都是单独的
+     * 2、队列采用有界，防止内存溢出
+     */
+    private int followsHeartbeatsQueueCapacity=5000;
+    /**
      * 清理任务备份表中失效的leader备份。默认1小时一次。
      */
     private int clearScheduleBakTime = 1;
@@ -146,6 +152,14 @@ public class AdvanceConfig {
 
     public void setReDispatchBatchCount(int reDispatchBatchCount) {
         this.reDispatchBatchCount = reDispatchBatchCount;
+    }
+
+    public int getFollowsHeartbeatsQueueCapacity() {
+        return followsHeartbeatsQueueCapacity;
+    }
+
+    public void setFollowsHeartbeatsQueueCapacity(int followsHeartbeatsQueueCapacity) {
+        this.followsHeartbeatsQueueCapacity = followsHeartbeatsQueueCapacity;
     }
 
     public int getClearScheduleBakTime() {

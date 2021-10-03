@@ -2,26 +2,29 @@ package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.dao.LogErrorDao;
 import com.github.liuche51.easyTaskX.dto.*;
 import com.github.liuche51.easyTaskX.cluster.task.leader.CheckFollowsAliveTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
+import com.github.liuche51.easyTaskX.dto.db.LogError;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
+import com.github.liuche51.easyTaskX.enume.LogErrorTypeEnum;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
+import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class LeaderService {
-    private static final Logger log = LoggerFactory.getLogger(VoteSlave.class);
+    private static final Logger log = LoggerFactory.getLogger(LeaderService.class);
     /**
      * 集群BROKER注册表LeaderNotifyClientUpdateBrokerChange
      */
@@ -30,6 +33,14 @@ public class LeaderService {
      * 集群CLIENT注册表
      */
     public static ConcurrentHashMap<String, RegClient> CLIENT_REGISTER_CENTER = new ConcurrentHashMap<>(10);
+
+    /**
+     * 集群节点心跳信息收集队列
+     * 1、leader使用。
+     * 2、bakleader异步消费
+     * 3、只有leader一个线程操作，不需支持并发
+     */
+    public static Map<String, LinkedBlockingQueue<String>> followsHeartbeats = new HashMap<>(2);
 
     /**
      * 通知follows节点更新注册表信息
@@ -86,9 +97,8 @@ public class LeaderService {
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyBrokerRegisterSucceeded)
                             .setSource(NodeService.CURRENTNODE.getAddress());
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, broker.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
-                    if (!ret)
-                    {
-                        NettyMsgService.writeRpcErrorMsgToDb("Leader通知Broker注册成功。失败！","com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifyBrokerRegisterSucceeded");
+                    if (!ret) {
+                        NettyMsgService.writeRpcErrorMsgToDb("Leader通知Broker注册成功。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifyBrokerRegisterSucceeded");
                     }
                 } catch (Exception e) {
                     log.error("", e);
@@ -143,7 +153,7 @@ public class LeaderService {
                 RegNode node = item.getValue();
                 boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                 if (!ret) {
-                    NettyMsgService.writeRpcErrorMsgToDb("leader通知slaves。旧Master失效，leader已选新Master。失败！","com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifySlaveVotedNewMaster");
+                    NettyMsgService.writeRpcErrorMsgToDb("leader通知slaves。旧Master失效，leader已选新Master。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifySlaveVotedNewMaster");
                 }
             }
             return true;
@@ -161,5 +171,43 @@ public class LeaderService {
         task.start();
         NodeService.timerTasks.add(task);
         return task;
+    }
+
+    /**
+     * bakleader的心跳同步队列发生变更
+     */
+    public static void changeFollowsHeartbeats() {
+        //找到新加入的slave队列
+        Iterator<String> items = NodeService.CURRENTNODE.getSlaves().keySet().iterator();
+        while (items.hasNext()) {
+            String key = items.next();
+            if (!followsHeartbeats.containsKey(key)) {
+                followsHeartbeats.put(key, new LinkedBlockingQueue<String>(NodeService.getConfig().getAdvanceConfig().getFollowsHeartbeatsQueueCapacity()));
+            }
+        }
+        // 找到需要移除的失效队列
+        Iterator<String> items2 = followsHeartbeats.keySet().iterator();
+        while (items2.hasNext()) {
+            String key = items2.next();
+            if (!NodeService.CURRENTNODE.getSlaves().containsKey(key)) {
+                followsHeartbeats.remove(key);
+            }
+        }
+    }
+
+    /**
+     * 往所有bakleader队列里心中节点心跳时间信息
+     *
+     * @param address 当前心跳的节点标识
+     */
+    public static void addFollowsHeartbeats(String address) {
+        followsHeartbeats.values().forEach(x -> {
+            boolean ret = x.offer(address + "," + DateUtils.getCurrentDateTime());
+            if (!ret) {
+                List<LogError> logErrors = new ArrayList<>(1);
+                logErrors.add(new LogError("leader往bakleader心跳队列存数据失败，队列已满!", "com.github.liuche51.easyTaskX.cluster.leader.LeaderService.addFollowsHeartbeats", LogErrorTypeEnum.NORMAL));
+                LogErrorDao.saveBatch(logErrors);
+            }
+        });
     }
 }

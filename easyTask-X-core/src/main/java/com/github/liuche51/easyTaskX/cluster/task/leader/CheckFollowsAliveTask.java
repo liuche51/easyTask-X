@@ -78,7 +78,8 @@ public class CheckFollowsAliveTask extends TimerTask {
                             LeaderService.notifyFollowsUpdateRegedit(regNode.getSlaves(), StringConstant.BROKER);
                             LeaderService.notifyClinetsChangedBroker(regNode.getAddress(), newMaster == null ? null : newMaster.getAddress(), OperationTypeEnum.DELETE);
                         }
-                        //master没失效，但是Slave失效了
+
+                        //master没失效，但是Slave失效了或刚注册还没选slave
                         else {
                             ConcurrentHashMap<String, RegNode> slaves = regNode.getSlaves();
                             //初始化，还没有一个Slave时，选出一批slave
@@ -92,8 +93,9 @@ public class CheckFollowsAliveTask extends TimerTask {
                                         binlogClusterMetas.add(new BinlogClusterMeta(OperationTypeEnum.UPDATE, RegNodeTypeEnum.REGBROKER, newslave.getAddress(), JSONObject.toJSONString(LeaderService.BROKER_REGISTER_CENTER.get(newslave.getAddress()))));
                                     }
                                     BinlogClusterMetaDao.saveBatch(binlogClusterMetas);
-                                    //如果当前节点是Leader自己选slave，则需要通知所有其他所有Follows更新备用Leader信息
+                                    //如果当前节点是Leader自己选slave，则需要通知所有其他所有Follows更新备用Leader信息。以及写入bakleader心跳信息队列
                                     if (regNode.getAddress().equals(NodeService.CURRENTNODE.getClusterLeader().getAddress())) {
+                                        LeaderService.changeFollowsHeartbeats();
                                         LeaderService.notifyFollowsBakLeaderChanged();
                                     }
                                 } catch (VotingException e) {
@@ -113,6 +115,10 @@ public class CheckFollowsAliveTask extends TimerTask {
                                     if (regSlave == null || DateUtils.isGreaterThanLoseTime(regSlave.getLastHeartbeat())) {
                                         try {
                                             RegNode newSlave = VoteSlave.voteNewSlave(regNode, slave);
+                                            //如果当前节点是Leader自己选slave，则需要触发bakleader心跳信息队列
+                                            if (regNode.getAddress().equals(NodeService.CURRENTNODE.getClusterLeader().getAddress())) {
+                                                LeaderService.changeFollowsHeartbeats();
+                                            }
                                             List<RegNode> nodes = new ArrayList<>(2);
                                             nodes.add(regNode);
                                             nodes.add(newSlave);

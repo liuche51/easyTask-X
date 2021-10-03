@@ -3,6 +3,7 @@ package com.github.liuche51.easyTaskX.cluster.task.broker;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.leader.CheckFollowsAliveTask;
+import com.github.liuche51.easyTaskX.cluster.task.slave.ClusterMetaBinLogSyncTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
@@ -72,5 +73,18 @@ public class HeartbeatsTask extends TimerTask {
             CheckFollowsAliveTask.hasRuning = false;
         }
     }
-
+    /**
+     * 初始化是否运行leader的检查follows存活任务
+     * @param leader
+     */
+    private static void initClusterMetaBinLogSyncTask(BaseNode bakleader) {
+        if (leader == null) return;
+        //如果当前节点是leader，且没有运行follow存活检查任务，则启动一个任务/
+        if (!ClusterMetaBinLogSyncTask.hasRuning && NodeService.CURRENTNODE.getAddress().equals(leader.getAddress())) {
+            NodeService.timerTasks.add(LeaderService.startCheckFollowAliveTask());
+        }
+        if (!NodeService.CURRENTNODE.getAddress().equals(leader.getAddress()) && CheckFollowsAliveTask.hasRuning) {
+            CheckFollowsAliveTask.hasRuning = false;
+        }
+    }
 }

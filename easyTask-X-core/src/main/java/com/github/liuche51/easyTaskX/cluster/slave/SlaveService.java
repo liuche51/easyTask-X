@@ -2,6 +2,10 @@ package com.github.liuche51.easyTaskX.cluster.slave;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
+import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerUpdateClientsTask;
+import com.github.liuche51.easyTaskX.cluster.task.slave.ClusterMetaBinLogSyncTask;
+import com.github.liuche51.easyTaskX.cluster.task.slave.ScheduleBinLogSyncTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
 import com.github.liuche51.easyTaskX.dao.TranlogScheduleBakDao;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
@@ -97,5 +101,23 @@ public class SlaveService {
                 }
             }
         }
+    }
+    /**
+     * 启动从master获取ScheduleBinLog订阅任务。
+     */
+    public static TimerTask startScheduleBinLogSyncTask() {
+        ScheduleBinLogSyncTask task = new ScheduleBinLogSyncTask();
+        task.start();
+        NodeService.timerTasks.add(task);
+        return task;
+    }
+    /**
+     * 启动从master获取ScheduleBinLog订阅任务。
+     */
+    public static TimerTask startClusterMetaBinLogSyncTask() {
+        ClusterMetaBinLogSyncTask task = new ClusterMetaBinLogSyncTask();
+        task.start();
+        NodeService.timerTasks.add(task);
+        return task;
     }
 }

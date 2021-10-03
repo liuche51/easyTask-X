@@ -7,6 +7,12 @@ public class LogError {
     private String type;
     private String createTime;
 
+    public LogError(String content, String detail, String type) {
+        this.content = content;
+        this.detail = detail;
+        this.type = type;
+    }
+
     public Long getId() {
         return id;
     }
