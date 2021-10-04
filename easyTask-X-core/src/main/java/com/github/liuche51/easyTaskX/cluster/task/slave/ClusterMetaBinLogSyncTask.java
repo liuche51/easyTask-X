@@ -15,6 +15,8 @@ import java.util.concurrent.TimeUnit;
  * 1、
  */
 public class ClusterMetaBinLogSyncTask extends TimerTask {
+    //是否已经存在一个任务实例运行中
+    public static volatile boolean hasRuning = false;
     @Override
     public void run() {
         while (!isExit()) {
