@@ -63,6 +63,10 @@ public class NettyInterfaceEnum {
      */
     public static final String SlaveRequestMasterGetScheduleBinlogData="SlaveRequestMasterGetScheduleBinlogData";
     /**
+     * bakleader请求leader获取ClusterMetaBinlog数据
+     */
+    public static final String BakLeaderRequestLeaderGetClusterMetaBinlogData="BakLeaderRequestLeaderGetClusterMetaBinlogData";
+    /**
      * broker或client通过定时任务获取leader最新注册表信息
      */
     public static final String FollowRequestLeaderSendRegedit="FollowRequestLeaderSendRegedit";

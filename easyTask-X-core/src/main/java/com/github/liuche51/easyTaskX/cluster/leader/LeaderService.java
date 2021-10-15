@@ -2,10 +2,14 @@ package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.dao.BinlogClusterMetaDao;
+import com.github.liuche51.easyTaskX.dao.BinlogScheduleDao;
 import com.github.liuche51.easyTaskX.dao.LogErrorDao;
 import com.github.liuche51.easyTaskX.dto.*;
 import com.github.liuche51.easyTaskX.cluster.task.leader.CheckFollowsAliveTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
+import com.github.liuche51.easyTaskX.dto.db.BinlogClusterMeta;
+import com.github.liuche51.easyTaskX.dto.db.BinlogSchedule;
 import com.github.liuche51.easyTaskX.dto.db.LogError;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
@@ -19,6 +23,7 @@ import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -35,8 +40,8 @@ public class LeaderService {
     public static ConcurrentHashMap<String, RegClient> CLIENT_REGISTER_CENTER = new ConcurrentHashMap<>(10);
 
     /**
-     * 集群节点心跳信息收集队列
-     * 1、leader使用。
+     * 集群节点心跳信息收集发送队列
+     * 1、leader使用。每个bakleader单独分开
      * 2、bakleader异步消费
      * 3、只有leader一个线程操作，不需支持并发
      */
@@ -199,15 +204,27 @@ public class LeaderService {
      * 往所有bakleader队列里心中节点心跳时间信息
      *
      * @param address 当前心跳的节点标识
+     * @param regnode 节点类型 RegNodeTypeEnum
      */
-    public static void addFollowsHeartbeats(String address) {
+    public static void addFollowsHeartbeats(String address, String regnode) {
         followsHeartbeats.values().forEach(x -> {
-            boolean ret = x.offer(address + "," + DateUtils.getCurrentDateTime());
+            boolean ret = x.offer(regnode + StringConstant.CHAR_SPRIT_COMMA + address + StringConstant.CHAR_SPRIT_COMMA + DateUtils.getCurrentDateTime());
             if (!ret) {
                 List<LogError> logErrors = new ArrayList<>(1);
                 logErrors.add(new LogError("leader往bakleader心跳队列存数据失败，队列已满!", "com.github.liuche51.easyTaskX.cluster.leader.LeaderService.addFollowsHeartbeats", LogErrorTypeEnum.NORMAL));
                 LogErrorDao.saveBatch(logErrors);
             }
         });
+    }
+
+    /**
+     * 查询指定集群元数据数据的binlog数据
+     *
+     * @param index
+     * @return
+     * @throws SQLException
+     */
+    public static List<BinlogClusterMeta> getBinlogClusterMetaByIndex(long index) throws SQLException {
+        return BinlogClusterMetaDao.getBinlogClusterMetaByIndex(index, NodeService.getConfig().getAdvanceConfig().getBinlogCount());
     }
 }

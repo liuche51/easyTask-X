@@ -31,6 +31,7 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.MasterNotifyLeaderUpdateRegeditForDataStatus,new MasterNotifyLeaderUpdateRegeditForDataStatusHandler());
                 //slave to master
                 put(NettyInterfaceEnum.SlaveRequestMasterGetScheduleBinlogData,new SlaveRequestMasterGetScheduleBinlogDataHandler());
+                put(NettyInterfaceEnum.BakLeaderRequestLeaderGetClusterMetaBinlogData,new BakLeaderRequestLeaderGetClusterMetaBinlogDataHandler());
                 //Follow to  leader
                 put(NettyInterfaceEnum.FollowHeartbeatToLeader,new FollowHeartbeatToLeaderHandler());
                 put(NettyInterfaceEnum.FollowRequestLeaderSendRegedit,new FollowRequestLeaderSendRegeditHandler());

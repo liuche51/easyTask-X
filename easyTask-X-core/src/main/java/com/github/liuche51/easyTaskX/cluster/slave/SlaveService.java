@@ -11,6 +11,7 @@ import com.github.liuche51.easyTaskX.dao.TranlogScheduleBakDao;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.ByteStringPack;
 import com.github.liuche51.easyTaskX.dto.MasterNode;
+import com.github.liuche51.easyTaskX.dto.db.BinlogClusterMeta;
 import com.github.liuche51.easyTaskX.dto.db.BinlogSchedule;
 import com.github.liuche51.easyTaskX.dto.db.ScheduleBak;
 import com.github.liuche51.easyTaskX.dto.db.TranlogScheduleBak;
@@ -18,6 +19,7 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
+import com.github.liuche51.easyTaskX.enume.OperationTypeEnum;
 import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.DbTableName;
@@ -102,20 +104,37 @@ public class SlaveService {
             }
         }
     }
+
+    /**
+     * 请求leader获取集群元数据
+     *
+     * @param leader
+     * @param task   当前运行的任务
+     * @throws Exception
+     */
+    public static void requestLeaderSyncClusterMetaData(BaseNode leader, ClusterMetaBinLogSyncTask task) throws Exception {
+        Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BakLeaderRequestLeaderGetClusterMetaBinlogData).setSource(NodeService.getConfig().getAddress())
+                .setBody(String.valueOf(task.getCurrentIndex()));
+        ByteStringPack respPack = new ByteStringPack();
+        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
+        if (ret) {
+            List<BinlogClusterMeta> binlogClusterMetas = JSONObject.parseArray(respPack.getRespbody().toString(), BinlogClusterMeta.class);
+            if (binlogClusterMetas == null || binlogClusterMetas.size() == 0) return;
+            Collections.sort(binlogClusterMetas, Comparator.comparing(BinlogClusterMeta::getId));
+            for (BinlogClusterMeta x : binlogClusterMetas) {
+                Long id = SlaveUtil.saveBinlogClusterMeta(x);
+                if (id != null) // id为null表示当前处理的是心跳类数据，不需要保存处理位置
+                    task.setCurrentIndex(id);
+            }
+        }
+    }
+
     /**
      * 启动从master获取ScheduleBinLog订阅任务。
      */
     public static TimerTask startScheduleBinLogSyncTask() {
         ScheduleBinLogSyncTask task = new ScheduleBinLogSyncTask();
-        task.start();
-        NodeService.timerTasks.add(task);
-        return task;
-    }
-    /**
-     * 启动从master获取ScheduleBinLog订阅任务。
-     */
-    public static TimerTask startClusterMetaBinLogSyncTask() {
-        ClusterMetaBinLogSyncTask task = new ClusterMetaBinLogSyncTask();
         task.start();
         NodeService.timerTasks.add(task);
         return task;

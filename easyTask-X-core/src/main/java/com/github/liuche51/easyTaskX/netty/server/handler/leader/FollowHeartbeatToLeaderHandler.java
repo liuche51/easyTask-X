@@ -38,7 +38,7 @@ public class FollowHeartbeatToLeaderHandler extends BaseHandler {
                     LeaderService.notifyClinetsChangedBroker(registerNode.getAddress(),null, OperationTypeEnum.ADD);
                 }else {
                     registerNode.setLastHeartbeat(ZonedDateTime.now());
-                    LeaderService.addFollowsHeartbeats(address);
+                    LeaderService.addFollowsHeartbeats(address,RegNodeTypeEnum.REGBROKER);
                 }
                 break;
             case StringConstant.CLINET:
@@ -52,7 +52,7 @@ public class FollowHeartbeatToLeaderHandler extends BaseHandler {
                     binlogClusterMetas.add(new BinlogClusterMeta(OperationTypeEnum.ADD, RegNodeTypeEnum.REGCLIENT,address, JSONObject.toJSONString(clientNode)));
                 }else {
                     clientNode.setLastHeartbeat(ZonedDateTime.now());
-                    LeaderService.addFollowsHeartbeats(address);
+                    LeaderService.addFollowsHeartbeats(address,RegNodeTypeEnum.REGCLIENT);
                 }
                 break;
             default:break;
