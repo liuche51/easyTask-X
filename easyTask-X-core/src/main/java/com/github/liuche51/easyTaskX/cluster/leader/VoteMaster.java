@@ -12,8 +12,11 @@ import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 选Master
@@ -23,18 +26,19 @@ public class VoteMaster {
 
     /**
      * leader从slaves中选择新的master
-     *
+     *1、优先选取数据同步状态为已同步的节点
      * @param slaves
      * @return
      */
     public static RegNode voteNewMaster(Map<String, RegNode> slaves) {
-        Iterator<Map.Entry<String, RegNode>> items = slaves.entrySet().iterator();
-        while (items.hasNext()) {
-            Map.Entry<String, RegNode> item = items.next();
-            RegNode node = item.getValue();
-            return node;
+        Collection<RegNode> salves = slaves.values();
+        List<RegNode> temp = salves.stream().filter(x -> x.getDataStatus().intValue() == 1).collect(Collectors.toList());
+        if(temp!=null&&temp.size()>0){
+            return temp.get(0);
+        }else {
+            RegNode[] regNodes = salves.toArray(new RegNode[]{});
+            return regNodes[0];
         }
-        return null;
     }
 
     /**

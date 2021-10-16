@@ -9,15 +9,15 @@ public class RegNode extends BaseNode {
     /**
      * 数据一致性状态。0同步中，1已同步
      */
-    private Short dataStatus=Short.valueOf("0");;
+    private Integer dataStatus = 0;
 
     public RegNode(BaseNode baseNode) {
         super(baseNode.getHost(), baseNode.getPort());
     }
 
-    public RegNode(String host, int port, Short dataStatus) {
+    public RegNode(String host, int port, Integer dataStatus) {
         super(host, port);
-        this.dataStatus=dataStatus;
+        this.dataStatus = dataStatus;
     }
 
     public RegNode(String host, int port) {
@@ -28,11 +28,11 @@ public class RegNode extends BaseNode {
         super(address);
     }
 
-    public Short getDataStatus() {
+    public Integer getDataStatus() {
         return dataStatus;
     }
 
-    public void setDataStatus(Short dataStatus) {
+    public void setDataStatus(Integer dataStatus) {
         this.dataStatus = dataStatus;
     }
 }
