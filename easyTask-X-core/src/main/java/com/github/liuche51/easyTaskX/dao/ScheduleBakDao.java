@@ -134,7 +134,9 @@ public class ScheduleBakDao {
         Long period = resultSet.getLong("period");
         String unit = resultSet.getString("unit");
         String param = resultSet.getString("param");
-        String source1 = resultSet.getString("source");
+        String source = resultSet.getString("source");
+        String executer = resultSet.getString("executer");
+        int status = resultSet.getInt("status");
         String createTime = resultSet.getString("create_time");
         ScheduleBak schedulebak = new ScheduleBak();
         schedulebak.setId(id);
@@ -144,13 +146,15 @@ public class ScheduleBakDao {
         schedulebak.setPeriod(period);
         schedulebak.setUnit(unit);
         schedulebak.setParam(param);
-        schedulebak.setSource(source1);
+        schedulebak.setSource(source);
+        schedulebak.setExecuter(executer);
+        schedulebak.setStatus(status);
         schedulebak.setCreateTime(createTime);
         return schedulebak;
     }
 
     private static String contactSaveSql(List<ScheduleBak> scheduleBaks) {
-        StringBuilder sql1 = new StringBuilder("insert into " + tableName + "(id,class_path,execute_time,task_type,period,unit,param,source,transaction_id,create_time,modify_time) values");
+        StringBuilder sql1 = new StringBuilder("insert into " + tableName + "(id,class_path,execute_time,task_type,period,unit,param,source,executer,status,create_time,modify_time) values");
         for (ScheduleBak scheduleBak : scheduleBaks) {
             scheduleBak.setCreateTime(DateUtils.getCurrentDateTime());
             sql1.append("('");
@@ -162,7 +166,8 @@ public class ScheduleBakDao {
             sql1.append(scheduleBak.getUnit()).append("','");
             sql1.append(scheduleBak.getParam()).append("','");
             sql1.append(scheduleBak.getSource()).append("','");
-            sql1.append(scheduleBak.getTransactionId()).append("','");
+            sql1.append(scheduleBak.getExecuter()).append("',");
+            sql1.append(scheduleBak.getStatus()).append(",'");
             sql1.append(scheduleBak.getCreateTime()).append("','");
             sql1.append(scheduleBak.getModifyTime()).append("')").append(',');
         }

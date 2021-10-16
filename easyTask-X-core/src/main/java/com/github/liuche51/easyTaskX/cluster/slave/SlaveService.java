@@ -3,31 +3,25 @@ package com.github.liuche51.easyTaskX.cluster.slave;
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
-import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerUpdateClientsTask;
 import com.github.liuche51.easyTaskX.cluster.task.slave.ClusterMetaBinLogSyncTask;
 import com.github.liuche51.easyTaskX.cluster.task.slave.ScheduleBinLogSyncTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
-import com.github.liuche51.easyTaskX.dao.TranlogScheduleBakDao;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.ByteStringPack;
 import com.github.liuche51.easyTaskX.dto.MasterNode;
 import com.github.liuche51.easyTaskX.dto.db.BinlogClusterMeta;
 import com.github.liuche51.easyTaskX.dto.db.BinlogSchedule;
 import com.github.liuche51.easyTaskX.dto.db.ScheduleBak;
-import com.github.liuche51.easyTaskX.dto.db.TranlogScheduleBak;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
-import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
-import com.github.liuche51.easyTaskX.enume.OperationTypeEnum;
-import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
+import com.github.liuche51.easyTaskX.enume.ScheduleStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.DbTableName;
-import com.github.liuche51.easyTaskX.util.StringConstant;
+import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sqlite.SQLiteException;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -40,31 +34,6 @@ import java.util.List;
  */
 public class SlaveService {
     private static final Logger log = LoggerFactory.getLogger(SlaveService.class);
-
-    /**
-     * 接受Master同步任务入备库
-     *
-     * @param schedule
-     */
-    public static void trySaveTask(ScheduleDto.Schedule schedule) throws Exception {
-        ScheduleBak bak = ScheduleBak.valueOf(schedule);
-        TranlogScheduleBak transactionLog = new TranlogScheduleBak();
-        transactionLog.setId(schedule.getTransactionId());
-        transactionLog.setContent(JSONObject.toJSONString(bak));
-        transactionLog.setStatus(TransactionStatusEnum.TRIED);
-        TranlogScheduleBakDao.saveBatch(Arrays.asList(transactionLog));
-    }
-
-    /**
-     * 确认提交任务备份
-     *
-     * @param transactionId
-     * @throws SQLException
-     * @throws ClassNotFoundException
-     */
-    public static void confirmSaveTask(String transactionId) throws SQLException, ClassNotFoundException {
-        TranlogScheduleBakDao.updateStatusById(transactionId, TransactionStatusEnum.CONFIRM);
-    }
 
     /**
      * 请求master binlog日志，并本地执行。
@@ -83,7 +52,8 @@ public class SlaveService {
         boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, master.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
         if (ret) {
             List<BinlogSchedule> binlogScheduleList = JSONObject.parseArray(respPack.getRespbody().toString(), BinlogSchedule.class);
-            if (binlogScheduleList == null || binlogScheduleList.size() == 0) return;
+            if (binlogScheduleList == null || binlogScheduleList.size() == 0)
+                return;
             Collections.sort(binlogScheduleList, Comparator.comparing(BinlogSchedule::getId));
             for (BinlogSchedule x : binlogScheduleList) {
                 String sql = x.getSql().replace(DbTableName.SCHEDULE, DbTableName.SCHEDULE_BAK);
@@ -91,9 +61,13 @@ public class SlaveService {
                     ScheduleBakDao.executeSql(sql);
                     MasterNode masterNode = NodeService.masterBinlogInfo.get(master.getAddress());
                     masterNode.setCurrentIndex(x.getId());
+                    //如果当前binlog新增任务是需要等待slave同步确认的。则通知master已经完成同步
+                    if (ScheduleStatusEnum.UNUSE == x.getStatus() && !StringUtils.isNullOrEmpty(x.getScheduleId())) {
+                        notifyMasterHasSyncUnUseTask(x.getScheduleId(), master);
+                    }
                 } catch (SQLException e) {
                     String message = e.getMessage();
-                    //因为开启了数据不丢失模式，导致其中一个slave 通过tcc机制已经与master的新增任务保持一致了，异步复制binlog时会导致主键冲突。故需要忽略此类冲突
+                    //防止重复处理。保证接口幂等性
                     if (message != null && message.contains("SQLITE_CONSTRAINT_PRIMARYKEY")) {
                         log.info("normally exception!slave sync master's ScheduleBinLog primarykey repeated.");
                     } else {
@@ -102,6 +76,27 @@ public class SlaveService {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * 通知master。还没正式使用的任务已经完成同步
+     *
+     * @param scheduleId
+     * @param master
+     */
+    public static void notifyMasterHasSyncUnUseTask(String scheduleId, BaseNode master) {
+        Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+        try {
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.SlaveNotifyMasterHasSyncUnUseTask).setSource(NodeService.getConfig().getAddress())
+                    .setBody(scheduleId);
+            ByteStringPack respPack = new ByteStringPack();
+            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, master.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
+            if (!ret) {
+                NettyMsgService.writeRpcErrorMsgToDb("slave通知master。还没正式使用的任务已经完成同步。失败！", "com.github.liuche51.easyTaskX.cluster.slave.SlaveService.notifyMasterHasSyncUnUseTask");
+            }
+        } catch (Exception e) {
+            log.error("", e);
         }
     }
 

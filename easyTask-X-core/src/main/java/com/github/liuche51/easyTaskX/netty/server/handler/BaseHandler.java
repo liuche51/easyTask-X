@@ -6,7 +6,7 @@ import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.server.handler.broker.*;
 import com.github.liuche51.easyTaskX.netty.server.handler.follow.*;
 import com.github.liuche51.easyTaskX.netty.server.handler.leader.*;
-import com.github.liuche51.easyTaskX.netty.server.handler.leader.MasterNotifyLeaderUpdateRegeditForDataStatusHandler;
+import com.github.liuche51.easyTaskX.netty.server.handler.master.SlaveNotifyMasterHasSyncUnUseTaskHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.master.SlaveRequestMasterGetScheduleBinlogDataHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.slave.*;
 import com.google.protobuf.ByteString;
@@ -24,14 +24,12 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.ClientNotifyBrokerDeleteTask,new ClientNotifyBrokerDeleteTaskHandler());
                 //Client to Leader
                 put(NettyInterfaceEnum.ClientRequestLeaderSendBrokers,new ClientRequestLeaderSendBrokersHandler());
-                //Master to Slave
-                put(NettyInterfaceEnum.MasterNotifySlaveTranTrySaveTask,new MasterNotifySlaveTranTrySaveTaskHandler());
-                put(NettyInterfaceEnum.MasterNotifySlaveTranConfirmSaveTask,new MasterNotifySlaveTranConfirmSaveTaskHandler());
-                //Master to Leader
-                put(NettyInterfaceEnum.MasterNotifyLeaderUpdateRegeditForDataStatus,new MasterNotifyLeaderUpdateRegeditForDataStatusHandler());
                 //slave to master
                 put(NettyInterfaceEnum.SlaveRequestMasterGetScheduleBinlogData,new SlaveRequestMasterGetScheduleBinlogDataHandler());
                 put(NettyInterfaceEnum.BakLeaderRequestLeaderGetClusterMetaBinlogData,new BakLeaderRequestLeaderGetClusterMetaBinlogDataHandler());
+                put(NettyInterfaceEnum.SlaveNotifyMasterHasSyncUnUseTask,new SlaveNotifyMasterHasSyncUnUseTaskHandler());
+               //master to leader
+                put(NettyInterfaceEnum.MasterNotifyLeaderChangeSlaveDataStatus,new MasterNotifyLeaderChangeSlaveDataStatusHandler());
                 //Follow to  leader
                 put(NettyInterfaceEnum.FollowHeartbeatToLeader,new FollowHeartbeatToLeaderHandler());
                 put(NettyInterfaceEnum.FollowRequestLeaderSendRegedit,new FollowRequestLeaderSendRegeditHandler());

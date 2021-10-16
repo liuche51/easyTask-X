@@ -1,12 +1,9 @@
 package com.github.liuche51.easyTaskX.dao;
 
-import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
 import com.github.liuche51.easyTaskX.dao.dbinit.DbInit;
 import com.github.liuche51.easyTaskX.dto.db.LogError;
-import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.DbTableName;
-import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

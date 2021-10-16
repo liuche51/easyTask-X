@@ -27,10 +27,8 @@ public class DbInit {
                 file.mkdirs();
             }
             ScheduleInit.initSchedule();
-            ScheduleInit.initTranlog();
             ScheduleInit.initBinlog();
             ScheduleBakInit.initSchedule();
-            ScheduleBakInit.initTranlog();
             LogInit.initLogError();
             ClusterMetadataBinlogInit.initClusterMetadataBinlog();
             hasInit = true;

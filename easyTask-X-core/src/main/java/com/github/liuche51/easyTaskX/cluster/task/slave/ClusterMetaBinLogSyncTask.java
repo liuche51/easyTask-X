@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * bakleader同步leader集群元数据BinLog任务，异步复制
- * 1、
+ * 1、每个bakleader都运行一个任务实例
  */
 public class ClusterMetaBinLogSyncTask extends TimerTask {
     //是否已经存在一个任务实例运行中
@@ -37,8 +37,7 @@ public class ClusterMetaBinLogSyncTask extends TimerTask {
             setLastRunTime(new Date());
             try {
                 BaseNode leader = NodeService.CURRENTNODE.getClusterLeader();
-                SlaveService.requestLeaderSyncClusterMetaData(leader, this.currentIndex);
-
+                SlaveService.requestLeaderSyncClusterMetaData(leader, this);
             } catch (Exception e) {
                 log.error("", e);
             }

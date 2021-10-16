@@ -1,23 +1,9 @@
 package com.github.liuche51.easyTaskX.cluster.task.slave;
 
-import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
-import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
-import com.github.liuche51.easyTaskX.dao.ScheduleDao;
-import com.github.liuche51.easyTaskX.dao.SqliteHelper;
-import com.github.liuche51.easyTaskX.dao.TranlogScheduleBakDao;
-import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.MasterNode;
-import com.github.liuche51.easyTaskX.dto.db.ScheduleBak;
-import com.github.liuche51.easyTaskX.dto.db.TranlogScheduleBak;
-import com.github.liuche51.easyTaskX.dto.proto.Dto;
-import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
-import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
-import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
-import com.github.liuche51.easyTaskX.util.DbTableName;
-import com.github.liuche51.easyTaskX.util.Util;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;

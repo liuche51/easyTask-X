@@ -104,7 +104,6 @@ public class NodeService {
         CURRENTNODE = new Node(Util.getLocalIP(), NodeService.getConfig().getServerPort());
         timerTasks.add(BrokerService.startHeartBeat());
         timerTasks.add(clearDataTask());
-        timerTasks.add(BrokerService.startCommitSaveTransactionTask());
         timerTasks.add(BrokerService.startUpdateRegeditTask());
         timerTasks.add(BrokerService.startBrokerUpdateClientsTask());
         timerTasks.add(SlaveService.startScheduleBinLogSyncTask());
@@ -119,7 +118,6 @@ public class NodeService {
         try {
             ScheduleDao.deleteAll();
             ScheduleBakDao.deleteAll();
-            TranlogScheduleDao.deleteAll();
         } catch (Exception e) {
             log.error("deleteAllData exception!", e);
         }

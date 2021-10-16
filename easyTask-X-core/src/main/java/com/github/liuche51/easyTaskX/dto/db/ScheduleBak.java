@@ -18,7 +18,10 @@ public class ScheduleBak {
     private String transactionId;
     private String createTime;
     private String modifyTime;
-
+    /**
+     * 任务状态。1正常，0暂时不可用
+     */
+    private int status;
     public String getId() {
         return id;
     }
@@ -88,6 +91,15 @@ public class ScheduleBak {
     public void setExecuter(String executer) {
         this.executer = executer;
     }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     public String getTransactionId() {
         return transactionId;
     }
@@ -121,7 +133,7 @@ public class ScheduleBak {
         schedule.param=dto.getParam();
         schedule.source=dto.getSource();
         schedule.executer=dto.getExecuter();
-        schedule.transactionId=dto.getTransactionId();
+        schedule.status=dto.getStatus();
         return schedule;
     }
 }

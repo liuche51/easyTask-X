@@ -5,7 +5,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class AdvanceConfig {
     /**
-     * 任务提交成功模式。1、数据不丢失模式（master和其中一个slave保存了任务才算提交成功）。0、高性能模式（master保存了任务就算提交成功）。
+     * 任务提交成功模式。1、高可靠模式（master和其中一个slave保存了任务才算提交成功）。0、高性能模式（master保存了任务就算提交成功）。
      */
     private int submitSuccessModel = 1;
     /**

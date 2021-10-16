@@ -150,10 +150,10 @@ public class VoteSlave {
             int index = random.nextInt(availableBrokers.size());//随机生成的随机数范围就变成[0,size)。注意这里size会动态变动。
             String ret = availableBrokers.get(index);
             RegBroker regNode2 = LeaderService.BROKER_REGISTER_CENTER.get(ret);
-            RegNode newFollow = new RegNode(regNode2);
+            RegNode newslave = new RegNode(regNode2);
             availableBrokers.remove(index);
             if (brokers.size() < count) {
-                brokers.add(newFollow);//这里一定要用新对象。否则对象重用会导致属性值也被公用了
+                brokers.add(newslave);//这里一定要用新对象。否则对象重用会导致属性值也被公用了
             } else break;//已选数量够了就跳出
         }
         if (brokers.size() < count)
@@ -163,19 +163,19 @@ public class VoteSlave {
 
 
     /**
-     * 节点初始化选新follows，更新注册表
+     * 节点初始化选新slaves，更新注册表
      *
      * @param regNode
-     * @param newfollows
+     * @param newSlaves
      */
-    private static void updateRegedit(RegBroker regNode, ConcurrentHashMap<String, RegNode> newfollows) {
-        regNode.setSlaves(newfollows);
-        Iterator<Map.Entry<String, RegNode>> items = newfollows.entrySet().iterator();
+    private static void updateRegedit(RegBroker regNode, ConcurrentHashMap<String, RegNode> newSlaves) {
+        regNode.setSlaves(newSlaves);
+        Iterator<Map.Entry<String, RegNode>> items = newSlaves.entrySet().iterator();
         while (items.hasNext()) {
             Map.Entry<String, RegNode> item = items.next();
             RegNode node = item.getValue();
-            RegBroker followRegnode = LeaderService.BROKER_REGISTER_CENTER.get(node.getAddress());
-            followRegnode.getMasters().put(regNode.getAddress(), new RegNode(regNode));
+            RegBroker slaveRegnode = LeaderService.BROKER_REGISTER_CENTER.get(node.getAddress());
+            slaveRegnode.getMasters().put(regNode.getAddress(), new RegNode(regNode));
         }
     }
 

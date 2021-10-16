@@ -17,7 +17,6 @@ public class Schedule {
      */
     private String unit;
     private String param;
-    private String transactionId;
     private String createTime;
     private String modifyTime;
     private String source;
@@ -25,6 +24,10 @@ public class Schedule {
      * 当前任务执行的Client
      */
     private String executer;
+    /**
+     * 任务状态。1正常，0暂时不可用
+     */
+    private int status;
 
     public String getId() {
         return id;
@@ -82,14 +85,6 @@ public class Schedule {
         this.param = param;
     }
 
-    public String getTransactionId() {
-        return transactionId;
-    }
-
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
-    }
-
     public String getModifyTime() {
         return modifyTime;
     }
@@ -122,6 +117,14 @@ public class Schedule {
         this.executer = executer;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     public static Schedule valueOf(ScheduleBak bak){
         Schedule schedule=new Schedule();
         schedule.id=bak.getId();
@@ -133,6 +136,7 @@ public class Schedule {
         schedule.param=bak.getParam();
         schedule.source=bak.getSource();
         schedule.executer=bak.getExecuter();
+        schedule.status=bak.getStatus();
         return schedule;
     }
     public static Schedule valueOf(ScheduleDto.Schedule dto){
@@ -145,8 +149,8 @@ public class Schedule {
         schedule.unit=dto.getUnit();
         schedule.param=dto.getParam();
         schedule.source=dto.getSource();
-        schedule.transactionId=dto.getTransactionId();
         schedule.executer=dto.getExecuter();
+        schedule.status=dto.getStatus();
         return schedule;
     }
 
@@ -159,7 +163,7 @@ public class Schedule {
         builder.setId(this.id).setClassPath(this.classPath).setExecuteTime(this.executeTime)
                 .setTaskType(this.taskType).setPeriod(this.period).setUnit(this.unit)
                 .setParam(this.param).setSource(NodeService.getConfig().getAddress())
-                .setExecuter(this.executer).setTransactionId(this.transactionId);
+                .setExecuter(this.executer).setStatus(this.status);
         return builder.build();
     }
 }

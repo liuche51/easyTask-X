@@ -4,8 +4,10 @@ package com.github.liuche51.easyTaskX.dao;
 import com.github.liuche51.easyTaskX.dao.dbinit.DbInit;
 import com.github.liuche51.easyTaskX.dto.db.BinlogSchedule;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
+import com.github.liuche51.easyTaskX.enume.ScheduleStatusEnum;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.DbTableName;
+import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.sqlite.SQLiteException;
 
 import java.sql.ResultSet;
@@ -52,16 +54,16 @@ public class ScheduleDao {
     public static void save(Schedule schedule) throws SQLException, ClassNotFoundException {
         if (!DbInit.hasInit)
             DbInit.init();
-        String sql = contactSaveSql(Arrays.asList(schedule));
-        SqliteHelper.executeUpdateForSync(sql, dbName, lock);
-    }
-
-    public static void saveBatch(List<Schedule> schedules, SqliteHelper helper) throws Exception {
-        if (!DbInit.hasInit)
-            DbInit.init();
-        String sql = contactSaveSql(schedules);
-        helper.executeUpdate(sql);
-        BinlogScheduleDao.save(sql,helper);
+        SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE, ScheduleDao.getLock());
+        helper.beginTran();
+        try {
+            String sql = contactSaveSql(Arrays.asList(schedule));
+            helper.executeUpdate(sql);
+            BinlogScheduleDao.save(sql,schedule.getId(),schedule.getStatus(), helper);
+            helper.commitTran();
+        } finally {
+            helper.destroyed();
+        }
     }
 
     public static List<Schedule> selectByIds(String[] ids) throws SQLException {
@@ -144,14 +146,14 @@ public class ScheduleDao {
         String instr = SqliteHelper.getInConditionStr(ids);
         String sql = "UPDATE " + tableName + " set " + updateStr + ",modify_time='" + DateUtils.getCurrentDateTime() + "' where id in " + instr + ";";
         helper.executeUpdate(sql);
-        BinlogScheduleDao.save(sql,helper);
+        BinlogScheduleDao.save(sql, StringConstant.EMPTY, ScheduleStatusEnum.NORMAL, helper);
     }
 
     public static void deleteByIds(String[] ids, SqliteHelper helper) throws SQLException, ClassNotFoundException {
         String instr = SqliteHelper.getInConditionStr(ids);
         String sql = "delete FROM " + tableName + " where id in" + instr + ";";
         helper.executeUpdate(sql);
-        BinlogScheduleDao.save(sql,helper);
+        BinlogScheduleDao.save(sql,StringConstant.EMPTY, ScheduleStatusEnum.NORMAL,helper);
     }
 
     public static void deleteByTransactionIds(String[] ids) throws SQLException, ClassNotFoundException {
@@ -173,10 +175,12 @@ public class ScheduleDao {
         Long period = resultSet.getLong("period");
         String unit = resultSet.getString("unit");
         String param = resultSet.getString("param");
-        String transactionId = resultSet.getString("transaction_id");
         String createTime = resultSet.getString("create_time");
         String modifyTime = resultSet.getString("modify_time");
         String source = resultSet.getString("source");
+        String executer = resultSet.getString("executer");
+        int status = resultSet.getInt("status");
+
         Schedule schedule = new Schedule();
         schedule.setId(id);
         schedule.setClassPath(classPath);
@@ -185,15 +189,16 @@ public class ScheduleDao {
         schedule.setPeriod(period);
         schedule.setUnit(unit);
         schedule.setParam(param);
-        schedule.setTransactionId(transactionId);
         schedule.setCreateTime(createTime);
         schedule.setModifyTime(modifyTime);
         schedule.setSource(source);
+        schedule.setExecuter(executer);
+        schedule.setStatus(status);
         return schedule;
     }
 
     private static String contactSaveSql(List<Schedule> schedules) {
-        StringBuilder sql1 = new StringBuilder("insert into " + tableName + "(id,class_path,execute_time,task_type,period,unit,param,transaction_id,create_time,modify_time,source) values");
+        StringBuilder sql1 = new StringBuilder("insert into " + tableName + "(id,class_path,execute_time,task_type,period,unit,param,create_time,modify_time,executer,status,source) values");
         for (Schedule schedule : schedules) {
             schedule.setCreateTime(DateUtils.getCurrentDateTime());
             schedule.setModifyTime(DateUtils.getCurrentDateTime());
@@ -205,9 +210,10 @@ public class ScheduleDao {
             sql1.append(schedule.getPeriod()).append(",'");
             sql1.append(schedule.getUnit()).append("','");
             sql1.append(schedule.getParam()).append("','");
-            sql1.append(schedule.getTransactionId()).append("','");
             sql1.append(schedule.getCreateTime()).append("','");
             sql1.append(schedule.getModifyTime()).append("','");
+            sql1.append(schedule.getExecuter()).append("',");
+            sql1.append(schedule.getStatus()).append(",'");
             sql1.append(schedule.getSource()).append("')").append(',');
         }
         String sql = sql1.substring(0, sql1.length() - 1);//去掉最后一个逗号

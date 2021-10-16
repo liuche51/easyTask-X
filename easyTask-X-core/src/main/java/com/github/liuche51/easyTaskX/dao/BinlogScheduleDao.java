@@ -40,9 +40,11 @@ public class BinlogScheduleDao {
         return false;
     }
 
-    public static void save(String schedulesql, SqliteHelper helper) throws SQLException {
+    public static void save(String schedulesql,String scheduleId,int status, SqliteHelper helper) throws SQLException {
         BinlogSchedule binlogSchedule = new BinlogSchedule();
         binlogSchedule.setSql(schedulesql);
+        binlogSchedule.setScheduleId(scheduleId);
+        binlogSchedule.setStatus(status);
         String sql = contactSaveSql(Arrays.asList(binlogSchedule));
         helper.executeUpdate(sql);
     }
@@ -68,21 +70,27 @@ public class BinlogScheduleDao {
     private static BinlogSchedule getBinlogSchedule(ResultSet resultSet) throws SQLException {
         long id = resultSet.getLong("id");
         String sql = resultSet.getString("sql");
+        String scheduleId = resultSet.getString("schedule_id");
+        int status = resultSet.getInt("status");
         String createTime = resultSet.getString("create_time");
         BinlogSchedule binlogSchedule = new BinlogSchedule();
         binlogSchedule.setId(id);
         binlogSchedule.setSql(sql);
+        binlogSchedule.setScheduleId(scheduleId);
+        binlogSchedule.setStatus(status);
         binlogSchedule.setCreateTime(createTime);
         return binlogSchedule;
     }
 
     private static String contactSaveSql(List<BinlogSchedule> binlogSchedules) {
-        StringBuilder sql1 = new StringBuilder("insert into " + tableName + "(id,sql,create_time) values");
+        StringBuilder sql1 = new StringBuilder("insert into " + tableName + "(id,sql,schedule_id,status,create_time) values");
         for (BinlogSchedule binlogSchedule : binlogSchedules) {
             binlogSchedule.setCreateTime(DateUtils.getCurrentDateTime());
             sql1.append("('");
             sql1.append(binlogSchedule.getId()).append("','");
-            sql1.append(binlogSchedule.getSql()).append("',");
+            sql1.append(binlogSchedule.getSql()).append("','");
+            sql1.append(binlogSchedule.getScheduleId()).append("',");
+            sql1.append(binlogSchedule.getStatus()).append(",'");
             sql1.append(binlogSchedule.getCreateTime()).append("')").append(',');
         }
         String sql = sql1.substring(0, sql1.length() - 1);//去掉最后一个逗号

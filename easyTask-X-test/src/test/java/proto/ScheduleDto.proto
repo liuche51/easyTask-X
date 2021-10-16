@@ -9,7 +9,7 @@ message Schedule {
   optional  string param = 7;
   optional string source = 8;
   optional string executer = 9;
-  optional string transactionId = 10;
+  optional int32 status = 10;
 
 }
 message ScheduleList {

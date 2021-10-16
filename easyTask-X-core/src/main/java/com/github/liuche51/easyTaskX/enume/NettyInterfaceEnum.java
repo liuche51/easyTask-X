@@ -23,6 +23,10 @@ public class NettyInterfaceEnum {
      */
     public static final String MasterSyncDataToNewSlave="MasterSyncDataToNewSlave";
     /**
+     * master通知leader，变更slave与master数据同步状态
+     */
+    public static final String MasterNotifyLeaderChangeSlaveDataStatus="MasterNotifyLeaderChangeSlaveDataStatus";
+    /**
      * 获取数据库表信息接口
      */
     public static final String GetDBInfoByTaskId="GetDBInfoByTaskId";
@@ -54,14 +58,15 @@ public class NettyInterfaceEnum {
      * leader通知Follow更新备用leader信息
      */
     public static final String LeaderNotifyFollowUpdateBakLeaderInfo="LeaderNotifyFollowUpdateBakLeaderInfo";
-    /**
-     * master通知leader，已经完成对新follow的数据同步。请求更新数据同步状态
-     */
-    public static final String MasterNotifyLeaderUpdateRegeditForDataStatus="MasterNotifyLeaderUpdateRegeditForDataStatus";
+
     /**
      * slave请求master获取ScheduleBinlog数据
      */
     public static final String SlaveRequestMasterGetScheduleBinlogData="SlaveRequestMasterGetScheduleBinlogData";
+    /**
+     * slave通知Master，已经同步了还不能使用的任务。
+     */
+    public static final String SlaveNotifyMasterHasSyncUnUseTask="SlaveNotifyMasterHasSyncUnUseTask";
     /**
      * bakleader请求leader获取ClusterMetaBinlog数据
      */

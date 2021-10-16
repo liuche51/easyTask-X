@@ -31,7 +31,7 @@ public class NettyClientTest {
                 ScheduleDto.Schedule.Builder builder=ScheduleDto.Schedule.newBuilder();
                 String id=String.valueOf(System.currentTimeMillis());
                 builder.setId(id).setClassPath("com.github.liuche51.easyTask.test.task.CusTask1").setExecuteTime(1586078809995l)
-                        .setTaskType("PERIOD").setPeriod(30).setUnit("SECONDS").setSource("127.0.0.1:2020").setTransactionId(Util.generateTransactionId())
+                        .setTaskType("PERIOD").setPeriod(30).setUnit("SECONDS").setSource("127.0.0.1:2020")
                         .setParam("birthday#;1986-1-1&;threadid#;1&;name#;Jack&;age#;32&");
                 Dto.Frame.Builder builder1=Dto.Frame.newBuilder();
                 builder1.setIdentity(Util.generateIdentityId());
@@ -56,12 +56,12 @@ public class NettyClientTest {
                 ScheduleDto.Schedule.Builder builder0=ScheduleDto.Schedule.newBuilder();
                 String id=String.valueOf(System.currentTimeMillis());
                 builder0.setId(id).setClassPath("com.github.liuche51.easyTask.test.task.CusTask1").setExecuteTime(1586078809995l)
-                        .setTaskType("PERIOD").setPeriod(30).setUnit("SECONDS").setSource("127.0.0.1:2020").setTransactionId(Util.generateTransactionId())
+                        .setTaskType("PERIOD").setPeriod(30).setUnit("SECONDS").setSource("127.0.0.1:2020")
                         .setParam("birthday#;1986-1-1&;threadid#;1&;name#;Jack&;age#;32&");
                 ScheduleDto.Schedule.Builder builder1=ScheduleDto.Schedule.newBuilder();
                 String id1=String.valueOf(System.currentTimeMillis()+1);
                 builder1.setId(id1).setClassPath("com.github.liuche51.easyTask.test.task.CusTask1").setExecuteTime(1586078809995l)
-                        .setTaskType("PERIOD").setPeriod(30).setUnit("SECONDS").setSource("127.0.0.1:2020").setTransactionId(Util.generateTransactionId())
+                        .setTaskType("PERIOD").setPeriod(30).setUnit("SECONDS").setSource("127.0.0.1:2020")
                         .setParam("birthday#;1986-1-1&;threadid#;1&;name#;Jack&;age#;32&");
                 ScheduleDto.ScheduleList.Builder builder3=ScheduleDto.ScheduleList.newBuilder();
                 builder3.addSchedules(builder0.build());
@@ -93,7 +93,7 @@ public class NettyClientTest {
                 ScheduleDto.Schedule.Builder builder=ScheduleDto.Schedule.newBuilder();
                 String id=String.valueOf(System.currentTimeMillis());
                 builder.setId(id).setClassPath("com.github.liuche51.easyTask.test.task.CusTask1").setExecuteTime(1586078809995l)
-                        .setTaskType("PERIOD").setPeriod(30).setUnit("SECONDS").setSource("127.0.0.1").setTransactionId(Util.generateTransactionId())
+                        .setTaskType("PERIOD").setPeriod(30).setUnit("SECONDS").setSource("127.0.0.1")
                         .setParam("birthday#;1986-1-1&;threadid#;1&;name#;Jack&;age#;32&");
                 Dto.Frame.Builder builder1=Dto.Frame.newBuilder();
                 builder1.setIdentity(StringConstant.EMPTY);

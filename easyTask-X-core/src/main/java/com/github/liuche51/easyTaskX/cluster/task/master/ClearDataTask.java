@@ -5,10 +5,6 @@ import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
-import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
-import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
-import com.github.liuche51.easyTaskX.enume.ScheduleSyncStatusEnum;
-import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 
 import java.util.*;
@@ -30,14 +26,6 @@ public class ClearDataTask extends TimerTask {
                     sources.add(item.getValue().getAddress());
                 }
                 ScheduleBakDao.deleteBySources(sources.toArray(new String[sources.size()]));
-                TranlogScheduleDao.deleteByStatus(TransactionStatusEnum.FINISHED);
-                List<String> deleteids = new LinkedList<>();
-                List<TranlogSchedule> tranlogList = TranlogScheduleDao.selectByStatus(TransactionStatusEnum.TRIED);
-                tranlogList.forEach(x -> {
-                    if (DateUtils.isGreaterThanSomeTime(DateUtils.parse(x.getCreateTime()), 300)) ;
-                    deleteids.add(x.getId());
-                });
-                TranlogScheduleDao.deleteByIds(deleteids.toArray(new String[]{}));
             } catch (Exception e) {
                 log.error("", e);
             }

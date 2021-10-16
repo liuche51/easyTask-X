@@ -3,7 +3,7 @@ package com.github.liuche51.easyTaskX.cluster.follow;
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
-import com.github.liuche51.easyTaskX.cluster.master.SaveTaskTCC;
+import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
 import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerUpdateClientsTask;
 import com.github.liuche51.easyTaskX.cluster.task.broker.ReDispatchToClientTask;
@@ -13,18 +13,15 @@ import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.*;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
 import com.github.liuche51.easyTaskX.dao.SqliteHelper;
-import com.github.liuche51.easyTaskX.dao.TranlogScheduleDao;
 import com.github.liuche51.easyTaskX.dto.*;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
-import com.github.liuche51.easyTaskX.dto.db.TranlogSchedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
-import com.github.liuche51.easyTaskX.enume.TransactionStatusEnum;
+import com.github.liuche51.easyTaskX.enume.ScheduleStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
-import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.DbTableName;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
@@ -59,8 +56,8 @@ public class BrokerService {
 
     /**
      * 任务数据持久化。并同步至备份库
-     * 1、提交模式为0，则只需要master保存成功即可。
-     * 2、模式为1，则使用TCC机制实现事务，只需要取第一个slave做事务同步即可。其他的slave使用binlog异步同步
+     * 1、高性能模式（0），则只需要master保存成功即可。
+     * 2、高可靠模式（1），则使用TCC机制实现事务，只需要取第一个slave做事务同步即可。其他的slave使用binlog异步同步
      *
      * @throws Exception
      */
@@ -69,31 +66,31 @@ public class BrokerService {
             throw new Exception("normally exception!the easyTask has not started,please wait a moment!");
         if (VoteSlave.isSelecting())
             throw new VotingException("normally exception!leader is voting slave,please wait a moment.");
-        Object[] slaves = NodeService.CURRENTNODE.getSlaves().values().toArray();
-        String transactionId = Util.generateTransactionId();
         if (NodeService.getConfig().getAdvanceConfig().getSubmitSuccessModel() == 0) {
-            TranlogSchedule transactionLog = new TranlogSchedule();
-            transactionLog.setId(transactionId);
-            transactionLog.setContent(JSONObject.toJSONString(schedule));
-            transactionLog.setStatus(TransactionStatusEnum.CONFIRM);
-            transactionLog.setSlaves(StringConstant.EMPTY);
-            TranlogScheduleDao.saveBatch(Arrays.asList(transactionLog));
+            schedule.setStatus(ScheduleStatusEnum.NORMAL);
+            ScheduleDao.save(schedule);
+            return;
         } else {
-            try {
-                SaveTaskTCC.trySave(transactionId, schedule, (BaseNode) slaves[0]);
-                SaveTaskTCC.confirm(transactionId, (BaseNode) slaves[0]);
-            } catch (Exception e) {
-                log.error("", e);
-                try {
-                    SaveTaskTCC.cancel(transactionId, schedule.getId());
-                } catch (Exception e1) {
-                    log.error("", e);
-                    TranlogScheduleDao.updateRetryInfoById(transactionId, new Short("1"), DateUtils.getCurrentDateTime());
+            schedule.setStatus(ScheduleStatusEnum.UNUSE);
+            ScheduleDao.save(schedule);
+            long start=System.currentTimeMillis();
+            long timeout=NodeService.getConfig().getAdvanceConfig().getTimeOut()*1000;//提交超时时间，单位毫秒
+            while (true) { // 线程等待slave同步完成
+                if(System.currentTimeMillis()-start>timeout){
+                    throw new Exception("normally exception!submit task timeout.");
                 }
-                throw new Exception("task submit failed!");
+                Boolean hasSyncToSlave = MasterService.TASK_SYNC_SALVE_STATUS.get(schedule.getId());
+                if (hasSyncToSlave.equals(Boolean.TRUE)) {
+                    return;
+                } else {
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(500L);
+                    } catch (InterruptedException e) {
+                        log.error("", e);
+                    }
+                }
             }
         }
-
     }
 
     /**
@@ -151,16 +148,6 @@ public class BrokerService {
         } finally {
             helper.destroyed();
         }
-    }
-
-    /**
-     * 启动批量事务数据提交任务
-     */
-    public static TimerTask startCommitSaveTransactionTask() {
-        CommitSaveTranForScheduleTask task = new CommitSaveTranForScheduleTask();
-        task.start();
-        NodeService.timerTasks.add(task);
-        return task;
     }
 
     /**
@@ -293,7 +280,7 @@ public class BrokerService {
                             .setSource(NodeService.CURRENTNODE.getAddress()).setBody(String.valueOf(reDispatchTaskStatus));
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret) {
-                        NettyMsgService.writeRpcErrorMsgToDb("broker通知leader，已经完成重新分配任务至新client以及salve的数据同步，请求更新数据同步状态 失败！","com.github.liuche51.easyTaskX.cluster.follow.BrokerService.notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus");
+                        NettyMsgService.writeRpcErrorMsgToDb("broker通知leader，已经完成重新分配任务至新client以及salve的数据同步，请求更新数据同步状态 失败！", "com.github.liuche51.easyTaskX.cluster.follow.BrokerService.notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus");
                     }
                 } catch (Exception e) {
                     log.error("", e);

@@ -134,20 +134,15 @@ public final class ScheduleDto {
     com.google.protobuf.ByteString
         getExecuterBytes();
 
-    // optional string transactionId = 10;
+    // optional int32 status = 10;
     /**
-     * <code>optional string transactionId = 10;</code>
+     * <code>optional int32 status = 10;</code>
      */
-    boolean hasTransactionId();
+    boolean hasStatus();
     /**
-     * <code>optional string transactionId = 10;</code>
+     * <code>optional int32 status = 10;</code>
      */
-    String getTransactionId();
-    /**
-     * <code>optional string transactionId = 10;</code>
-     */
-    com.google.protobuf.ByteString
-        getTransactionIdBytes();
+    int getStatus();
   }
   /**
    * Protobuf type {@code Schedule}
@@ -245,9 +240,9 @@ public final class ScheduleDto {
               executer_ = input.readBytes();
               break;
             }
-            case 82: {
+            case 80: {
               bitField0_ |= 0x00000200;
-              transactionId_ = input.readBytes();
+              status_ = input.readInt32();
               break;
             }
           }
@@ -623,47 +618,20 @@ public final class ScheduleDto {
       }
     }
 
-    // optional string transactionId = 10;
-    public static final int TRANSACTIONID_FIELD_NUMBER = 10;
-    private Object transactionId_;
+    // optional int32 status = 10;
+    public static final int STATUS_FIELD_NUMBER = 10;
+    private int status_;
     /**
-     * <code>optional string transactionId = 10;</code>
+     * <code>optional int32 status = 10;</code>
      */
-    public boolean hasTransactionId() {
+    public boolean hasStatus() {
       return ((bitField0_ & 0x00000200) == 0x00000200);
     }
     /**
-     * <code>optional string transactionId = 10;</code>
+     * <code>optional int32 status = 10;</code>
      */
-    public String getTransactionId() {
-      Object ref = transactionId_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          transactionId_ = s;
-        }
-        return s;
-      }
-    }
-    /**
-     * <code>optional string transactionId = 10;</code>
-     */
-    public com.google.protobuf.ByteString
-        getTransactionIdBytes() {
-      Object ref = transactionId_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (String) ref);
-        transactionId_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public int getStatus() {
+      return status_;
     }
 
     private void initFields() {
@@ -676,7 +644,7 @@ public final class ScheduleDto {
       param_ = "";
       source_ = "";
       executer_ = "";
-      transactionId_ = "";
+      status_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -718,7 +686,7 @@ public final class ScheduleDto {
         output.writeBytes(9, getExecuterBytes());
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        output.writeBytes(10, getTransactionIdBytes());
+        output.writeInt32(10, status_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -767,7 +735,7 @@ public final class ScheduleDto {
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(10, getTransactionIdBytes());
+          .computeInt32Size(10, status_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -903,7 +871,7 @@ public final class ScheduleDto {
         bitField0_ = (bitField0_ & ~0x00000080);
         executer_ = "";
         bitField0_ = (bitField0_ & ~0x00000100);
-        transactionId_ = "";
+        status_ = 0;
         bitField0_ = (bitField0_ & ~0x00000200);
         return this;
       }
@@ -972,7 +940,7 @@ public final class ScheduleDto {
         if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
           to_bitField0_ |= 0x00000200;
         }
-        result.transactionId_ = transactionId_;
+        result.status_ = status_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1030,10 +998,8 @@ public final class ScheduleDto {
           executer_ = other.executer_;
           onChanged();
         }
-        if (other.hasTransactionId()) {
-          bitField0_ |= 0x00000200;
-          transactionId_ = other.transactionId_;
-          onChanged();
+        if (other.hasStatus()) {
+          setStatus(other.getStatus());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -1646,76 +1612,35 @@ public final class ScheduleDto {
         return this;
       }
 
-      // optional string transactionId = 10;
-      private Object transactionId_ = "";
+      // optional int32 status = 10;
+      private int status_ ;
       /**
-       * <code>optional string transactionId = 10;</code>
+       * <code>optional int32 status = 10;</code>
        */
-      public boolean hasTransactionId() {
+      public boolean hasStatus() {
         return ((bitField0_ & 0x00000200) == 0x00000200);
       }
       /**
-       * <code>optional string transactionId = 10;</code>
+       * <code>optional int32 status = 10;</code>
        */
-      public String getTransactionId() {
-        Object ref = transactionId_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          transactionId_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      public int getStatus() {
+        return status_;
       }
       /**
-       * <code>optional string transactionId = 10;</code>
+       * <code>optional int32 status = 10;</code>
        */
-      public com.google.protobuf.ByteString
-          getTransactionIdBytes() {
-        Object ref = transactionId_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (String) ref);
-          transactionId_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string transactionId = 10;</code>
-       */
-      public Builder setTransactionId(
-          String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000200;
-        transactionId_ = value;
+      public Builder setStatus(int value) {
+        bitField0_ |= 0x00000200;
+        status_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string transactionId = 10;</code>
+       * <code>optional int32 status = 10;</code>
        */
-      public Builder clearTransactionId() {
+      public Builder clearStatus() {
         bitField0_ = (bitField0_ & ~0x00000200);
-        transactionId_ = getDefaultInstance().getTransactionId();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string transactionId = 10;</code>
-       */
-      public Builder setTransactionIdBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000200;
-        transactionId_ = value;
+        status_ = 0;
         onChanged();
         return this;
       }
@@ -2424,13 +2349,13 @@ public final class ScheduleDto {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\021ScheduleDto.proto\"\266\001\n\010Schedule\022\n\n\002id\030\001" +
+      "\n\021ScheduleDto.proto\"\257\001\n\010Schedule\022\n\n\002id\030\001" +
       " \001(\t\022\021\n\tclassPath\030\002 \001(\t\022\023\n\013executeTime\030\003" +
       " \001(\003\022\020\n\010taskType\030\004 \001(\t\022\016\n\006period\030\005 \001(\003\022\014" +
       "\n\004unit\030\006 \001(\t\022\r\n\005param\030\007 \001(\t\022\016\n\006source\030\010 " +
-      "\001(\t\022\020\n\010executer\030\t \001(\t\022\025\n\rtransactionId\030\n" +
-      " \001(\t\",\n\014ScheduleList\022\034\n\tschedules\030\001 \003(\0132" +
-      "\t.ScheduleB\rB\013ScheduleDto"
+      "\001(\t\022\020\n\010executer\030\t \001(\t\022\016\n\006status\030\n \001(\005\",\n" +
+      "\014ScheduleList\022\034\n\tschedules\030\001 \003(\0132\t.Sched" +
+      "uleB\rB\013ScheduleDto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2442,7 +2367,7 @@ public final class ScheduleDto {
           internal_static_Schedule_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_Schedule_descriptor,
-              new String[] { "Id", "ClassPath", "ExecuteTime", "TaskType", "Period", "Unit", "Param", "Source", "Executer", "TransactionId", });
+              new String[] { "Id", "ClassPath", "ExecuteTime", "TaskType", "Period", "Unit", "Param", "Source", "Executer", "Status", });
           internal_static_ScheduleList_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_ScheduleList_fieldAccessorTable = new
