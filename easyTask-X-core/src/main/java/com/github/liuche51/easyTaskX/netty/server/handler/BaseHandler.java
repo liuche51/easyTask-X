@@ -27,6 +27,7 @@ public abstract class BaseHandler {
                 //slave to master
                 put(NettyInterfaceEnum.SlaveRequestMasterGetScheduleBinlogData,new SlaveRequestMasterGetScheduleBinlogDataHandler());
                 put(NettyInterfaceEnum.BakLeaderRequestLeaderGetClusterMetaBinlogData,new BakLeaderRequestLeaderGetClusterMetaBinlogDataHandler());
+                put(NettyInterfaceEnum.BakLeaderQueryOtherBakLeaderDataStatus,new BakLeaderQueryOtherBakLeaderDataStatusHandler());
                 put(NettyInterfaceEnum.SlaveNotifyMasterHasSyncUnUseTask,new SlaveNotifyMasterHasSyncUnUseTaskHandler());
                //master to leader
                 put(NettyInterfaceEnum.MasterNotifyLeaderChangeSlaveDataStatus,new MasterNotifyLeaderChangeSlaveDataStatusHandler());
