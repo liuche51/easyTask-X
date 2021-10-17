@@ -12,10 +12,7 @@ import org.sqlite.SQLiteException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ScheduleDao {
@@ -59,7 +56,7 @@ public class ScheduleDao {
         try {
             String sql = contactSaveSql(Arrays.asList(schedule));
             helper.executeUpdate(sql);
-            BinlogScheduleDao.save(sql,schedule.getId(),schedule.getStatus(), helper);
+            BinlogScheduleDao.save(sql, schedule.getId(), schedule.getStatus(), helper);
             helper.commitTran();
         } finally {
             helper.destroyed();
@@ -138,28 +135,45 @@ public class ScheduleDao {
      * 通用更新
      *
      * @param ids
-     * @param updateStr
+     * @param values
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public static void updateByIds(String[] ids, String updateStr, SqliteHelper helper) throws SQLException, ClassNotFoundException {
+    public static void updateByIds(String[] ids, Map<String, Object> values) throws SQLException {
+        Iterator<Map.Entry<String, Object>> items2 = values.entrySet().iterator();
+        //组装更新字段。
+        StringBuilder updatestr = new StringBuilder();
+        while (items2.hasNext()) {
+            Map.Entry<String, Object> item2 = items2.next();
+            switch (item2.getKey()) {
+                case "executer":
+                    updatestr.append("executer='").append(item2.getValue()).append("'");
+                    break;
+                case "status":
+                    updatestr.append("status=").append(item2.getValue());
+                    break;
+                default:
+                    break;
+            }
+        }
         String instr = SqliteHelper.getInConditionStr(ids);
-        String sql = "UPDATE " + tableName + " set " + updateStr + ",modify_time='" + DateUtils.getCurrentDateTime() + "' where id in " + instr + ";";
-        helper.executeUpdate(sql);
-        BinlogScheduleDao.save(sql, StringConstant.EMPTY, ScheduleStatusEnum.NORMAL, helper);
+        String sql = "UPDATE " + tableName + " set " + updatestr.toString() + ",modify_time='" + DateUtils.getCurrentDateTime() + "' where id in " + instr + ";";
+        SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE,lock);
+        try {
+            helper.beginTran();
+            helper.executeUpdate(sql);
+            BinlogScheduleDao.save(sql, StringConstant.EMPTY, ScheduleStatusEnum.NORMAL, helper);
+            helper.commitTran();
+        } finally {
+            helper.destroyed();
+        }
     }
 
-    public static void deleteByIds(String[] ids, SqliteHelper helper) throws SQLException, ClassNotFoundException {
+    public static void deleteByIds(String[] ids, SqliteHelper helper) throws SQLException {
         String instr = SqliteHelper.getInConditionStr(ids);
         String sql = "delete FROM " + tableName + " where id in" + instr + ";";
         helper.executeUpdate(sql);
-        BinlogScheduleDao.save(sql,StringConstant.EMPTY, ScheduleStatusEnum.NORMAL,helper);
-    }
-
-    public static void deleteByTransactionIds(String[] ids) throws SQLException, ClassNotFoundException {
-        String instr = SqliteHelper.getInConditionStr(ids);
-        String sql = "delete FROM " + tableName + " where transaction_id in" + instr + ";";
-        SqliteHelper.executeUpdateForSync(sql, dbName, lock);
+        BinlogScheduleDao.save(sql, StringConstant.EMPTY, ScheduleStatusEnum.NORMAL, helper);
     }
 
     public static void deleteAll() throws SQLException, ClassNotFoundException {

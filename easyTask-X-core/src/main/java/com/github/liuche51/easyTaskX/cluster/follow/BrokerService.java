@@ -73,10 +73,10 @@ public class BrokerService {
         } else {
             schedule.setStatus(ScheduleStatusEnum.UNUSE);
             ScheduleDao.save(schedule);
-            long start=System.currentTimeMillis();
-            long timeout=NodeService.getConfig().getAdvanceConfig().getTimeOut()*1000;//提交超时时间，单位毫秒
+            long start = System.currentTimeMillis();
+            long timeout = NodeService.getConfig().getAdvanceConfig().getTimeOut() * 1000;//提交超时时间，单位毫秒
             while (true) { // 线程等待slave同步完成
-                if(System.currentTimeMillis()-start>timeout){
+                if (System.currentTimeMillis() - start > timeout) {
                     throw new Exception("normally exception!submit task timeout.");
                 }
                 Boolean hasSyncToSlave = MasterService.TASK_SYNC_SALVE_STATUS.get(schedule.getId());
@@ -122,31 +122,13 @@ public class BrokerService {
      * @param taskIds
      * @return
      */
-    public static boolean updateTask(String[] taskIds, Map<String, String> values) {
-        SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE, ScheduleDao.getLock());
+    public static boolean updateTask(String[] taskIds, Map<String, Object> values) {
         try {
-            Iterator<Map.Entry<String, String>> items2 = values.entrySet().iterator();
-            //组装更新字段。目前只有一个字段。支持未来扩展成多个字段
-            StringBuilder updatestr = new StringBuilder();
-            while (items2.hasNext()) {
-                Map.Entry<String, String> item2 = items2.next();
-                switch (item2.getKey()) {
-                    case "executer":
-                        updatestr.append("executer='").append(item2.getValue()).append("'");
-                        break;
-                    default:
-                        break;
-                }
-            }
-            helper.beginTran();
-            ScheduleDao.updateByIds(taskIds, updatestr.toString(), helper);
-            helper.commitTran();
+            ScheduleDao.updateByIds(taskIds, values);
             return true;
         } catch (Exception e) {
             log.error("", e);
             return false;
-        } finally {
-            helper.destroyed();
         }
     }
 
