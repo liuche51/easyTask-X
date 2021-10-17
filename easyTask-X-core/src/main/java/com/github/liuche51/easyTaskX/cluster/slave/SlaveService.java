@@ -3,17 +3,13 @@ package com.github.liuche51.easyTaskX.cluster.slave;
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
-import com.github.liuche51.easyTaskX.cluster.task.slave.ClusterMetaBinLogSyncTask;
 import com.github.liuche51.easyTaskX.cluster.task.slave.ScheduleBinLogSyncTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.ByteStringPack;
 import com.github.liuche51.easyTaskX.dto.MasterNode;
-import com.github.liuche51.easyTaskX.dto.db.BinlogClusterMeta;
 import com.github.liuche51.easyTaskX.dto.db.BinlogSchedule;
-import com.github.liuche51.easyTaskX.dto.db.ScheduleBak;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
-import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.ScheduleStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
@@ -24,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -100,30 +95,6 @@ public class SlaveService {
         }
     }
 
-    /**
-     * 请求leader获取集群元数据
-     *
-     * @param leader
-     * @param task   当前运行的任务
-     * @throws Exception
-     */
-    public static void requestLeaderSyncClusterMetaData(BaseNode leader, ClusterMetaBinLogSyncTask task) throws Exception {
-        Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BakLeaderRequestLeaderGetClusterMetaBinlogData).setSource(NodeService.getConfig().getAddress())
-                .setBody(String.valueOf(task.getCurrentIndex()));
-        ByteStringPack respPack = new ByteStringPack();
-        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
-        if (ret) {
-            List<BinlogClusterMeta> binlogClusterMetas = JSONObject.parseArray(respPack.getRespbody().toString(), BinlogClusterMeta.class);
-            if (binlogClusterMetas == null || binlogClusterMetas.size() == 0) return;
-            Collections.sort(binlogClusterMetas, Comparator.comparing(BinlogClusterMeta::getId));
-            for (BinlogClusterMeta x : binlogClusterMetas) {
-                Long id = SlaveUtil.saveBinlogClusterMeta(x);
-                if (id != null) // id为null表示当前处理的是心跳类数据，不需要保存处理位置
-                    task.setCurrentIndex(id);
-            }
-        }
-    }
 
     /**
      * 启动从master获取ScheduleBinLog订阅任务。

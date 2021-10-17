@@ -1,15 +1,12 @@
 package com.github.liuche51.easyTaskX.netty.server.handler.master;
 
-import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
-import com.github.liuche51.easyTaskX.dto.db.BinlogSchedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.google.protobuf.ByteString;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

@@ -1,14 +1,11 @@
-package com.github.liuche51.easyTaskX.cluster.task.slave;
+package com.github.liuche51.easyTaskX.cluster.task.leader;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
-import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
+import com.github.liuche51.easyTaskX.cluster.leader.BakLeaderService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
-import com.github.liuche51.easyTaskX.dto.MasterNode;
 
 import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -37,7 +34,7 @@ public class ClusterMetaBinLogSyncTask extends TimerTask {
             setLastRunTime(new Date());
             try {
                 BaseNode leader = NodeService.CURRENTNODE.getClusterLeader();
-                SlaveService.requestLeaderSyncClusterMetaData(leader, this);
+                BakLeaderService.requestLeaderSyncClusterMetaData(leader, this);
             } catch (Exception e) {
                 log.error("", e);
             }

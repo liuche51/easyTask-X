@@ -19,7 +19,7 @@ public class MasterNotifyLeaderChangeSlaveDataStatusHandler extends BaseHandler 
         String[] items=body.split(StringConstant.CHAR_SPRIT_STRING);//slave|状态
         RegBroker master= LeaderService.BROKER_REGISTER_CENTER.get(frame.getSource());
         RegNode slave=master.getSlaves().get(items[0]);
-        slave.setDataStatus(new Short(items[1]));
+        slave.setDataStatus(new Integer(items[1]));
         return null;
     }
 }

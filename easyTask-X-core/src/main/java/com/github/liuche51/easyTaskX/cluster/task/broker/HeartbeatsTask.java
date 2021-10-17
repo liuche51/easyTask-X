@@ -3,7 +3,7 @@ package com.github.liuche51.easyTaskX.cluster.task.broker;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.leader.CheckFollowsAliveTask;
-import com.github.liuche51.easyTaskX.cluster.task.slave.ClusterMetaBinLogSyncTask;
+import com.github.liuche51.easyTaskX.cluster.task.leader.ClusterMetaBinLogSyncTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;

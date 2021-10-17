@@ -47,7 +47,7 @@ public class ReDispatchToClientTask extends OnceTask {
                 if (NodeService.canAllConnect(objHost)) {
                     boolean ret = BrokerService.notifyClientExecuteNewTask(newClient, list);
                     if (ret) {
-                        Map<String, String> values = new HashMap<>();
+                        Map<String, Object> values = new HashMap<>();
                         values.put("executer", newClient.getAddress());
                         String[] scheduleIds = list.stream().map(Schedule::getId).toArray(String[]::new);
                         BrokerService.updateTask(scheduleIds, values);
