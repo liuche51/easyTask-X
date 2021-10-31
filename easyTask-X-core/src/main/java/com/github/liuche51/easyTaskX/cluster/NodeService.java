@@ -35,7 +35,7 @@ public class NodeService {
     /**
      * 当前集群节点的Node对象
      */
-    public static Node CURRENTNODE;
+    public static Node CURRENT_NODE;
     /**
      * 作为slave，异步同步其各个masterbinlog位置。
      * 每次都重新开始同步
@@ -43,13 +43,13 @@ public class NodeService {
     public static ConcurrentHashMap<String, MasterNode> masterBinlogInfo;
     /**
      * 集群一次性任务线程集合。
-     * 系统没有重启只是初始化了集群initCurrentNode()。此时也需要立即停止运行的一次性后台任务
+     * 系统没有重启只是初始化了集群initCURRENT_NODE()。此时也需要立即停止运行的一次性后台任务
      * 需要定时检查其中的线程是否已经运行完，完了需要移除线程对象，释放内存资源
      */
     public static List<OnceTask> onceTasks = new LinkedList<OnceTask>();
     /**
      * 集群定时任务线程集合。
-     * 系统没有重启只是初始化了集群initCurrentNode()。此时需要停止之前的定时任务，重新启动新的
+     * 系统没有重启只是初始化了集群initCURRENT_NODE()。此时需要停止之前的定时任务，重新启动新的
      */
     public static List<TimerTask> timerTasks = new LinkedList<TimerTask>();
 
@@ -88,7 +88,7 @@ public class NodeService {
         DbInit.init();//初始化数据库
         NettyServer.getInstance().run();//启动组件的Netty服务端口
         CmdServer.init();//启动命令服务的socket端口
-        initCurrentNode();//初始化本节点的集群服务
+        initCURRENT_NODE();//初始化本节点的集群服务
         isStarted = true;
     }
 
@@ -98,10 +98,10 @@ public class NodeService {
      *
      * @return
      */
-    public static void initCurrentNode() throws Exception {
+    public static void initCURRENT_NODE() throws Exception {
         clearThreadTask();
         deleteAllData();
-        CURRENTNODE = new Node(Util.getLocalIP(), NodeService.getConfig().getServerPort());
+        CURRENT_NODE = new Node(Util.getLocalIP(), NodeService.getConfig().getServerPort());
         timerTasks.add(BrokerService.startHeartBeat());
         timerTasks.add(clearDataTask());
         timerTasks.add(BrokerService.startUpdateRegeditTask());

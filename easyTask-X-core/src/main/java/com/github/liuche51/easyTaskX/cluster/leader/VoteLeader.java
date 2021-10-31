@@ -50,7 +50,7 @@ public class VoteLeader {
                 hasLock = true;
                 LeaderData data = ZKService.getLeaderData(false);
                 if (data == null || StringUtils.isNullOrEmpty(data.getHost())) {//leader节点为空时才需要选新leader
-                    ZKService.registerLeader(new LeaderData(NodeService.CURRENTNODE.getHost(), NodeService.CURRENTNODE.getPort()));
+                    ZKService.registerLeader(new LeaderData(NodeService.CURRENT_NODE.getHost(), NodeService.CURRENT_NODE.getPort()));
                     return true;
                 }
 
@@ -79,12 +79,12 @@ public class VoteLeader {
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BakLeaderQueryOtherBakLeaderDataStatus).setSource(NodeService.getConfig().getAddress());
-            String bakLeader = NodeService.CURRENTNODE.getBakLeader();
+            String bakLeader = NodeService.CURRENT_NODE.getBakLeader();
             if (!StringUtils.isNullOrEmpty(bakLeader)) {
                 Map<String, BaseNode> bakLeaders = JSONObject.parseObject(bakLeader, new TypeReference<Map<String, BaseNode>>() {
                 });
                 for (BaseNode bak : bakLeaders.values()) {
-                    if (bak.getAddress().equals(NodeService.CURRENTNODE.getAddress()))//排除查询自己
+                    if (bak.getAddress().equals(NodeService.CURRENT_NODE.getAddress()))//排除查询自己
                         continue;
                     ByteStringPack respPack = new ByteStringPack();
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, bak.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);

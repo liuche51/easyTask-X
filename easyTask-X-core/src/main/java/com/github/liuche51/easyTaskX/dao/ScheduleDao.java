@@ -48,15 +48,21 @@ public class ScheduleDao {
         return false;
     }
 
-    public static void save(Schedule schedule) throws SQLException, ClassNotFoundException {
-        if (!DbInit.hasInit)
-            DbInit.init();
+    public static void saveBatch(List<Schedule> schedules) throws SQLException, ClassNotFoundException {
         SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE, ScheduleDao.getLock());
         helper.beginTran();
         try {
-            String sql = contactSaveSql(Arrays.asList(schedule));
+            String sql = contactSaveSql(schedules);
             helper.executeUpdate(sql);
-            BinlogScheduleDao.save(sql, schedule.getId(), schedule.getStatus(), helper);
+            List<BinlogSchedule> binlogSchedules = new ArrayList<>(schedules.size());
+            schedules.forEach(x -> {
+                BinlogSchedule binlogSchedule = new BinlogSchedule();
+                binlogSchedule.setSql(contactSaveSql(Arrays.asList(x)));
+                binlogSchedule.setScheduleId(x.getId());
+                binlogSchedule.setStatus(x.getStatus());
+                binlogSchedules.add(binlogSchedule);
+            });
+            BinlogScheduleDao.saveBatch(binlogSchedules, helper);
             helper.commitTran();
         } finally {
             helper.destroyed();
@@ -158,7 +164,7 @@ public class ScheduleDao {
         }
         String instr = SqliteHelper.getInConditionStr(ids);
         String sql = "UPDATE " + tableName + " set " + updatestr.toString() + ",modify_time='" + DateUtils.getCurrentDateTime() + "' where id in " + instr + ";";
-        SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE,lock);
+        SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE, lock);
         try {
             helper.beginTran();
             helper.executeUpdate(sql);

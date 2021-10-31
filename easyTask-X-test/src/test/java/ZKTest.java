@@ -46,7 +46,7 @@ public class ZKTest {
         EasyTaskConfig config=new EasyTaskConfig();
         config.setZkAddress("127.0.0.1:2181");
         NodeService.setConfig(config);
-        NodeService.CURRENTNODE=new Node("127.0.0.1",2121);
+        NodeService.CURRENT_NODE=new Node("127.0.0.1",2121);
         for(int i=0;i<5;i++){
             int name=i;
             Thread th=new Thread(new Runnable() {
@@ -89,7 +89,7 @@ public class ZKTest {
         EasyTaskConfig config=new EasyTaskConfig();
         config.setZkAddress("127.0.0.1:2181");
         NodeService.setConfig(config);
-        NodeService.CURRENTNODE=new Node("127.0.0.1",2121);
+        NodeService.CURRENT_NODE=new Node("127.0.0.1",2121);
         try {
             ZKService.listenLeaderDataNode();
             int y=0;

@@ -12,7 +12,7 @@ public class LeaderServiceTest {
     public void initSelectFollows() {
         try {
             NodeService.getConfig().setBackupCount(2);
-            NodeService.CURRENTNODE=new Node("127.0.0.1",2020);
+            NodeService.CURRENT_NODE=new Node("127.0.0.1",2020);
             //SliceLeaderService.initSelectFollows();
         } catch (Exception e) {
             e.printStackTrace();

@@ -31,7 +31,7 @@ public class ClusterConcurrentTest {
     }
 
     private void printinfo() {
-        //log.info("集群节点信息：" + ClusterMonitor.getCurrentNodeInfo());
+        //log.info("集群节点信息：" + ClusterMonitor.getCURRENT_NODEInfo());
         log.info("Netty客户端连接池信息："+JSONObject.toJSONString(ClusterMonitor.getNettyClientPoolInfo()));
     }
 }

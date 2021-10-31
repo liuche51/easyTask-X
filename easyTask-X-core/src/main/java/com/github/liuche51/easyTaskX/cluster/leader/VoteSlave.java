@@ -127,7 +127,7 @@ public class VoteSlave {
             if (temp1.isPresent())
                 availableFollows.remove(temp1.get());
         }
-        if (availableFollows.size() < count - NodeService.CURRENTNODE.getSlaves().size())//如果可选备库节点数量不足，则等待1s，然后重新选。注意：等待会阻塞整个服务可用性
+        if (availableFollows.size() < count - NodeService.CURRENT_NODE.getSlaves().size())//如果可选备库节点数量不足，则等待1s，然后重新选。注意：等待会阻塞整个服务可用性
         {
             log.info("[{}] getAvailableSlave is not enough! only has {},current own {}", regNode.getAddress(), availableFollows.size(), regNode.getSlaves().size());
             TimeUnit.SECONDS.sleep(1L);

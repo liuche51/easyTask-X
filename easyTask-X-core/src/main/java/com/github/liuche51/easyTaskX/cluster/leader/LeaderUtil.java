@@ -34,7 +34,7 @@ public class LeaderUtil {
                             NodeDto.Node.Builder nodeBuilder = packageBrokerRegeditInfo(node);
                             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyBrokerUpdateRegedit)
-                                    .setSource(NodeService.CURRENTNODE.getAddress()).setBodyBytes(nodeBuilder.build().toByteString());
+                                    .setSource(NodeService.CURRENT_NODE.getAddress()).setBodyBytes(nodeBuilder.build().toByteString());
                             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                             if (!ret) {
                                 NettyMsgService.writeRpcErrorMsgToDb("Leader通知Follow节点更新注册表信息。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil.notifyFollowUpdateRegedit");
@@ -66,7 +66,7 @@ public class LeaderUtil {
     public static NodeDto.Node.Builder packageBrokerRegeditInfo(RegBroker node) {
         NodeDto.Node.Builder nodeBuilder = NodeDto.Node.newBuilder();
         //备用leader信息
-        nodeBuilder.setBakleader(JSONObject.toJSONString(NodeService.CURRENTNODE.getSlaves()));
+        nodeBuilder.setBakleader(JSONObject.toJSONString(NodeService.CURRENT_NODE.getSlaves()));
         //slaves
         NodeDto.NodeList.Builder slavesBuilder = NodeDto.NodeList.newBuilder();
         Iterator<Map.Entry<String, RegNode>> items2 = node.getSlaves().entrySet().iterator();
@@ -105,7 +105,7 @@ public class LeaderUtil {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyFollowUpdateBakLeaderInfo)
-                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(bakLeader);
+                            .setSource(NodeService.CURRENT_NODE.getAddress()).setBody(bakLeader);
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, new Node(address).getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret)
                         log.info("normally exception!notifyFollowBakLeaderChanged() failed.");
@@ -133,7 +133,7 @@ public class LeaderUtil {
                         str.append(StringConstant.CHAR_SPRIT_STRING).append(newMaster);
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyClientBrokerChanged)
-                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(type + str.toString());//type+Broker地址+新master地址
+                            .setSource(NodeService.CURRENT_NODE.getAddress()).setBody(type + str.toString());//type+Broker地址+新master地址
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, client.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret) {
                        NettyMsgService.writeRpcErrorMsgToDb("Leader通知Clinets。Broker发生变更。失败！","com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil.notifyClinetChangedBroker");
@@ -159,7 +159,7 @@ public class LeaderUtil {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyBrokerClientChanged)
-                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(type + StringConstant.CHAR_SPRIT_STRING + client);
+                            .setSource(NodeService.CURRENT_NODE.getAddress()).setBody(type + StringConstant.CHAR_SPRIT_STRING + client);
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, broker.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret) {
                         NettyMsgService.writeRpcErrorMsgToDb("Leader通知Broker。有Client注册变更消息。失败！","com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil.notifyBrokerChangedClient");

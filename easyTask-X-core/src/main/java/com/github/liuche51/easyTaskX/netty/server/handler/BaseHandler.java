@@ -20,7 +20,7 @@ public abstract class BaseHandler {
         INSTANCES=new HashMap<String,BaseHandler>(){
             {
                 //Client to Broker
-                put(NettyInterfaceEnum.ClientNotifyBrokerSubmitTask,new ClientNotifyBrokerSubmitTaskHandler());
+                put(NettyInterfaceEnum.ClientSubmitTaskToBroker,new ClientSubmitTaskToBrokerHandler());
                 put(NettyInterfaceEnum.ClientNotifyBrokerDeleteTask,new ClientNotifyBrokerDeleteTaskHandler());
                 //Client to Leader
                 put(NettyInterfaceEnum.ClientRequestLeaderSendBrokers,new ClientRequestLeaderSendBrokersHandler());

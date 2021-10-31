@@ -29,6 +29,14 @@ public class Schedule {
      */
     private int status;
 
+    /**
+     * 任务提交模式。不保存库中
+     * 0（高性能模式，任务提交至等待发送服务端队列成功即算成功）
+     * 1（普通模式，任务提交至服务端Master化成功即算成功）
+     * 2（高可靠模式，任务提交至服务端Master和一个Slave成功即算成功）
+     */
+    private int submit_model = 1;
+
     public String getId() {
         return id;
     }
@@ -125,6 +133,14 @@ public class Schedule {
         this.status = status;
     }
 
+    public int getSubmit_model() {
+        return submit_model;
+    }
+
+    public void setSubmit_model(int submit_model) {
+        this.submit_model = submit_model;
+    }
+
     public static Schedule valueOf(ScheduleBak bak){
         Schedule schedule=new Schedule();
         schedule.id=bak.getId();
@@ -151,6 +167,7 @@ public class Schedule {
         schedule.source=dto.getSource();
         schedule.executer=dto.getExecuter();
         schedule.status=dto.getStatus();
+        schedule.setSubmit_model(dto.getSubmitModel());
         return schedule;
     }
 

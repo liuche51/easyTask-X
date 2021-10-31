@@ -15,8 +15,8 @@ public class CmdService {
                         return JSONObject.toJSONString(ClusterMonitor.getBrokerRegisterInfo());
                     case "clinetRegisterInfo":
                         return JSONObject.toJSONString(ClusterMonitor.getClinetRegisterInfo());
-                    case "currentNodeInfo":
-                        return JSONObject.toJSONString(ClusterMonitor.getCurrentNodeInfo());
+                    case "CURRENT_NODEInfo":
+                        return JSONObject.toJSONString(ClusterMonitor.getCURRENT_NODEInfo());
                 }
         }
         return "unknown command!";

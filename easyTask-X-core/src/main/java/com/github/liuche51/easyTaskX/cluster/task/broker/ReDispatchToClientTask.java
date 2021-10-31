@@ -41,7 +41,7 @@ public class ReDispatchToClientTask extends OnceTask {
                     break;
                 }
                 List<BaseNode> objHost = new LinkedList<>();
-                objHost.addAll((Collection<? extends BaseNode>) NodeService.CURRENTNODE.getSlaves());
+                objHost.addAll((Collection<? extends BaseNode>) NodeService.CURRENT_NODE.getSlaves());
                 BaseNode newClient = findNewClient(this.oldClient);
                 objHost.add(newClient);
                 if (NodeService.canAllConnect(objHost)) {
@@ -69,7 +69,7 @@ public class ReDispatchToClientTask extends OnceTask {
      * @throws Exception
      */
     private BaseNode findNewClient(BaseNode oldClient) throws Exception {
-        CopyOnWriteArrayList<BaseNode> clients = NodeService.CURRENTNODE.getClients();
+        CopyOnWriteArrayList<BaseNode> clients = NodeService.CURRENT_NODE.getClients();
         BaseNode selectedNode = null;
         if (clients == null || clients.size() == 0)
             throw new Exception("clients==null||clients.size()==0");

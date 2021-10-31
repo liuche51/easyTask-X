@@ -16,7 +16,7 @@ public class LeaderNotiySlaveVotedNewMasterHandler extends BaseHandler {
         String body=frame.getBody();
         String[] items=body.split(StringConstant.CHAR_SPRIT_STRING);
         //如果自己就是新master。就重新提交旧master的任务给自己
-        if(NodeService.CURRENTNODE.getAddress().equals(items[1])){
+        if(NodeService.CURRENT_NODE.getAddress().equals(items[1])){
             MasterService.submitNewTaskByOldMaster(items[0]);
         }
         //如果自己不是新master。则直接删除旧master的备份数据。新Master删除备份数据逻辑放到上面的异步任务里去

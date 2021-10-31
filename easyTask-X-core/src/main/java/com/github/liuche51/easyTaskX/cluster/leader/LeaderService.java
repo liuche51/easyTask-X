@@ -77,7 +77,7 @@ public class LeaderService {
      * 通知Follow更新备用leader信息
      */
     public static void notifyFollowsBakLeaderChanged() {
-        String bakLeader = JSONObject.toJSONString(NodeService.CURRENTNODE.getSlaves());
+        String bakLeader = JSONObject.toJSONString(NodeService.CURRENT_NODE.getSlaves());
         Iterator<String> items = LeaderService.BROKER_REGISTER_CENTER.keySet().iterator();
         while (items.hasNext()) {
             LeaderUtil.notifyFollowBakLeaderChanged(items.next(), bakLeader);
@@ -100,7 +100,7 @@ public class LeaderService {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyBrokerRegisterSucceeded)
-                            .setSource(NodeService.CURRENTNODE.getAddress());
+                            .setSource(NodeService.CURRENT_NODE.getAddress());
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, broker.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret) {
                         NettyMsgService.writeRpcErrorMsgToDb("Leader通知Broker注册成功。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifyBrokerRegisterSucceeded");
@@ -183,7 +183,7 @@ public class LeaderService {
      */
     public static void changeFollowsHeartbeats() {
         //找到新加入的slave队列
-        Iterator<String> items = NodeService.CURRENTNODE.getSlaves().keySet().iterator();
+        Iterator<String> items = NodeService.CURRENT_NODE.getSlaves().keySet().iterator();
         while (items.hasNext()) {
             String key = items.next();
             if (!followsHeartbeats.containsKey(key)) {
@@ -194,7 +194,7 @@ public class LeaderService {
         Iterator<String> items2 = followsHeartbeats.keySet().iterator();
         while (items2.hasNext()) {
             String key = items2.next();
-            if (!NodeService.CURRENTNODE.getSlaves().containsKey(key)) {
+            if (!NodeService.CURRENT_NODE.getSlaves().containsKey(key)) {
                 followsHeartbeats.remove(key);
             }
         }

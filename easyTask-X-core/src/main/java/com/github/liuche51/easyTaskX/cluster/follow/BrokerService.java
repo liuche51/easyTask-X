@@ -24,6 +24,7 @@ import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.DbTableName;
 import com.github.liuche51.easyTaskX.util.StringConstant;
+import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
 import org.slf4j.Logger;
@@ -38,61 +39,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class BrokerService {
     private static final Logger log = LoggerFactory.getLogger(BrokerService.class);
-
-    /**
-     * 客户端提交任务。允许线程等待，直到easyTask组件启动完成
-     *
-     * @param schedule
-     * @return
-     * @throws Exception
-     */
-    public void submitTaskAllowWait(Schedule schedule) throws Exception {
-        //集群未启动或正在选举salve中，则继续等待完成
-        while (!NodeService.isStarted || VoteSlave.isSelecting()) {
-            TimeUnit.SECONDS.sleep(1L);
-        }
-        this.submitTask(schedule);
-    }
-
-    /**
-     * 任务数据持久化。并同步至备份库
-     * 1、高性能模式（0），则只需要master保存成功即可。
-     * 2、高可靠模式（1），则使用TCC机制实现事务，只需要取第一个slave做事务同步即可。其他的slave使用binlog异步同步
-     *
-     * @throws Exception
-     */
-    public static void submitTask(Schedule schedule) throws Exception {
-        if (!NodeService.isStarted)
-            throw new Exception("normally exception!the easyTask has not started,please wait a moment!");
-        if (VoteSlave.isSelecting())
-            throw new VotingException("normally exception!leader is voting slave,please wait a moment.");
-        if (NodeService.getConfig().getAdvanceConfig().getSubmitSuccessModel() == 0) {
-            schedule.setStatus(ScheduleStatusEnum.NORMAL);
-            ScheduleDao.save(schedule);
-            return;
-        } else {
-            schedule.setStatus(ScheduleStatusEnum.UNUSE);
-            ScheduleDao.save(schedule);
-            long start = System.currentTimeMillis();
-            long timeout = NodeService.getConfig().getAdvanceConfig().getTimeOut() * 1000;//提交超时时间，单位毫秒
-            while (true) { // 线程等待slave同步完成
-                if (System.currentTimeMillis() - start > timeout) {
-                    throw new Exception("normally exception!submit task timeout.");
-                }
-                Boolean hasSyncToSlave = MasterService.TASK_SYNC_SALVE_STATUS.get(schedule.getId());
-                if (hasSyncToSlave.equals(Boolean.TRUE)) {
-                    return;
-                } else {
-                    try {
-                        TimeUnit.MILLISECONDS.sleep(500L);
-                    } catch (InterruptedException e) {
-                        log.error("", e);
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * 删除任务。
      * 1、slaves通过异步复制binlog同步删除
@@ -188,7 +134,7 @@ public class BrokerService {
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestLeaderSendRegedit).setSource(NodeService.getConfig().getAddress())
                     .setBody(StringConstant.BROKER);
             ByteStringPack respPack = new ByteStringPack();
-            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
+            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENT_NODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
             if (ret) {
                 NodeDto.Node node = NodeDto.Node.parseFrom(respPack.getRespbody());
                 dealUpdate(node);
@@ -211,7 +157,7 @@ public class BrokerService {
      * @param node
      */
     public static void dealUpdate(NodeDto.Node node) {
-        NodeService.CURRENTNODE.setBakLeader(node.getBakleader());
+        NodeService.CURRENT_NODE.setBakLeader(node.getBakleader());
         NodeDto.NodeList slaveNodes = node.getSalves();
         ConcurrentHashMap<String, BaseNode> slaves = new ConcurrentHashMap<>();
         slaveNodes.getNodesList().forEach(x -> {
@@ -222,8 +168,8 @@ public class BrokerService {
         masterNodes.getNodesList().forEach(x -> {
             masters.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
         });
-        NodeService.CURRENTNODE.setSlaves(slaves);
-        NodeService.CURRENTNODE.setMasters(masters);
+        NodeService.CURRENT_NODE.setSlaves(slaves);
+        NodeService.CURRENT_NODE.setMasters(masters);
         BrokerUtil.updateMasterBinlogInfo(masters);
     }
 
@@ -259,8 +205,8 @@ public class BrokerService {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setBody(NettyInterfaceEnum.BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus)
-                            .setSource(NodeService.CURRENTNODE.getAddress()).setBody(String.valueOf(reDispatchTaskStatus));
-                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENTNODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                            .setSource(NodeService.CURRENT_NODE.getAddress()).setBody(String.valueOf(reDispatchTaskStatus));
+                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENT_NODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret) {
                         NettyMsgService.writeRpcErrorMsgToDb("broker通知leader，已经完成重新分配任务至新client以及salve的数据同步，请求更新数据同步状态 失败！", "com.github.liuche51.easyTaskX.cluster.follow.BrokerService.notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus");
                     }

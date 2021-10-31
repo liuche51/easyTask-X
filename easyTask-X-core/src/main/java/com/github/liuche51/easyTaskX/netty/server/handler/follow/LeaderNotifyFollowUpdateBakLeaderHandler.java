@@ -12,7 +12,7 @@ public class LeaderNotifyFollowUpdateBakLeaderHandler extends BaseHandler {
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {
         String info=frame.getBody();
-        NodeService.CURRENTNODE.setBakLeader(info);
+        NodeService.CURRENT_NODE.setBakLeader(info);
         return null;
     }
 }

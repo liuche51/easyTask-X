@@ -7,6 +7,8 @@ import com.github.liuche51.easyTaskX.dto.db.ScheduleBak;
 import org.junit.Test;
 import org.sqlite.SQLiteException;
 
+import java.io.FileNotFoundException;
+import java.io.RandomAccessFile;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -32,6 +34,24 @@ public class UnitTest {
         }
 
     }
-
+    // 文件随机位置写入  耗时：1000ms
+    public static void randomWrite1(String path,String content) throws Exception {
+        RandomAccessFile raf=new RandomAccessFile(path,"rw");
+        Random random=new Random();
+        for(int i=0;i<100000;i++){
+            raf.seek(random.nextInt((int)raf.length())); // 在文件随机位置写入覆盖
+            raf.write((i+content+System.lineSeparator()).getBytes());
+        }
+        raf.close();
+    }
+    // 文件尾部位置写入  耗时：800ms
+    public static void randomWrite2(String path,String content) throws Exception {
+        RandomAccessFile raf=new RandomAccessFile(path,"rw");
+        for(int i=0;i<100000;i++){
+            raf.seek(raf.length()); // 总是在文件尾部追加
+            raf.write((i+content+System.lineSeparator()).getBytes());
+        }
+        raf.close();
+    }
 }
 

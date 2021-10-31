@@ -33,7 +33,7 @@ public class ClusterMetaBinLogSyncTask extends TimerTask {
         while (!isExit()) {
             setLastRunTime(new Date());
             try {
-                BaseNode leader = NodeService.CURRENTNODE.getClusterLeader();
+                BaseNode leader = NodeService.CURRENT_NODE.getClusterLeader();
                 BakLeaderService.requestLeaderSyncClusterMetaData(leader, this);
             } catch (Exception e) {
                 log.error("", e);

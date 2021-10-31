@@ -18,7 +18,7 @@ public class ClearDataTask extends TimerTask {
     public void run() {
         while (!isExit()) {
             try {
-                Map<String, BaseNode> leaders = NodeService.CURRENTNODE.getMasters();
+                Map<String, BaseNode> leaders = NodeService.CURRENT_NODE.getMasters();
                 Iterator<Map.Entry<String, BaseNode>> items = leaders.entrySet().iterator();//使用遍历+移除操作安全的迭代器方式
                 List<String> sources = new ArrayList<>(leaders.size());
                 while (items.hasNext()) {

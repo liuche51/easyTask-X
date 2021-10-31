@@ -48,6 +48,10 @@ public class BinlogScheduleDao {
         String sql = contactSaveSql(Arrays.asList(binlogSchedule));
         helper.executeUpdate(sql);
     }
+    public static void saveBatch(List<BinlogSchedule> schedules, SqliteHelper helper) throws SQLException {
+        String sql = contactSaveSql(schedules);
+        helper.executeUpdate(sql);
+    }
 
     public static List<BinlogSchedule> getScheduleBinlogByIndex(long index, int count) throws SQLException {
         List<BinlogSchedule> list = new LinkedList<>();

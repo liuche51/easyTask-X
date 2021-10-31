@@ -72,14 +72,14 @@ public class ZKService {
                 // 防止节点被删除时发生错误
                 if (nodeCache.getCurrentData() == null) {
                     log.error("nodeCache.getCurrentData() == null，可能该节点已被删除");
-                    NodeService.CURRENTNODE.setClusterLeader(null);
+                    NodeService.CURRENT_NODE.setClusterLeader(null);
                 } else {
                     // 获取节点最新的数据
                     LeaderData ld = JSONObject.parseObject(nodeCache.getCurrentData().getData(), LeaderData.class);
                     if (ld == null)
-                        NodeService.CURRENTNODE.setClusterLeader(null);
+                        NodeService.CURRENT_NODE.setClusterLeader(null);
                     else
-                        NodeService.CURRENTNODE.setClusterLeader(new BaseNode(ld.getHost(), ld.getPort()));
+                        NodeService.CURRENT_NODE.setClusterLeader(new BaseNode(ld.getHost(), ld.getPort()));
                 }
             }
         });

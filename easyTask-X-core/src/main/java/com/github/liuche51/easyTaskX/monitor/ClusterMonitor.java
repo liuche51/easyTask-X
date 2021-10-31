@@ -34,8 +34,8 @@ public class ClusterMonitor {
      *
      * @return
      */
-    public static String getCurrentNodeInfo() {
-        return JSONObject.toJSONString(NodeService.CURRENTNODE);
+    public static String getCURRENT_NODEInfo() {
+        return JSONObject.toJSONString(NodeService.CURRENT_NODE);
     }
 
     public static String getSqlitePoolInfo() {
@@ -51,7 +51,7 @@ public class ClusterMonitor {
         Map<String, Map<String, List>> map = new HashMap<>(3);
         Map<String, List> leaderInfo = DBMonitor.getInfoByTaskId(taskId);
         map.put(NodeService.getConfig().getAddress(), leaderInfo);
-        Iterator<Map.Entry<String, BaseNode>> items = NodeService.CURRENTNODE.getSlaves().entrySet().iterator();
+        Iterator<Map.Entry<String, BaseNode>> items = NodeService.CURRENT_NODE.getSlaves().entrySet().iterator();
         while (items.hasNext()) {
             BaseNode item = items.next().getValue();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();

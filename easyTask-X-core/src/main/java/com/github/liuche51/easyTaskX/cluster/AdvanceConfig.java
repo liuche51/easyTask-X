@@ -5,10 +5,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class AdvanceConfig {
     /**
-     * 任务提交成功模式。1、高可靠模式（master和其中一个slave保存了任务才算提交成功）。0、高性能模式（master保存了任务就算提交成功）。
-     */
-    private int submitSuccessModel = 1;
-    /**
      * sqlite连接池大小设置。默认3
      */
     private int dbPoolSize = 3;
@@ -47,6 +43,10 @@ public class AdvanceConfig {
      */
     private int followsHeartbeatsQueueCapacity=5000;
     /**
+     * 等待入库同步的提交任务队列最大长度
+     */
+    private int waitSubmitTaskQueueCapacity=10000;
+    /**
      * 清理任务备份表中失效的leader备份。默认1小时一次。
      */
     private int clearScheduleBakTime = 1;
@@ -72,16 +72,6 @@ public class AdvanceConfig {
 
     public int getsQLlitePoolSize() {
         return dbPoolSize;
-    }
-
-    public int getSubmitSuccessModel() {
-        return submitSuccessModel;
-    }
-
-    public void setSubmitSuccessModel(int submitSuccessModel) throws Exception {
-        if (submitSuccessModel != 0 && submitSuccessModel != 1)
-            throw new Exception("submitSuccessModel must in (0,1)");
-        this.submitSuccessModel = submitSuccessModel;
     }
 
     /**
@@ -160,6 +150,14 @@ public class AdvanceConfig {
 
     public void setFollowsHeartbeatsQueueCapacity(int followsHeartbeatsQueueCapacity) {
         this.followsHeartbeatsQueueCapacity = followsHeartbeatsQueueCapacity;
+    }
+
+    public int getWaitSubmitTaskQueueCapacity() {
+        return waitSubmitTaskQueueCapacity;
+    }
+
+    public void setWaitSubmitTaskQueueCapacity(int waitSubmitTaskQueueCapacity) {
+        this.waitSubmitTaskQueueCapacity = waitSubmitTaskQueueCapacity;
     }
 
     public int getClearScheduleBakTime() {
