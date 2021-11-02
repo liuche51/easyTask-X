@@ -6,6 +6,7 @@ import com.github.liuche51.easyTaskX.util.StringConstant;
  * 提交的任务结果数据分装对象
  */
 public class SubmitTaskResult {
+    private String clientAddress;
     private String id;
     /**
      * 任务状态。
@@ -26,6 +27,14 @@ public class SubmitTaskResult {
         this.id = id;
         this.status = status;
         this.error = error;
+    }
+
+    public String getClientAddress() {
+        return clientAddress;
+    }
+
+    public void setClientAddress(String clientAddress) {
+        this.clientAddress = clientAddress;
     }
 
     public String getId() {

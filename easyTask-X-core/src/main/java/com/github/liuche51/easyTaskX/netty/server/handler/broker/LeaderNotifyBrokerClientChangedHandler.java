@@ -3,7 +3,6 @@ package com.github.liuche51.easyTaskX.netty.server.handler.broker;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
-import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerNotifyClientSubmitTaskResultTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.SubmitTaskResult;
@@ -32,8 +31,6 @@ public class LeaderNotifyBrokerClientChangedHandler extends BaseHandler {
                 NodeService.CURRENT_NODE.getClients().add(new BaseNode(items[1]));
                 if (!MasterService.WAIT_RESPONSE_TASK_RESULT.containsKey(items[1])) {//找到新加入的Clinet队列
                     MasterService.WAIT_RESPONSE_TASK_RESULT.put(items[1], new LinkedBlockingQueue<SubmitTaskResult>(NodeService.getConfig().getAdvanceConfig().getWaitSubmitTaskQueueCapacity()));
-                    BrokerNotifyClientSubmitTaskResultTask task = new BrokerNotifyClientSubmitTaskResultTask(items[1]);
-                    task.start();
                 }
                 break;
             case OperationTypeEnum.DELETE:

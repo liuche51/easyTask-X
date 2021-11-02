@@ -10,9 +10,7 @@ message Schedule {
   optional string source = 8;
   optional string executer = 9;
   optional int32 status = 10;
-  optional string submit_broker = 11;
-  optional int32 submit_model = 12;
-  optional int32 submit_timeout = 13;
+  optional int32 submit_model = 11;
 
 }
 message ScheduleList {

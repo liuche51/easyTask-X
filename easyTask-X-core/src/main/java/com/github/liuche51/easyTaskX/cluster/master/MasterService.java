@@ -1,16 +1,14 @@
 package com.github.liuche51.easyTaskX.cluster.master;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
-import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
-import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerNotifyClientSubmitTaskResultTask;
+import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
+import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.broker.ReDispatchToClientTask;
+import com.github.liuche51.easyTaskX.cluster.task.master.MasterSubmitTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.NewMasterSyncBakDataTask;
 import com.github.liuche51.easyTaskX.dao.BinlogScheduleDao;
-import com.github.liuche51.easyTaskX.dto.BaseNode;
-import com.github.liuche51.easyTaskX.dto.ByteStringPack;
-import com.github.liuche51.easyTaskX.dto.Node;
-import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
+import com.github.liuche51.easyTaskX.dto.ByteStringPack;
 import com.github.liuche51.easyTaskX.dto.SubmitTaskResult;
 import com.github.liuche51.easyTaskX.dto.db.BinlogSchedule;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
@@ -23,11 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -126,8 +121,6 @@ public class MasterService {
         if (queue == null) {// 防止数据不一致导致未能正确添加Clinet的队列
             WAIT_RESPONSE_TASK_RESULT.put(address, new LinkedBlockingQueue<SubmitTaskResult>(NodeService.getConfig().getAdvanceConfig().getWaitSubmitTaskQueueCapacity()));
             queue=WAIT_RESPONSE_TASK_RESULT.get(address);
-            BrokerNotifyClientSubmitTaskResultTask task = new BrokerNotifyClientSubmitTaskResultTask(address);
-            task.start();
         }
         boolean offer = queue.offer(schedule, schedule.getSubmitTimeout(), TimeUnit.SECONDS);
         if (offer == false) {
@@ -160,5 +153,13 @@ public class MasterService {
                 }
             }
         }
+    }
+    /**
+     * 启动点定时从leader获取注册表更新任务
+     */
+    public static TimerTask startMasterSubmitTask() {
+        MasterSubmitTask task = new MasterSubmitTask();
+        task.start();
+        return task;
     }
 }

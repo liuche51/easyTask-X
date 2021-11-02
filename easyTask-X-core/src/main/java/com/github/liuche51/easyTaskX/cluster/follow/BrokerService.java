@@ -5,10 +5,7 @@ import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
-import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerUpdateClientsTask;
-import com.github.liuche51.easyTaskX.cluster.task.broker.ReDispatchToClientTask;
-import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerRequestUpdateRegeditTask;
-import com.github.liuche51.easyTaskX.cluster.task.broker.HeartbeatsTask;
+import com.github.liuche51.easyTaskX.cluster.task.broker.*;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.*;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
@@ -84,7 +81,6 @@ public class BrokerService {
     public static TimerTask startHeartBeat() {
         HeartbeatsTask task = new HeartbeatsTask();
         task.start();
-        NodeService.timerTasks.add(task);
         return task;
     }
 
@@ -94,7 +90,6 @@ public class BrokerService {
     public static TimerTask startUpdateRegeditTask() {
         BrokerRequestUpdateRegeditTask task = new BrokerRequestUpdateRegeditTask();
         task.start();
-        NodeService.timerTasks.add(task);
         return task;
     }
 
@@ -104,7 +99,14 @@ public class BrokerService {
     public static TimerTask startBrokerUpdateClientsTask() {
         BrokerUpdateClientsTask task = new BrokerUpdateClientsTask();
         task.start();
-        NodeService.timerTasks.add(task);
+        return task;
+    }
+    /**
+     * 启动Broker通知客户端提交的任务同步结果反馈
+     */
+    public static TimerTask startBrokerNotifyClientSubmitTaskResultTask() {
+        BrokerNotifyClientSubmitTaskResultTask task = new BrokerNotifyClientSubmitTaskResultTask();
+        task.start();
         return task;
     }
 
@@ -118,7 +120,6 @@ public class BrokerService {
         if (ReDispatchToClientTask.runningTask.contains(key)) return null;
         ReDispatchToClientTask.runningTask.put(key, null);
         task.start();
-        NodeService.onceTasks.add(task);
         return task;
     }
 

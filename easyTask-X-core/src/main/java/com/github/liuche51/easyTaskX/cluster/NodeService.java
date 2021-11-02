@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.cluster;
 
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.leader.BakLeaderService;
+import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.*;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
@@ -106,7 +107,9 @@ public class NodeService {
         timerTasks.add(clearDataTask());
         timerTasks.add(BrokerService.startUpdateRegeditTask());
         timerTasks.add(BrokerService.startBrokerUpdateClientsTask());
+        timerTasks.add(BrokerService.startBrokerNotifyClientSubmitTaskResultTask());
         timerTasks.add(SlaveService.startScheduleBinLogSyncTask());
+        timerTasks.add(MasterService.startMasterSubmitTask());
         ZKService.listenLeaderDataNode();
     }
 
