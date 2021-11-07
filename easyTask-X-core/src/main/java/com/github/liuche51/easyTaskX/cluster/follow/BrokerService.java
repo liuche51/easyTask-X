@@ -56,23 +56,6 @@ public class BrokerService {
     }
 
     /**
-     * 更新任务。含同步至备份库
-     * 1、slaves通过异步复制binlog同步更新
-     *
-     * @param taskIds
-     * @return
-     */
-    public static boolean updateTask(String[] taskIds, Map<String, Object> values) {
-        try {
-            ScheduleDao.updateByIds(taskIds, values);
-            return true;
-        } catch (Exception e) {
-            log.error("", e);
-            return false;
-        }
-    }
-
-    /**
      * 节点对leader的心跳。
      */
     public static TimerTask startHeartBeat() {
@@ -103,19 +86,6 @@ public class BrokerService {
      */
     public static TimerTask startBrokerNotifyClientSubmitTaskResultTask() {
         BrokerNotifyClientSubmitTaskResultTask task = new BrokerNotifyClientSubmitTaskResultTask();
-        task.start();
-        return task;
-    }
-
-    /**
-     * 启动Broker重新将旧Client任务分配给新Clientd的任务。
-     * 需要保证幂等性。防止接口重复触发相同任务
-     */
-    public static synchronized OnceTask startReDispatchToClientTask(BaseNode oldClient) {
-        ReDispatchToClientTask task = new ReDispatchToClientTask(oldClient);
-        String key = task.getClass().getName() + "," + oldClient.getAddress();
-        if (ReDispatchToClientTask.runningTask.contains(key)) return null;
-        ReDispatchToClientTask.runningTask.put(key, null);
         task.start();
         return task;
     }
@@ -171,27 +141,7 @@ public class BrokerService {
         BrokerUtil.updateMasterBinlogInfo(masters);
     }
 
-    /**
-     * Broker通知Client接受执行新任务
-     *
-     * @param newClient
-     * @param schedules
-     * @return
-     * @throws Exception
-     */
-    public static boolean notifyClientExecuteNewTask(BaseNode newClient, List<Schedule> schedules) throws Exception {
-        ScheduleDto.ScheduleList.Builder builder0 = ScheduleDto.ScheduleList.newBuilder();
-        for (Schedule schedule : schedules) {
-            ScheduleDto.Schedule s = schedule.toScheduleDto();
-            builder0.addSchedules(s);
-        }
-        Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BrokerNotifyClientExecuteNewTask).setSource(NodeService.getConfig().getAddress())
-                .setBodyBytes(builder0.build().toByteString());
-        NettyClient client = newClient.getClientWithCount(1);
-        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, client, NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
-        return ret;
-    }
+
 
     /**
      * broker通知leader，已经完成重新分配任务至新client以及salve的数据同步。请求更新数据同步状态

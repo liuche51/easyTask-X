@@ -110,6 +110,7 @@ public class NodeService {
         timerTasks.add(BrokerService.startBrokerNotifyClientSubmitTaskResultTask());
         timerTasks.add(SlaveService.startScheduleBinLogSyncTask());
         timerTasks.add(MasterService.startMasterSubmitTask());
+        timerTasks.add(MasterService.startMasterUpdateSubmitTaskStatusTask());
         ZKService.listenLeaderDataNode();
     }
 

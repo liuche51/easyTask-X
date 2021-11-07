@@ -6,7 +6,13 @@ import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
 import com.github.liuche51.easyTaskX.dto.*;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
+import com.github.liuche51.easyTaskX.dto.proto.Dto;
+import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
+import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
+import com.github.liuche51.easyTaskX.netty.client.NettyClient;
+import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
+import com.github.liuche51.easyTaskX.util.Util;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,11 +25,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class ReDispatchToClientTask extends OnceTask {
     private BaseNode oldClient;
-    /**
-     * 当前正在运行的Task实例。
-     * 需要保证不能重复启动相同的任务检查。
-     */
-    public static ConcurrentHashMap<String, Object> runningTask = new ConcurrentHashMap<>();
 
     public ReDispatchToClientTask(BaseNode oldClient) {
         this.oldClient = oldClient;
@@ -31,35 +32,52 @@ public class ReDispatchToClientTask extends OnceTask {
 
     @Override
     public void run() {
-        try {
+        synchronized (this.getClass()) { // 防止触发了多个实例运行。实现幂等性
             while (!isExit()) {
-                //获取批次数据
-                List<Schedule> list = ScheduleDao.selectByExecuter(this.oldClient.getAddress(), NodeService.getConfig().getAdvanceConfig().getReDispatchBatchCount());
-                if (list.size() == 0) {//如果已经同步完，通知leader更新注册表状态并则跳出循环
-                    BrokerService.notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus(NodeSyncDataStatusEnum.SUCCEEDED);
-                    setExit(true);
-                    break;
-                }
-                List<BaseNode> objHost = new LinkedList<>();
-                objHost.addAll((Collection<? extends BaseNode>) NodeService.CURRENT_NODE.getSlaves());
-                BaseNode newClient = findNewClient(this.oldClient);
-                objHost.add(newClient);
-                if (NodeService.canAllConnect(objHost)) {
-                    boolean ret = BrokerService.notifyClientExecuteNewTask(newClient, list);
+                try {
+                    //获取批次数据
+                    List<Schedule> list = ScheduleDao.selectByExecuter(this.oldClient.getAddress(), NodeService.getConfig().getAdvanceConfig().getReDispatchBatchCount());
+                    if (list.size() == 0) {//如果已经同步完，通知leader更新注册表状态并则跳出循环
+                        BrokerService.notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus(NodeSyncDataStatusEnum.SUCCEEDED);
+                        setExit(true);
+                        break;
+                    }
+                    BaseNode newClient = findNewClient(this.oldClient);
+                    boolean ret = notifyClientExecuteNewTask(newClient, list);
                     if (ret) {
                         Map<String, Object> values = new HashMap<>();
                         values.put("executer", newClient.getAddress());
                         String[] scheduleIds = list.stream().map(Schedule::getId).toArray(String[]::new);
-                        BrokerService.updateTask(scheduleIds, values);
+                        ScheduleDao.updateByIds(scheduleIds, values);
                     }
-
+                } catch (Exception e) {
+                    log.error("", e);
                 }
-
             }
-            runningTask.remove(this.getClass().getName() + "," + this.oldClient.getAddress());
-        } catch (Exception e) {
-            log.error("", e);
+
         }
+    }
+
+    /**
+     * Broker通知Client接受执行新任务
+     *
+     * @param newClient
+     * @param schedules
+     * @return
+     * @throws Exception
+     */
+    private boolean notifyClientExecuteNewTask(BaseNode newClient, List<Schedule> schedules) throws Exception {
+        ScheduleDto.ScheduleList.Builder builder0 = ScheduleDto.ScheduleList.newBuilder();
+        for (Schedule schedule : schedules) {
+            ScheduleDto.Schedule s = schedule.toScheduleDto();
+            builder0.addSchedules(s);
+        }
+        Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BrokerNotifyClientExecuteNewTask).setSource(NodeService.getConfig().getAddress())
+                .setBodyBytes(builder0.build().toByteString());
+        NettyClient client = newClient.getClientWithCount(1);
+        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, client, NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+        return ret;
     }
 
     /**

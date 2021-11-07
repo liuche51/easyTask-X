@@ -3,6 +3,7 @@ package com.github.liuche51.easyTaskX.netty.server.handler.broker;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
+import com.github.liuche51.easyTaskX.cluster.task.broker.ReDispatchToClientTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.SubmitTaskResult;
@@ -51,7 +52,8 @@ public class LeaderNotifyBrokerClientChangedHandler extends BaseHandler {
                         });
                         if (ScheduleDao.isExistByExecuter(bn.getAddress())) {
                             BrokerService.notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus(NodeSyncDataStatusEnum.SYNCING);
-                            BrokerService.startReDispatchToClientTask(bn);
+                            ReDispatchToClientTask task = new ReDispatchToClientTask(bn);
+                            task.start();
                         }
                     }
                 }

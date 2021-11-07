@@ -11,6 +11,10 @@ import sun.security.krb5.internal.Ticket;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * master更新任务提交状态
+ * 1、高可靠模式下使用
+ */
 public class MasterUpdateSubmitTaskStatusTask extends TimerTask {
     @Override
     public void run() {
@@ -43,9 +47,13 @@ public class MasterUpdateSubmitTaskStatusTask extends TimerTask {
                 }
 
             } catch (Exception e) {
-                if (schedules.size() > 0) {
-                    schedules.forEach(x -> {
-                        MasterService.addWAIT_RESPONSE_CLINET_TASK_RESULT(x.getSource(), new SubmitTaskResult(x.getId(), 9, "Master 持久化任务异常!"));
+                if (results.size() > 0) {//发生数据库访问异常，重新进队列以便重试。
+                    results.forEach(x -> {
+                        try {
+                            MasterService.SLAVE_RESPONSE_SUCCESS_TASK_RESULT.put(x);//这里因为是异常情况下。所以直接用阻塞的api即可。
+                        } catch (InterruptedException interruptedException) {
+                            log.error("", e);
+                        }
                     });
                 }
                 log.error("", e);

@@ -2,11 +2,9 @@ package com.github.liuche51.easyTaskX.cluster.master;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
-import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
-import com.github.liuche51.easyTaskX.cluster.task.broker.ReDispatchToClientTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.MasterSubmitTask;
-import com.github.liuche51.easyTaskX.cluster.task.master.NewMasterSyncBakDataTask;
+import com.github.liuche51.easyTaskX.cluster.task.master.MasterUpdateSubmitTaskStatusTask;
 import com.github.liuche51.easyTaskX.dao.BinlogScheduleDao;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
 import com.github.liuche51.easyTaskX.dto.ByteStringPack;
@@ -65,22 +63,6 @@ public class MasterService {
      */
     public static void deleteOldMasterBackTask(String oldMasterAddress) throws SQLException, ClassNotFoundException {
         ScheduleBakDao.deleteBySource(oldMasterAddress);
-    }
-
-    /**
-     * 新master将旧master的备份数据同步给自己的slave
-     * 后期需要考虑数据一致性
-     *
-     * @param oldMasterAddress
-     */
-    public static synchronized OnceTask submitNewTaskByOldMaster(String oldMasterAddress) {
-        NewMasterSyncBakDataTask task = new NewMasterSyncBakDataTask(oldMasterAddress);
-        String key = task.getClass().getName() + "," + oldMasterAddress;
-        if (ReDispatchToClientTask.runningTask.contains(key)) return null;
-        ReDispatchToClientTask.runningTask.put(key, null);
-        task.start();
-        NodeService.onceTasks.add(task);
-        return task;
     }
 
     /**
@@ -143,6 +125,14 @@ public class MasterService {
      */
     public static TimerTask startMasterSubmitTask() {
         MasterSubmitTask task = new MasterSubmitTask();
+        task.start();
+        return task;
+    }
+    /**
+     * 启动master更新任务提交状态任务
+     */
+    public static TimerTask startMasterUpdateSubmitTaskStatusTask() {
+        MasterUpdateSubmitTaskStatusTask task = new MasterUpdateSubmitTaskStatusTask();
         task.start();
         return task;
     }
