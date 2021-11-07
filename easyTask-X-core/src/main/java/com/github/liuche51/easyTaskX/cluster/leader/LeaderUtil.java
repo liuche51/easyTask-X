@@ -8,6 +8,7 @@ import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.OperationTypeEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
+import com.github.liuche51.easyTaskX.util.LogErrorUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
@@ -37,7 +38,7 @@ public class LeaderUtil {
                                     .setSource(NodeService.CURRENT_NODE.getAddress()).setBodyBytes(nodeBuilder.build().toByteString());
                             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                             if (!ret) {
-                                NettyMsgService.writeRpcErrorMsgToDb("Leader通知Follow节点更新注册表信息。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil.notifyFollowUpdateRegedit");
+                                LogErrorUtil.writeRpcErrorMsgToDb("Leader通知Follow节点更新注册表信息。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil.notifyFollowUpdateRegedit");
                             }
                         case StringConstant.CLINET:
                             //目前没有客户端需要更新注册表逻辑
@@ -136,7 +137,7 @@ public class LeaderUtil {
                             .setSource(NodeService.CURRENT_NODE.getAddress()).setBody(type + str.toString());//type+Broker地址+新master地址
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, client.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret) {
-                       NettyMsgService.writeRpcErrorMsgToDb("Leader通知Clinets。Broker发生变更。失败！","com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil.notifyClinetChangedBroker");
+                       LogErrorUtil.writeRpcErrorMsgToDb("Leader通知Clinets。Broker发生变更。失败！","com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil.notifyClinetChangedBroker");
                     }
                 } catch (Exception e) {
                     log.error("", e);
@@ -162,7 +163,7 @@ public class LeaderUtil {
                             .setSource(NodeService.CURRENT_NODE.getAddress()).setBody(type + StringConstant.CHAR_SPRIT_STRING + client);
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, broker.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret) {
-                        NettyMsgService.writeRpcErrorMsgToDb("Leader通知Broker。有Client注册变更消息。失败！","com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil.notifyBrokerChangedClient");
+                        LogErrorUtil.writeRpcErrorMsgToDb("Leader通知Broker。有Client注册变更消息。失败！","com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil.notifyBrokerChangedClient");
                     }
                 } catch (Exception e) {
                     log.error("", e);

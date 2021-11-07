@@ -16,10 +16,7 @@ import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.enume.LogErrorTypeEnum;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
-import com.github.liuche51.easyTaskX.util.DateUtils;
-import com.github.liuche51.easyTaskX.util.StringConstant;
-import com.github.liuche51.easyTaskX.util.StringUtils;
-import com.github.liuche51.easyTaskX.util.Util;
+import com.github.liuche51.easyTaskX.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +100,7 @@ public class LeaderService {
                             .setSource(NodeService.CURRENT_NODE.getAddress());
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, broker.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret) {
-                        NettyMsgService.writeRpcErrorMsgToDb("Leader通知Broker注册成功。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifyBrokerRegisterSucceeded");
+                        LogErrorUtil.writeRpcErrorMsgToDb("Leader通知Broker注册成功。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifyBrokerRegisterSucceeded");
                     }
                 } catch (Exception e) {
                     log.error("", e);
@@ -158,7 +155,7 @@ public class LeaderService {
                 RegNode node = item.getValue();
                 boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                 if (!ret) {
-                    NettyMsgService.writeRpcErrorMsgToDb("leader通知slaves。旧Master失效，leader已选新Master。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifySlaveVotedNewMaster");
+                    LogErrorUtil.writeRpcErrorMsgToDb("leader通知slaves。旧Master失效，leader已选新Master。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifySlaveVotedNewMaster");
                 }
             }
             return true;

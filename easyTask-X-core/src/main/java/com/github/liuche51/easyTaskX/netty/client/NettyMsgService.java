@@ -98,8 +98,5 @@ public class NettyMsgService {
         return sendSyncMsgWithCount(builder, client, tryCount, waiteSecond, respPack);
     }
 
-    public static void writeRpcErrorMsgToDb(String content, String detail) {
-        LogError logError = new LogError(content, detail, LogErrorTypeEnum.RPC);
-        LogErrorDao.saveBatch(Arrays.asList(logError));
-    }
+
 }

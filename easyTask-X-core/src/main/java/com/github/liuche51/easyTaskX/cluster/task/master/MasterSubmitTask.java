@@ -8,9 +8,8 @@ import com.github.liuche51.easyTaskX.dto.SubmitTaskResult;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.enume.ScheduleStatusEnum;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -21,11 +20,12 @@ public class MasterSubmitTask extends TimerTask {
     public void run() {
         while (!isExit()) {
             setLastRunTime(new Date());
+            List<Schedule> schedules = new ArrayList<>(10);
             try {
-                List<Schedule> schedules = new ArrayList<>(10);
                 MasterService.WAIT_SUBMIT_TASK.drainTo(schedules, 10);// 批量获取，为空不阻塞。
                 if (schedules.size() > 0) {
                     List<Schedule> molde1list = new ArrayList<>(schedules.size());// 普通模式的任务，Master本地保存成功后，直接进入反馈队列
+                    Map<String, Map<String, Object>> model2list = new HashMap<>();// 高可靠模式的任务
                     for (Schedule schedule : schedules) {
                         if (schedule.getSubmit_model() == 1) { // 普通模式
                             schedule.setStatus(ScheduleStatusEnum.NORMAL);
@@ -33,11 +33,16 @@ public class MasterSubmitTask extends TimerTask {
                             return;
                         } else if (schedule.getSubmit_model() == 2) { // 高可靠模式，需等待一个Slave同步成功才算成功
                             schedule.setStatus(ScheduleStatusEnum.UNUSE);
+                            Map<String, Object> item=new HashMap<>();
+                            item.put("source",schedule.getSource());
+                            item.put("time",System.currentTimeMillis());
+                            model2list.put(schedule.getId(), item);
                         }
                     }
                     ScheduleDao.saveBatch(schedules);
+                    MasterService.SLAVE_SYNC_TASK_RECORD.putAll(model2list);
                     molde1list.forEach(x -> {
-                        MasterService.WAIT_RESPONSE_TASK_RESULT.get(x.getSource());
+                        MasterService.addWAIT_RESPONSE_CLINET_TASK_RESULT(x.getSource(), new SubmitTaskResult(x.getId(), 1));
                     });
                 } else {
                     try {
@@ -49,6 +54,11 @@ public class MasterSubmitTask extends TimerTask {
                 }
 
             } catch (Exception e) {
+                if (schedules.size() > 0) {
+                    schedules.forEach(x -> {
+                        MasterService.addWAIT_RESPONSE_CLINET_TASK_RESULT(x.getSource(), new SubmitTaskResult(x.getId(), 9, "Master 持久化任务异常!"));
+                    });
+                }
                 log.error("", e);
             }
         }

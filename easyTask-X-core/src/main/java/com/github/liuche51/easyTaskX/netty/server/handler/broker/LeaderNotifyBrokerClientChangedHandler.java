@@ -29,8 +29,8 @@ public class LeaderNotifyBrokerClientChangedHandler extends BaseHandler {
         switch (items[0]) {
             case OperationTypeEnum.ADD:
                 NodeService.CURRENT_NODE.getClients().add(new BaseNode(items[1]));
-                if (!MasterService.WAIT_RESPONSE_TASK_RESULT.containsKey(items[1])) {//找到新加入的Clinet队列
-                    MasterService.WAIT_RESPONSE_TASK_RESULT.put(items[1], new LinkedBlockingQueue<SubmitTaskResult>(NodeService.getConfig().getAdvanceConfig().getWaitSubmitTaskQueueCapacity()));
+                if (!MasterService.WAIT_RESPONSE_CLINET_TASK_RESULT.containsKey(items[1])) {//找到新加入的Clinet队列
+                    MasterService.WAIT_RESPONSE_CLINET_TASK_RESULT.put(items[1], new LinkedBlockingQueue<SubmitTaskResult>(NodeService.getConfig().getAdvanceConfig().getWaitSubmitTaskQueueCapacity()));
                 }
                 break;
             case OperationTypeEnum.DELETE:
@@ -40,12 +40,12 @@ public class LeaderNotifyBrokerClientChangedHandler extends BaseHandler {
                     if (bn.getAddress().equals(items[1])) {
                         NodeService.CURRENT_NODE.getClients().remove(bn);
                         //移除该客户端任务反馈发送队列，如果队列中有反馈的任务，则需要删除之
-                        LinkedBlockingQueue<SubmitTaskResult> submitTaskResults = MasterService.WAIT_RESPONSE_TASK_RESULT.get(items[1]);
+                        LinkedBlockingQueue<SubmitTaskResult> submitTaskResults = MasterService.WAIT_RESPONSE_CLINET_TASK_RESULT.get(items[1]);
                         List<SubmitTaskResult> all=new ArrayList<>(submitTaskResults.size());
                         if(submitTaskResults!=null&&submitTaskResults.size()>0){
                             submitTaskResults.drainTo(all,Integer.MAX_VALUE);
                         }
-                        MasterService.WAIT_RESPONSE_TASK_RESULT.remove(items[1]);
+                        MasterService.WAIT_RESPONSE_CLINET_TASK_RESULT.remove(items[1]);
                         all.forEach(x->{
                             BrokerService.deleteTask(x.getId());
                         });

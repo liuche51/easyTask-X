@@ -12,6 +12,7 @@ import com.github.liuche51.easyTaskX.dto.proto.StringListDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.ScheduleStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
+import com.github.liuche51.easyTaskX.util.LogErrorUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
 
@@ -32,7 +33,7 @@ public class BrokerNotifyClientSubmitTaskResultTask extends TimerTask {
         while (!isExit()) {
             setLastRunTime(new Date());
             try {
-                Collection<LinkedBlockingQueue<SubmitTaskResult>> queues = MasterService.WAIT_RESPONSE_TASK_RESULT.values();
+                Collection<LinkedBlockingQueue<SubmitTaskResult>> queues = MasterService.WAIT_RESPONSE_CLINET_TASK_RESULT.values();
                 List<SubmitTaskResult> results = new ArrayList<>(10);
                 for (LinkedBlockingQueue<SubmitTaskResult> queue : queues) {
                     queue.drainTo(results, 10);
@@ -54,7 +55,7 @@ public class BrokerNotifyClientSubmitTaskResultTask extends TimerTask {
                                         .setSource(NodeService.CURRENT_NODE.getAddress()).setBodyBytes(builder0.build().toByteString());//任务ID,状态,错误信息
                                 boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, new BaseNode(results.get(0).getClientAddress()).getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                                 if (!ret) {
-                                    NettyMsgService.writeRpcErrorMsgToDb("Leader通知Clinets。Broker发生变更。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil.notifyClinetChangedBroker");
+                                    LogErrorUtil.writeRpcErrorMsgToDb("Leader通知Clinets。Broker发生变更。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil.notifyClinetChangedBroker");
                                 }
                             } catch (Exception e) {
                                 log.error("", e);

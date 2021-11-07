@@ -48,7 +48,7 @@ public class ScheduleDao {
         return false;
     }
 
-    public static void saveBatch(List<Schedule> schedules) throws SQLException, ClassNotFoundException {
+    public static void saveBatch(List<Schedule> schedules) throws SQLException {
         SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE, ScheduleDao.getLock());
         helper.beginTran();
         try {

@@ -6,7 +6,6 @@ import com.github.liuche51.easyTaskX.util.StringConstant;
  * 提交的任务结果数据分装对象
  */
 public class SubmitTaskResult {
-    private String clientAddress;
     private String id;
     /**
      * 任务状态。
@@ -14,6 +13,7 @@ public class SubmitTaskResult {
      */
     private int status = 0;
     private String error = StringConstant.EMPTY;
+    private String source;
 
     public SubmitTaskResult() {
     }
@@ -28,13 +28,11 @@ public class SubmitTaskResult {
         this.status = status;
         this.error = error;
     }
-
-    public String getClientAddress() {
-        return clientAddress;
-    }
-
-    public void setClientAddress(String clientAddress) {
-        this.clientAddress = clientAddress;
+    public SubmitTaskResult(String id, int status, String error, String source) {
+        this.id = id;
+        this.status = status;
+        this.error = error;
+        this.source = source;
     }
 
     public String getId() {
@@ -59,5 +57,13 @@ public class SubmitTaskResult {
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 }
