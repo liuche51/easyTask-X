@@ -6,6 +6,7 @@ import com.github.liuche51.easyTaskX.dao.ScheduleDao;
 import com.github.liuche51.easyTaskX.dto.SubmitTaskResult;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.enume.ScheduleStatusEnum;
+import com.github.liuche51.easyTaskX.enume.SubmitTaskResultStatusEnum;
 import sun.security.krb5.internal.Ticket;
 
 import java.util.*;
@@ -33,7 +34,7 @@ public class MasterUpdateSubmitTaskStatusTask extends TimerTask {
                         values.put("status", ScheduleStatusEnum.NORMAL);
                         ScheduleDao.updateByIds(ids.toArray(new String[]{}), values);
                         results.forEach(x->{ // 分别将处理成功的任务结果放入对应的客户端反馈队列中去。
-                            MasterService.addWAIT_RESPONSE_CLINET_TASK_RESULT(x.getSource(),new SubmitTaskResult(x.getId(),1));
+                            MasterService.addWAIT_RESPONSE_CLINET_TASK_RESULT(x.getSource(),new SubmitTaskResult(x.getId(), SubmitTaskResultStatusEnum.SUCCESSED));
                         });
 
                     }

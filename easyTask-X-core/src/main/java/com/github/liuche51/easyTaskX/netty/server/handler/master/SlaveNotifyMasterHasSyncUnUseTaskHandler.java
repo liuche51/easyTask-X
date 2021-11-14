@@ -5,6 +5,7 @@ import com.github.liuche51.easyTaskX.dao.ScheduleDao;
 import com.github.liuche51.easyTaskX.dto.SubmitTaskResult;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.StringListDto;
+import com.github.liuche51.easyTaskX.enume.SubmitTaskResultStatusEnum;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.StringUtils;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * master响应。slave通知Master，已经同步了还不能使用的任务。
+ * slave通知Master，已经同步了还不能使用的任务。
  */
 public class SlaveNotifyMasterHasSyncUnUseTaskHandler extends BaseHandler {
 
@@ -33,9 +34,9 @@ public class SlaveNotifyMasterHasSyncUnUseTaskHandler extends BaseHandler {
             }
             MasterService.SLAVE_SYNC_TASK_RECORD.remove(taskId);
             if (status == 1) { // 如果成功，则放入反馈成功队列。等待Master进一步处理（单线程更新任务状态）。这里不直接处理更新状态，是担心多线程并发处理导致数据库繁忙。影响性能
-                MasterService.SLAVE_RESPONSE_SUCCESS_TASK_RESULT.put(new SubmitTaskResult(taskId, 1, StringConstant.EMPTY, (String) map.get("source")));
+                MasterService.SLAVE_RESPONSE_SUCCESS_TASK_RESULT.put(new SubmitTaskResult(taskId, SubmitTaskResultStatusEnum.SUCCESSED, StringConstant.EMPTY, (String) map.get("source")));
             } else if (status == 9) { // 如果处理失败，则直接放入反馈客户端队列
-                MasterService.addWAIT_RESPONSE_CLINET_TASK_RESULT((String) map.get("source"), new SubmitTaskResult(taskId, 9, error));
+                MasterService.addWAIT_RESPONSE_CLINET_TASK_RESULT((String) map.get("source"), new SubmitTaskResult(taskId, SubmitTaskResultStatusEnum.FAILED, error));
             }
         }
         return null;

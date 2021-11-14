@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.follow;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.MasterNode;
 import com.github.liuche51.easyTaskX.dto.Node;
@@ -18,14 +19,14 @@ public class BrokerUtil {
     public static void updateMasterBinlogInfo(ConcurrentHashMap<String, BaseNode> masters){
         //获取新加入的master节点
         masters.keySet().forEach(x->{
-            if(!NodeService.masterBinlogInfo.contains(x)){
-                NodeService.masterBinlogInfo.put(x,new MasterNode(x));
+            if(!SlaveService.MASTER_SYNC_BINLOG_INFO.contains(x)){
+                SlaveService.MASTER_SYNC_BINLOG_INFO.put(x,new MasterNode(x));
             }
         });
         //删除已经失效的master
-        NodeService.masterBinlogInfo.keySet().forEach(x->{
+        SlaveService.MASTER_SYNC_BINLOG_INFO.keySet().forEach(x->{
             if(!masters.contains(x)){
-                NodeService.masterBinlogInfo.remove(x);
+                SlaveService.MASTER_SYNC_BINLOG_INFO.remove(x);
             }
         });
 

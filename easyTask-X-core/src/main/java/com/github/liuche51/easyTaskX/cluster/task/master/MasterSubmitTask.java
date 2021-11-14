@@ -7,6 +7,7 @@ import com.github.liuche51.easyTaskX.dao.ScheduleDao;
 import com.github.liuche51.easyTaskX.dto.SubmitTaskResult;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.enume.ScheduleStatusEnum;
+import com.github.liuche51.easyTaskX.enume.SubmitTaskResultStatusEnum;
 
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -42,7 +43,7 @@ public class MasterSubmitTask extends TimerTask {
                     ScheduleDao.saveBatch(schedules);
                     MasterService.SLAVE_SYNC_TASK_RECORD.putAll(model2list);
                     molde1list.forEach(x -> {
-                        MasterService.addWAIT_RESPONSE_CLINET_TASK_RESULT(x.getSource(), new SubmitTaskResult(x.getId(), 1));
+                        MasterService.addWAIT_RESPONSE_CLINET_TASK_RESULT(x.getSource(), new SubmitTaskResult(x.getId(), SubmitTaskResultStatusEnum.SUCCESSED));
                     });
                 } else {
                     try {
@@ -56,7 +57,7 @@ public class MasterSubmitTask extends TimerTask {
             } catch (Exception e) {
                 if (schedules.size() > 0) {
                     schedules.forEach(x -> {
-                        MasterService.addWAIT_RESPONSE_CLINET_TASK_RESULT(x.getSource(), new SubmitTaskResult(x.getId(), 9, "Master 持久化任务异常!"));
+                        MasterService.addWAIT_RESPONSE_CLINET_TASK_RESULT(x.getSource(), new SubmitTaskResult(x.getId(), SubmitTaskResultStatusEnum.FAILED, "Master 持久化任务异常!"));
                     });
                 }
                 log.error("", e);

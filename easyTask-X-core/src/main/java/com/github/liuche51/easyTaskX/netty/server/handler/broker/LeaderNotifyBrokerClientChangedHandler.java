@@ -28,11 +28,8 @@ public class LeaderNotifyBrokerClientChangedHandler extends BaseHandler {
         String body = frame.getBody();
         String[] items = body.split(StringConstant.CHAR_SPRIT_STRING);//type+地址
         switch (items[0]) {
-            case OperationTypeEnum.ADD:
+            case OperationTypeEnum.ADD: // 这里无需添加 WAIT_RESPONSE_CLINET_TASK_RESULT队列，有实际数据添加到队列时，再新增队列
                 NodeService.CURRENT_NODE.getClients().add(new BaseNode(items[1]));
-                if (!MasterService.WAIT_RESPONSE_CLINET_TASK_RESULT.containsKey(items[1])) {//找到新加入的Clinet队列
-                    MasterService.WAIT_RESPONSE_CLINET_TASK_RESULT.put(items[1], new LinkedBlockingQueue<SubmitTaskResult>(NodeService.getConfig().getAdvanceConfig().getWaitSubmitTaskQueueCapacity()));
-                }
                 break;
             case OperationTypeEnum.DELETE:
                 Iterator<BaseNode> temps = NodeService.CURRENT_NODE.getClients().iterator();

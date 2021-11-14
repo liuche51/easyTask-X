@@ -92,7 +92,7 @@ public class NettyInterfaceEnum {
      */
     public static final String BrokerNotifyClientExecuteNewTask="BrokerNotifyClientExecuteNewTask";
     /**
-     * Broker通知Client接受执行新任务
+     * Broker通知Client反馈提交的任务状态信息
      */
     public static final String BrokerNotifyClientSubmitTaskResult="BrokerNotifyClientSubmitTaskResult";
     /**
