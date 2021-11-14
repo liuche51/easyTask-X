@@ -33,27 +33,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class BrokerService {
     private static final Logger log = LoggerFactory.getLogger(BrokerService.class);
-    /**
-     * 删除任务。
-     * 1、slaves通过异步复制binlog同步删除
-     *
-     * @param taskId
-     * @return
-     */
-    public static boolean deleteTask(String taskId) {
-        SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE, ScheduleDao.getLock());
-        try {
-            helper.beginTran();
-            ScheduleDao.deleteByIds(new String[]{taskId}, helper);
-            helper.commitTran();
-            return true;
-        } catch (Exception e) {
-            log.error("", e);
-            return false;
-        } finally {
-            helper.destroyed();
-        }
-    }
 
     /**
      * 节点对leader的心跳。
@@ -81,6 +60,7 @@ public class BrokerService {
         task.start();
         return task;
     }
+
     /**
      * 启动Broker通知客户端提交的任务同步结果反馈
      */
@@ -142,7 +122,6 @@ public class BrokerService {
     }
 
 
-
     /**
      * broker通知leader，已经完成重新分配任务至新client以及salve的数据同步。请求更新数据同步状态
      */
@@ -152,7 +131,7 @@ public class BrokerService {
             public void run() {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                    builder.setIdentity(Util.generateIdentityId()).setBody(NettyInterfaceEnum.BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus)
+                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus)
                             .setSource(NodeService.CURRENT_NODE.getAddress()).setBody(String.valueOf(reDispatchTaskStatus));
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENT_NODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret) {

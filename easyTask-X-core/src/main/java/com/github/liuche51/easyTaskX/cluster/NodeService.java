@@ -108,6 +108,7 @@ public class NodeService {
         timerTasks.add(SlaveService.startSlaveNotifyMasterSubmitTaskResultTask());
         timerTasks.add(MasterService.startMasterSubmitTask());
         timerTasks.add(MasterService.startMasterUpdateSubmitTaskStatusTask());
+        timerTasks.add(MasterService.startMasterDeleteTaskTask());
         ZKService.listenLeaderDataNode();
     }
 

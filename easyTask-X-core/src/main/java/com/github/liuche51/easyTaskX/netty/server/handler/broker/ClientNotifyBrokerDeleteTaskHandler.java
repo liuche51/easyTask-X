@@ -1,23 +1,30 @@
 package com.github.liuche51.easyTaskX.netty.server.handler.broker;
 
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
-import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
+import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
+import com.github.liuche51.easyTaskX.dto.proto.StringListDto;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.google.protobuf.ByteString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Broker响应：Client删除任务处理类
- * 系统自动删除已执行完的任务使用
+ * 1、任务先入删除队列。异步删除
  */
 public class ClientNotifyBrokerDeleteTaskHandler extends BaseHandler {
+    protected static final Logger log = LoggerFactory.getLogger(ClientNotifyBrokerDeleteTaskHandler.class);
 
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {
-        String taskId = frame.getBody();
-        boolean ret= BrokerService.deleteTask(taskId);
-        if(!ret) throw new Exception("ret=false");
-        return ByteString.copyFromUtf8(taskId);
+        StringListDto.StringList list = StringListDto.StringList.parseFrom(frame.getBodyBytes());
+        List<String> tasks = list.getListList();
+        tasks.forEach(x -> {
+            MasterService.addWAIT_DELETE_TASK(x);
+        });
+        return null;
     }
 }

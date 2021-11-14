@@ -175,11 +175,18 @@ public class ScheduleDao {
         }
     }
 
-    public static void deleteByIds(String[] ids, SqliteHelper helper) throws SQLException {
-        String instr = SqliteHelper.getInConditionStr(ids);
-        String sql = "delete FROM " + tableName + " where id in" + instr + ";";
-        helper.executeUpdate(sql);
-        BinlogScheduleDao.save(sql, StringConstant.EMPTY, ScheduleStatusEnum.NORMAL, helper);
+    public static void deleteByIds(String[] ids) throws SQLException {
+        SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE, ScheduleDao.getLock());
+        try {
+            helper.beginTran();
+            String instr = SqliteHelper.getInConditionStr(ids);
+            String sql = "delete FROM " + tableName + " where id in" + instr + ";";
+            helper.executeUpdate(sql);
+            BinlogScheduleDao.save(sql, StringConstant.EMPTY, ScheduleStatusEnum.NORMAL, helper);
+            helper.commitTran();
+        } finally {
+            helper.destroyed();
+        }
     }
 
     public static void deleteAll() throws SQLException, ClassNotFoundException {

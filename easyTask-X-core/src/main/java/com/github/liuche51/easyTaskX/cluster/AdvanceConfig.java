@@ -43,9 +43,9 @@ public class AdvanceConfig {
      */
     private int followsHeartbeatsQueueCapacity=5000;
     /**
-     * 等待入库同步的提交任务队列最大长度
+     * 处理任务队列最大长度
      */
-    private int waitSubmitTaskQueueCapacity=10000;
+    private int taskQueueCapacity=10000;
     /**
      * 清理任务备份表中失效的leader备份。默认1小时一次。
      */
@@ -152,12 +152,12 @@ public class AdvanceConfig {
         this.followsHeartbeatsQueueCapacity = followsHeartbeatsQueueCapacity;
     }
 
-    public int getWaitSubmitTaskQueueCapacity() {
-        return waitSubmitTaskQueueCapacity;
+    public int getTaskQueueCapacity() {
+        return taskQueueCapacity;
     }
 
-    public void setWaitSubmitTaskQueueCapacity(int waitSubmitTaskQueueCapacity) {
-        this.waitSubmitTaskQueueCapacity = waitSubmitTaskQueueCapacity;
+    public void setTaskQueueCapacity(int taskQueueCapacity) {
+        this.taskQueueCapacity = taskQueueCapacity;
     }
 
     public int getClearScheduleBakTime() {

@@ -65,7 +65,7 @@ public class ClearDataTask extends TimerTask {
             long time = (long) item.getValue().get("time");
             if (DateUtils.getTimeStamp(ZonedDateTime.now().plusHours(1)) > time) {
                 items.remove();
-                BrokerService.deleteTask(item.getKey());
+                MasterService.addWAIT_DELETE_TASK(item.getKey());
             }
         }
     }

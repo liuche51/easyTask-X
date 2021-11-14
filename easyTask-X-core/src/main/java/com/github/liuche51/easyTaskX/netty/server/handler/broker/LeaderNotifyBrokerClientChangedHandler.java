@@ -45,7 +45,7 @@ public class LeaderNotifyBrokerClientChangedHandler extends BaseHandler {
                         }
                         MasterService.WAIT_RESPONSE_CLINET_TASK_RESULT.remove(items[1]);
                         all.forEach(x->{
-                            BrokerService.deleteTask(x.getId());
+                            MasterService.addWAIT_DELETE_TASK(x.getId());
                         });
                         if (ScheduleDao.isExistByExecuter(bn.getAddress())) {
                             BrokerService.notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus(NodeSyncDataStatusEnum.SYNCING);

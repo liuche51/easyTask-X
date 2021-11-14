@@ -125,7 +125,7 @@ public class ScheduleBinLogSyncTask extends TimerTask {
     private static void addWAIT_RESPONSE_MASTER_TASK_RESULT(String master, SubmitTaskResult submitTaskResult) {
         LinkedBlockingQueue<SubmitTaskResult> queue = SlaveService.WAIT_RESPONSE_MASTER_TASK_RESULT.get(master);
         if (queue == null) {
-            SlaveService.WAIT_RESPONSE_MASTER_TASK_RESULT.put(master, new LinkedBlockingQueue<SubmitTaskResult>(NodeService.getConfig().getAdvanceConfig().getWaitSubmitTaskQueueCapacity()));
+            SlaveService.WAIT_RESPONSE_MASTER_TASK_RESULT.put(master, new LinkedBlockingQueue<SubmitTaskResult>(NodeService.getConfig().getAdvanceConfig().getTaskQueueCapacity()));
             queue = SlaveService.WAIT_RESPONSE_MASTER_TASK_RESULT.get(queue);
         }
         try {
