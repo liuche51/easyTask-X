@@ -87,17 +87,17 @@ public class ScheduleDao {
         return list;
     }
 
-    public static List<Schedule> selectByTaskId(String taskId) throws SQLException {
+    public static List<Schedule> selectByCount(int count) throws SQLException {
         List<Schedule> list = new LinkedList<>();
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
-            ResultSet resultSet = helper.executeQuery("SELECT * FROM " + tableName + " where id = '" + taskId + "';");
+            ResultSet resultSet = helper.executeQuery("SELECT * FROM " + tableName + " where status != 2 limit " + count + ";");
             while (resultSet.next()) {
                 Schedule schedule = getSchedule(resultSet);
                 list.add(schedule);
             }
         } catch (SQLiteException e) {
-            SqliteHelper.writeDatabaseLockedExceptionLog(e, "ScheduleDao->selectByTaskId");
+            SqliteHelper.writeDatabaseLockedExceptionLog(e, "ScheduleDao->selectIdsByExecuter");
         } finally {
             helper.destroyed();
         }

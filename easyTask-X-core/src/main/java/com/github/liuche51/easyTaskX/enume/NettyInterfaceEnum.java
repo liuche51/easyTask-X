@@ -39,6 +39,10 @@ public class NettyInterfaceEnum {
      */
     public static final String FollowHeartbeatToLeader="FollowHeartbeatToLeader";
     /**
+     *follow通知leader，已经重新启动了
+     */
+    public static final String FollowNotifyLeaderHasRestart="FollowNotifyLeaderHasRestart";
+    /**
      * leader通知slaves已经选出新master
      */
     public static final String LeaderNotiySlaveVotedNewMaster="LeaderNotiySlaveVotedNewMaster";
@@ -103,4 +107,6 @@ public class NettyInterfaceEnum {
      *broker通知leader，已经完成重新分配任务至新client以及salve的数据同步。请求更新数据同步状态
      */
     public static final String BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus="BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus";
+
+
 }

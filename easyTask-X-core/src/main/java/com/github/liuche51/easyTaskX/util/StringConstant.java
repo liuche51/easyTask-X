@@ -19,6 +19,7 @@ public class StringConstant {
     public static final String SUCCESS = "success";
 
     public static final String UPDATE_HEARTBEATS = "updateHeartbeats";
+    public static final String ALIVE = "alive";
 
 
 }

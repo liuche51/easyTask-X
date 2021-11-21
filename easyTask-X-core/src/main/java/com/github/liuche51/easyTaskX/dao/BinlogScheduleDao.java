@@ -70,7 +70,10 @@ public class BinlogScheduleDao {
         }
         return list;
     }
-
+    public static void deleteAll() throws SQLException, ClassNotFoundException {
+        String sql = "delete FROM " + tableName + ";";
+        SqliteHelper.executeUpdateForSync(sql, dbName, ScheduleDao.getLock());
+    }
     private static BinlogSchedule getBinlogSchedule(ResultSet resultSet) throws SQLException {
         long id = resultSet.getLong("id");
         String sql = resultSet.getString("sql");

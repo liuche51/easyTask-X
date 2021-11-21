@@ -1,5 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.leader.BakLeaderService;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
@@ -12,6 +13,9 @@ import com.github.liuche51.easyTaskX.dao.dbinit.DbInit;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.MasterNode;
 import com.github.liuche51.easyTaskX.dto.Node;
+import com.github.liuche51.easyTaskX.dto.db.HistorySchedule;
+import com.github.liuche51.easyTaskX.dto.db.Schedule;
+import com.github.liuche51.easyTaskX.enume.ScheduleStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.server.NettyServer;
 import com.github.liuche51.easyTaskX.socket.CmdServer;
@@ -27,8 +31,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class NodeService {
     private static Logger log = LoggerFactory.getLogger(NodeService.class);
     private static EasyTaskConfig config = null;
-    public static volatile boolean isStarted = false;//是否已经启动
-    public static volatile boolean isFirstStarted = true;//当前节点是否属于首次启动注册到leader。默认是
+    public static volatile boolean IS_STARTED = false;//是否已经启动
+    public static volatile boolean IS_FIRST_STARTED = true;//当前节点是否属于首次启动注册到leader。默认是
     /**
      * 集群所有可用的clients
      */
@@ -76,7 +80,7 @@ public class NodeService {
      */
     public static synchronized void start(EasyTaskConfig config) throws Exception {
         //避免重复执行
-        if (isStarted)
+        if (IS_STARTED)
             return;
         if (config == null)
             throw new Exception("config is null,please set a EasyTaskConfig!");
@@ -85,19 +89,20 @@ public class NodeService {
         DbInit.init();//初始化数据库
         NettyServer.getInstance().run();//启动组件的Netty服务端口
         CmdServer.init();//启动命令服务的socket端口
-        initCURRENT_NODE();//初始化本节点的集群服务
-        isStarted = true;
+        initCURRENT_NODE(true);//初始化本节点的集群服务
+        IS_STARTED = true;
     }
 
     /**
      * 初始化当前节点的集群。
      * (系统重启或因心网络问题被leader踢出，然后又恢复了)
-     *
+     * @param isFirstStarted 是否首次初始化。进程重启属于首次
      * @return
      */
-    public static void initCURRENT_NODE() throws Exception {
+    public static void initCURRENT_NODE(boolean isFirstStarted) throws Exception {
         clearThreadTask();
-        deleteAllData();
+        if (isFirstStarted&&!NodeUtil.isAliveInCluster())
+            NodeUtil.clearAllData();
         CURRENT_NODE = new Node(Util.getLocalIP(), NodeService.getConfig().getServerPort());
         timerTasks.add(BrokerService.startHeartBeat());
         timerTasks.add(clearDataTask());
@@ -112,18 +117,6 @@ public class NodeService {
         ZKService.listenLeaderDataNode();
     }
 
-    /**
-     * 清空所有表的记录
-     * 节点宕机后，重启。或失去联系zk后又重新连接了。都视为新节点加入集群。加入前需要清空所有记录，避免有重复数据在集群中
-     */
-    public static void deleteAllData() {
-        try {
-            ScheduleDao.deleteAll();
-            ScheduleBakDao.deleteAll();
-        } catch (Exception e) {
-            log.error("deleteAllData exception!", e);
-        }
-    }
 
     public static TimerTask clearDataTask() {
         ClearDataTask task = new ClearDataTask();
@@ -143,24 +136,5 @@ public class NodeService {
             x.setExit(true);
         });
         onceTasks.clear();
-    }
-
-    /**
-     * 测试目标主机是否都可以联通
-     *
-     * @param list
-     * @return
-     */
-    public static boolean canAllConnect(List<BaseNode> list) {
-        for (BaseNode node : list) {
-            try {
-                NettyClient client = node.getClient();
-                if (client == null) return false;
-            } catch (Exception e) {
-                log.info("normally exception!canAllConnect() failed.object address=" + node.getAddress());
-                return false;
-            }
-        }
-        return true;
     }
 }

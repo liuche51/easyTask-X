@@ -28,6 +28,7 @@ public class DbInit {
             }
             ScheduleInit.initSchedule();
             ScheduleInit.initBinlog();
+            ScheduleInit.initHistory();
             ScheduleBakInit.initSchedule();
             LogInit.initLogError();
             ClusterMetadataBinlogInit.initClusterMetadataBinlog();

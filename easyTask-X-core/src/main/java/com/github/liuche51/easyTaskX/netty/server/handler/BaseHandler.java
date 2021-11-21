@@ -38,6 +38,7 @@ public abstract class BaseHandler {
                 //Follow to  leader
                 put(NettyInterfaceEnum.FollowHeartbeatToLeader,new FollowHeartbeatToLeaderHandler());
                 put(NettyInterfaceEnum.FollowRequestLeaderSendRegedit,new FollowRequestLeaderSendRegeditHandler());
+                put(NettyInterfaceEnum.FollowNotifyLeaderHasRestart,new FollowNotifyLeaderHasRestartHandler());
                 //Leader to Broker
                 put(NettyInterfaceEnum.LeaderNotifyBrokerUpdateRegedit,new LeaderNotifyBrokerUpdateRegeditHandler());
                 put(NettyInterfaceEnum.LeaderNotifyBrokerClientChanged,new LeaderNotifyBrokerClientChangedHandler());

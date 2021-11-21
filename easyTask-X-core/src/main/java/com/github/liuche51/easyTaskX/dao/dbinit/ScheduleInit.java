@@ -53,4 +53,17 @@ public class ScheduleInit {
             helper.executeUpdate(sql);
         }
     }
+    public static void initHistory() throws SQLException, ClassNotFoundException {
+        boolean exist = BinlogScheduleDao.existTable();
+        if (!exist) {
+            //本地待运行的任务
+            String sql = "CREATE TABLE \"" + DbTableName.HIS_SCHEDULE + "\" (\n" +
+                    "\"id\"  TEXT PRIMARY KEY NOT NULL,\n" +
+                    "\"content\"  TEXT,\n" +
+                    "\"create_time\"  TEXT\n" +
+                    ");";
+            SqliteHelper helper = new SqliteHelper(DbTableName.HIS_SCHEDULE);
+            helper.executeUpdate(sql);
+        }
+    }
 }
