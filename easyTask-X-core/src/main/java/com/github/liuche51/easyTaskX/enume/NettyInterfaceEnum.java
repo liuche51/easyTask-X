@@ -6,9 +6,13 @@ public class NettyInterfaceEnum {
      */
     public static final String ClientSubmitTaskToBroker="ClientSubmitTaskToBroker";
     /**
-     * 客户端删除任务
+     * 客户端内部删除任务
      */
     public static final String ClientNotifyBrokerDeleteTask="ClientNotifyBrokerDeleteTask";
+    /**
+     * 客户端全局通缉模式删除任务
+     */
+    public static final String ClientNotifyLeaderDeleteTask="ClientNotifyLeaderDeleteTask";
     /**
      * 预备提交任务接口。阶段一
      */

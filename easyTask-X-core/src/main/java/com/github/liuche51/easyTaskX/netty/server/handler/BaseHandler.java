@@ -10,11 +10,14 @@ import com.github.liuche51.easyTaskX.netty.server.handler.master.SlaveNotifyMast
 import com.github.liuche51.easyTaskX.netty.server.handler.master.SlaveRequestMasterGetScheduleBinlogDataHandler;
 import com.github.liuche51.easyTaskX.netty.server.handler.slave.*;
 import com.google.protobuf.ByteString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class BaseHandler {
+    protected static final Logger log = LoggerFactory.getLogger(BaseHandler.class);
     public static Map<String,BaseHandler> INSTANCES;
     static {
         INSTANCES=new HashMap<String,BaseHandler>(){
@@ -24,6 +27,7 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.ClientNotifyBrokerDeleteTask,new ClientNotifyBrokerDeleteTaskHandler());
                 //Client to Leader
                 put(NettyInterfaceEnum.ClientRequestLeaderSendBrokers,new ClientRequestLeaderSendBrokersHandler());
+                put(NettyInterfaceEnum.ClientNotifyLeaderDeleteTask,new ClientNotifyLeaderDeleteTaskHandler());
                 //slave to master
                 put(NettyInterfaceEnum.SlaveRequestMasterGetScheduleBinlogData,new SlaveRequestMasterGetScheduleBinlogDataHandler());
                 put(NettyInterfaceEnum.BakLeaderRequestLeaderGetClusterMetaBinlogData,new BakLeaderRequestLeaderGetClusterMetaBinlogDataHandler());
