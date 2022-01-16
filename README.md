@@ -10,7 +10,7 @@
 * 会员登录系统30秒后自动发送一条登录短信通知
 * 每个登录用户每隔10秒统计一次其某活动中获得的积分
 
-## 特性(Features)
+## 设计目标(Design goal)
 
 ![Architecture](https://images.cnblogs.com/cnblogs_com/liuche/1811577/o_200722062611QQ%E5%9B%BE%E7%89%8720200722142544.png)
 * 高可用：因为我们是分布式master-slave集群，每个任务多有多个备份数据，节点宕机，集群自动重新选举和恢复。所以可靠性非常高
