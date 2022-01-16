@@ -1,7 +1,7 @@
 # easyTask-X
 
-* 一个方便触发一次性或周期性任务执行的分布式架构组件，支持海量,高并发,高可用的任务处理
-* A distributed architecture component that facilitates the triggering of one-time or periodic task execution, supporting massive, highly concurrent, and highly available task processing
+* 一个方便触发一次性或周期性任务执行的分布式架构中间件，支持海量,高并发,高可用,强一致性的超大规模任务处理。
+* a distributed architecture middleware that can easily trigger one-time or periodic task execution, supports massive, high concurrency, high availability and strong consistency of large-scale task processing.
 
 ## 使用场景(Usage scenarios)
 
