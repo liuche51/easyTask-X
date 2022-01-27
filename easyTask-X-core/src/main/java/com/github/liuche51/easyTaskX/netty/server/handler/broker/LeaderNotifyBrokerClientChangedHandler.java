@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.netty.server.handler.broker;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerUtil;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.cluster.task.broker.ReDispatchToClientTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
@@ -36,6 +37,7 @@ public class LeaderNotifyBrokerClientChangedHandler extends BaseHandler {
                 while (temps.hasNext()) {
                     BaseNode bn = temps.next();
                     if (bn.getAddress().equals(items[1])) {
+                        BrokerUtil.notifyLeaderChangeRegNodeStatus();
                         NodeService.CURRENT_NODE.getClients().remove(bn);
                         //移除该客户端任务反馈发送队列，如果队列中有反馈的任务，则需要删除之
                         LinkedBlockingQueue<SubmitTaskResult> submitTaskResults = MasterService.WAIT_RESPONSE_CLINET_TASK_RESULT.get(items[1]);

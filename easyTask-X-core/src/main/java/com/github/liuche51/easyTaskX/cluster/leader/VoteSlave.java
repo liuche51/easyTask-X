@@ -5,7 +5,9 @@ import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
+import com.github.liuche51.easyTaskX.enume.DataStatusEnum;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
+import com.github.liuche51.easyTaskX.enume.NodeStatusEnum;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.StringConstant;
@@ -34,12 +36,12 @@ public class VoteSlave {
     }
 
     /**
-     * 节点启动初始化选举follows。
+     * 节点启动初始化选举slave。
      *
      * @return
      */
     public static List<RegNode> initVoteSlaves(RegBroker regNode) throws Exception {
-        if (selecting) throw new VotingException(String.format("[%s] is voting a new follow", regNode.getAddress()));
+        if (selecting) throw new VotingException(String.format("[%s] is voting a new slave", regNode.getAddress()));
         selecting = true;
         int count = NodeService.getConfig().getBackupCount();
         try {
@@ -54,7 +56,7 @@ public class VoteSlave {
                 slaves.forEach(x -> {
                     slaves2.put(x.getAddress(), x);
                 });
-                updateRegedit(regNode, slaves2);
+                updateNodeRegedit(regNode, slaves2);
                 return slaves;
             }
         } finally {
@@ -84,7 +86,7 @@ public class VoteSlave {
                 voteNewSlave(regNode, oldSlave);//数量不够递归重新选
             else {
                 RegNode newSlave = slaves.get(0);
-                updateRegedit(regNode, oldSlave.getAddress(), newSlave);
+                updateNodeRegedit(regNode, oldSlave.getAddress(), newSlave);
             }
 
         } finally {
@@ -165,27 +167,31 @@ public class VoteSlave {
     /**
      * 节点初始化选新slaves，更新注册表
      *
-     * @param regNode
+     * @param master
      * @param newSlaves
      */
-    private static void updateRegedit(RegBroker regNode, ConcurrentHashMap<String, RegNode> newSlaves) {
-        regNode.setSlaves(newSlaves);
+    private static void updateNodeRegedit(RegBroker master, ConcurrentHashMap<String, RegNode> newSlaves) {
+        master.setSlaves(newSlaves);
         Iterator<Map.Entry<String, RegNode>> items = newSlaves.entrySet().iterator();
         while (items.hasNext()) {
             Map.Entry<String, RegNode> item = items.next();
             RegNode node = item.getValue();
             RegBroker slaveRegnode = LeaderService.BROKER_REGISTER_CENTER.get(node.getAddress());
-            slaveRegnode.getMasters().put(regNode.getAddress(), new RegNode(regNode));
+            slaveRegnode.getMasters().put(master.getAddress(), new RegNode(master));
+            slaveRegnode.setDataStatus(DataStatusEnum.UNSYNC);
+            slaveRegnode.setNodeStatus(NodeStatusEnum.RECOVERING);
         }
     }
 
     /**
-     * 旧follow失效，选新follow。更新注册表
+     * 旧Slave失效，选新Slave。更新注册表
      *
      * @param regNode
      * @param oldSlave
      */
-    private static void updateRegedit(RegBroker regNode, String oldSlave, RegNode newSlave) {
+    private static void updateNodeRegedit(RegBroker regNode, String oldSlave, RegNode newSlave) {
+        regNode.setDataStatus(DataStatusEnum.UNSYNC);
+        newSlave.setNodeStatus(NodeStatusEnum.RECOVERING);
         regNode.getSlaves().remove(oldSlave);
         regNode.getSlaves().put(newSlave.getAddress(), newSlave);
         RegBroker newSlaveRegNode = LeaderService.BROKER_REGISTER_CENTER.get(newSlave.getAddress());

@@ -11,6 +11,7 @@ import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegClient;
 import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.dto.db.BinlogClusterMeta;
+import com.github.liuche51.easyTaskX.enume.NodeStatusEnum;
 import com.github.liuche51.easyTaskX.enume.OperationTypeEnum;
 import com.github.liuche51.easyTaskX.enume.RegNodeTypeEnum;
 import com.github.liuche51.easyTaskX.util.DateUtils;
@@ -60,21 +61,14 @@ public class CheckFollowsAliveTask extends TimerTask {
                     try {
                         //master节点失效,且有Slaves。选新master
                         if (DateUtils.isGreaterThanLoseTime(regNode.getLastHeartbeat())) {
-                            List<BinlogClusterMeta> binlogClusterMetas = new ArrayList<>(regNode.getSlaves().size() + 1);
-                            binlogClusterMetas.add(new BinlogClusterMeta(OperationTypeEnum.DELETE, RegNodeTypeEnum.REGBROKER, regNode.getAddress(), StringConstant.EMPTY));
+                            regNode.setNodeStatus(NodeStatusEnum.RECOVERING);
                             //如果有Slaves。则选出新master，并通知它们。没有则直接移出注册表
                             RegNode newMaster = null;
                             if (regNode.getSlaves().size() > 0) {
-                                newMaster = VoteMaster.voteNewMaster(regNode.getSlaves());
-                                VoteMaster.updateRegedit(regNode);
-                                Iterator<String> items = regNode.getSlaves().keySet().iterator();
-                                while (items.hasNext()) {
-                                    String item = items.next();
-                                    binlogClusterMetas.add(new BinlogClusterMeta(OperationTypeEnum.UPDATE, RegNodeTypeEnum.REGBROKER, item, JSONObject.toJSONString(brokers.get(item))));
-                                }
+                                newMaster = VoteMaster.voteNewMaster(regNode);
                                 LeaderService.notifySlaveVotedNewMaster(regNode.getSlaves(), newMaster.getAddress(), regNode.getAddress());
                             }
-                            BinlogClusterMetaDao.saveBatch(binlogClusterMetas);
+                            BinlogClusterMetaDao.saveBatch(addBinlogClusterMetaForVotingNewMaster(regNode));
                             LeaderService.notifyFollowsUpdateRegedit(regNode.getSlaves(), StringConstant.BROKER);
                             LeaderService.notifyClinetsChangedBroker(regNode.getAddress(), newMaster == null ? null : newMaster.getAddress(), OperationTypeEnum.DELETE);
                         }
@@ -87,12 +81,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                                 try {
                                     List<RegNode> newSlaves = VoteSlave.initVoteSlaves(regNode);
                                     LeaderService.notifyFollowsUpdateRegedit(newSlaves, StringConstant.BROKER);
-                                    List<BinlogClusterMeta> binlogClusterMetas = new ArrayList<>(newSlaves.size() + 1);
-                                    binlogClusterMetas.add(new BinlogClusterMeta(OperationTypeEnum.UPDATE, RegNodeTypeEnum.REGBROKER, regNode.getAddress(), JSONObject.toJSONString(regNode)));
-                                    for (RegNode newslave : newSlaves) {
-                                        binlogClusterMetas.add(new BinlogClusterMeta(OperationTypeEnum.UPDATE, RegNodeTypeEnum.REGBROKER, newslave.getAddress(), JSONObject.toJSONString(LeaderService.BROKER_REGISTER_CENTER.get(newslave.getAddress()))));
-                                    }
-                                    BinlogClusterMetaDao.saveBatch(binlogClusterMetas);
+                                    BinlogClusterMetaDao.saveBatch(addBinlogClusterMetaForVotingAllSlaves(regNode));
                                     //如果当前节点是Leader自己选slave，则需要通知所有其他所有Follows更新备用Leader信息。以及写入bakleader心跳信息队列
                                     if (regNode.getAddress().equals(NodeService.CURRENT_NODE.getClusterLeader().getAddress())) {
                                         LeaderService.changeFollowsHeartbeats();
@@ -119,14 +108,8 @@ public class CheckFollowsAliveTask extends TimerTask {
                                             if (regNode.getAddress().equals(NodeService.CURRENT_NODE.getClusterLeader().getAddress())) {
                                                 LeaderService.changeFollowsHeartbeats();
                                             }
-                                            List<RegNode> nodes = new ArrayList<>(2);
-                                            nodes.add(regNode);
-                                            nodes.add(newSlave);
-                                            LeaderService.notifyFollowsUpdateRegedit(nodes, StringConstant.BROKER);
-                                            List<BinlogClusterMeta> binlogClusterMetas = new ArrayList<>(2);
-                                            binlogClusterMetas.add(new BinlogClusterMeta(OperationTypeEnum.UPDATE, RegNodeTypeEnum.REGBROKER, regNode.getAddress(), JSONObject.toJSONString(regNode)));
-                                            binlogClusterMetas.add(new BinlogClusterMeta(OperationTypeEnum.UPDATE, RegNodeTypeEnum.REGBROKER, newSlave.getAddress(), JSONObject.toJSONString(LeaderService.BROKER_REGISTER_CENTER.get(newSlave.getAddress()))));
-                                            BinlogClusterMetaDao.saveBatch(binlogClusterMetas);
+                                            LeaderService.notifyFollowsUpdateRegedit(Arrays.asList(regNode,newSlave), StringConstant.BROKER);
+                                            BinlogClusterMetaDao.saveBatch(addBinlogClusterMetaForVotingNewSlave(regNode,newSlave));
                                             //如果当前节点是Leader自己变更slave，则需要通知所有其他所有Follows更新备用Leader信息
                                             if (regNode.getAddress().equals(NodeService.CURRENT_NODE.getClusterLeader().getAddress())) {
                                                 LeaderService.notifyFollowsBakLeaderChanged();
@@ -177,6 +160,37 @@ public class CheckFollowsAliveTask extends TimerTask {
                 }
             });
         }
+    }
+
+    private List<BinlogClusterMeta> addBinlogClusterMetaForVotingNewMaster(RegBroker regNode) {
+        List<BinlogClusterMeta> binlogClusterMetas = new ArrayList<>(regNode.getSlaves().size() + 1);
+        binlogClusterMetas.add(new BinlogClusterMeta(OperationTypeEnum.DELETE, RegNodeTypeEnum.REGBROKER, regNode.getAddress(), StringConstant.EMPTY));
+        Iterator<String> items = regNode.getSlaves().keySet().iterator();
+        while (items.hasNext()) {
+            String item = items.next();
+            binlogClusterMetas.add(new BinlogClusterMeta(OperationTypeEnum.UPDATE, RegNodeTypeEnum.REGBROKER, item, JSONObject.toJSONString(LeaderService.BROKER_REGISTER_CENTER.get(item))));
+        }
+        return binlogClusterMetas;
+
+    }
+
+    private List<BinlogClusterMeta> addBinlogClusterMetaForVotingAllSlaves(RegBroker regNode) {
+        List<BinlogClusterMeta> binlogClusterMetas = new ArrayList<>(regNode.getSlaves().size() + 1);
+        binlogClusterMetas.add(new BinlogClusterMeta(OperationTypeEnum.UPDATE, RegNodeTypeEnum.REGBROKER, regNode.getAddress(), JSONObject.toJSONString(regNode)));
+        Iterator<String> items = regNode.getSlaves().keySet().iterator();
+        while (items.hasNext()) {
+            String item = items.next();
+            binlogClusterMetas.add(new BinlogClusterMeta(OperationTypeEnum.UPDATE, RegNodeTypeEnum.REGBROKER, item, JSONObject.toJSONString(LeaderService.BROKER_REGISTER_CENTER.get(item))));
+        }
+        return binlogClusterMetas;
+
+    }
+    private List<BinlogClusterMeta> addBinlogClusterMetaForVotingNewSlave(RegBroker regNode, RegNode newSlave) {
+        List<BinlogClusterMeta> binlogClusterMetas = new ArrayList<>(2);
+        binlogClusterMetas.add(new BinlogClusterMeta(OperationTypeEnum.UPDATE, RegNodeTypeEnum.REGBROKER, regNode.getAddress(), JSONObject.toJSONString(regNode)));
+        binlogClusterMetas.add(new BinlogClusterMeta(OperationTypeEnum.UPDATE, RegNodeTypeEnum.REGBROKER, newSlave.getAddress(), JSONObject.toJSONString(LeaderService.BROKER_REGISTER_CENTER.get(newSlave.getAddress()))));
+        return binlogClusterMetas;
+
     }
 
 }

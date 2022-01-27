@@ -7,7 +7,14 @@ import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
+import com.github.liuche51.easyTaskX.dto.ByteStringPack;
+import com.github.liuche51.easyTaskX.dto.proto.Dto;
+import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
+import com.github.liuche51.easyTaskX.enume.NodeStatusEnum;
+import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.DateUtils;
+import com.github.liuche51.easyTaskX.util.StringConstant;
+import com.github.liuche51.easyTaskX.util.Util;
 
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
@@ -16,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Master清理无用的数据定时任务
+ * 1、
  */
 public class ClearDataTask extends TimerTask {
     @Override
@@ -37,20 +45,22 @@ public class ClearDataTask extends TimerTask {
 
     /**
      * 清理任务备份库数据
-     * 1、master已经失效了的情况下。且自身不是新Master。如果是，则需要等到提交到自身主任务库后，才能清理。不再此处操作
+     * 1、master已经失效了的情况下。
+     * 2、且自身不是新Master。如果是，则需要等到提交到自身主任务库后，才能清理。不再此处操作
      */
-    private void clearScheduleBakData(){
+    private void clearScheduleBakData() {
         try {
-            Map<String, BaseNode> leaders = NodeService.CURRENT_NODE.getMasters();
-            Iterator<Map.Entry<String, BaseNode>> items = leaders.entrySet().iterator();//使用遍历+移除操作安全的迭代器方式
-            List<String> sources = new ArrayList<>(leaders.size());
+            if (!requestLeaderNodeStatusIsNormal()) return;//只有正常状态才能清理。
+            Map<String, BaseNode> masters = NodeService.CURRENT_NODE.getMasters();
+            Iterator<Map.Entry<String, BaseNode>> items = masters.entrySet().iterator();//使用遍历+移除操作安全的迭代器方式
+            List<String> sources = new ArrayList<>(masters.size());
             while (items.hasNext()) {
                 Map.Entry<String, BaseNode> item = items.next();
                 sources.add(item.getValue().getAddress());
             }
-            ScheduleBakDao.deleteBySources(sources.toArray(new String[sources.size()]));
-        }catch (Exception e){
-            log.error("",e);
+            ScheduleBakDao.deleteNotInBySources(sources.toArray(new String[sources.size()]));
+        } catch (Exception e) {
+            log.error("", e);
         }
     }
 
@@ -68,5 +78,30 @@ public class ClearDataTask extends TimerTask {
                 MasterService.addWAIT_DELETE_TASK(item.getKey());
             }
         }
+    }
+
+    /**
+     * 请求leader当前节点状态是否正常
+     *
+     * @return
+     */
+    public static boolean requestLeaderNodeStatusIsNormal() {
+        try {
+            Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestLeaderGetNodeStatus).setSource(NodeService.getConfig().getAddress())
+                    .setBody(StringConstant.BROKER);
+            ByteStringPack respPack = new ByteStringPack();
+            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENT_NODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
+            if (ret) {
+                String result = respPack.getRespbody().toStringUtf8();
+                if (String.valueOf(NodeStatusEnum.NORMAL).equals(result))
+                    return true;
+            } else {
+                log.info("normally exception!requestLeaderNodeStatusIsNormal() failed.");
+            }
+        } catch (Exception e) {
+            log.error("", e);
+        }
+        return false;
     }
 }

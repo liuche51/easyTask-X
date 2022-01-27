@@ -85,7 +85,7 @@ public class ScheduleBakDao {
         SqliteHelper.executeUpdateForSync(sql, dbName, lock);
     }
 
-    public static void deleteBySources(String[] sources) throws SQLException, ClassNotFoundException {
+    public static void deleteNotInBySources(String[] sources) throws SQLException, ClassNotFoundException {
         if (sources == null || sources.length == 0) return;
         String conditionStr = SqliteHelper.getInConditionStr(sources);
         String sql = "delete FROM " + tableName + " where source not in" + conditionStr + ";";

@@ -8,6 +8,9 @@ public class HistorySchedule {
     private String content;
     private String createTime;
 
+    public HistorySchedule() {
+    }
+
     public HistorySchedule(String id, String content) {
         this.id = id;
         this.content = content;

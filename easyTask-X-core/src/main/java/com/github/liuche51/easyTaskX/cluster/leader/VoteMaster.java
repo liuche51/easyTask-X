@@ -4,7 +4,9 @@ import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
+import com.github.liuche51.easyTaskX.enume.DataStatusEnum;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
+import com.github.liuche51.easyTaskX.enume.NodeStatusEnum;
 import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.StringConstant;
@@ -27,35 +29,46 @@ public class VoteMaster {
     /**
      * leader从slaves中选择新的master
      *1、优先选取数据同步状态为已同步的节点
-     * @param slaves
+     * @param oldmaster
      * @return
      */
-    public static RegNode voteNewMaster(Map<String, RegNode> slaves) {
-        Collection<RegNode> salves = slaves.values();
+    public static RegNode voteNewMaster( RegBroker oldmaster) {
+        Collection<RegNode> salves = oldmaster.getSlaves().values();
+        RegNode newMaster=null;
         List<RegNode> temp = salves.stream().filter(x -> x.getDataStatus().intValue() == 1).collect(Collectors.toList());
         if(temp!=null&&temp.size()>0){
-            return temp.get(0);
+            newMaster= temp.get(0);
         }else {
             RegNode[] regNodes = salves.toArray(new RegNode[]{});
-            return regNodes[0];
+            newMaster= regNodes[0];
         }
+        VoteMaster.updateNodeRegedit(oldmaster,newMaster);
+        return newMaster;
     }
 
     /**
      * 新master选举后，leader更新注册表
+     * 1、将当前master节点移出注册表
+     * 2、将当前master的slave节点的从其master集合中移出
      *
-     * @param regBroker
+     * @param oldmaster
+     * @param newMaster
      */
-    public static void updateRegedit(RegBroker regBroker) {
-        LeaderService.BROKER_REGISTER_CENTER.remove(regBroker.getAddress());
-        Map<String, RegNode> slaves = regBroker.getSlaves();
+    private static void updateNodeRegedit(RegBroker oldmaster,RegNode newMaster) {
+        LeaderService.BROKER_REGISTER_CENTER.remove(oldmaster.getAddress());
+        Map<String, RegNode> slaves = oldmaster.getSlaves();
         if (slaves.size() > 0) {
             Iterator<Map.Entry<String, RegNode>> items = slaves.entrySet().iterator();
             while (items.hasNext()) {
                 RegNode regNode = items.next().getValue();
                 RegBroker slave = LeaderService.BROKER_REGISTER_CENTER.get(regNode.getAddress());
                 if (slave != null) {
-                    slave.getMasters().remove(regBroker.getAddress());
+                    slave.getMasters().remove(oldmaster.getAddress());
+                    if(slave.getAddress().equals(newMaster.getAddress())){
+                        slave.setNodeStatus(NodeStatusEnum.RECOVERING);
+                        slave.setDataStatus(DataStatusEnum.UNSYNC);
+                    }
+
                 }
             }
         }

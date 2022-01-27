@@ -86,8 +86,24 @@ public class ScheduleDao {
         }
         return list;
     }
+    public static List<Schedule> selectByTaskId(String taskId) throws SQLException {
+        List<Schedule> list = new LinkedList<>();
+        SqliteHelper helper = new SqliteHelper(dbName);
+        try {
+            ResultSet resultSet = helper.executeQuery("SELECT * FROM " + tableName + " where id = '" + taskId + "';");
+            while (resultSet.next()) {
+                Schedule schedule = getSchedule(resultSet);
+                list.add(schedule);
+            }
 
-    public static List<Schedule> selectByCount(int count) throws SQLException {
+        } catch (SQLiteException e) {
+            SqliteHelper.writeDatabaseLockedExceptionLog(e, "ScheduleDao->selectByTaskId");
+        } finally {
+            helper.destroyed();
+        }
+        return list;
+    }
+        public static List<Schedule> selectByCount(int count) throws SQLException {
         List<Schedule> list = new LinkedList<>();
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
