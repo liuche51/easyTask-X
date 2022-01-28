@@ -121,26 +121,4 @@ public class BrokerService {
         BrokerUtil.updateMasterBinlogInfo(masters);
     }
 
-
-    /**
-     * broker通知leader，已经完成重新分配任务至新client以及salve的数据同步。请求更新数据同步状态
-     */
-    public static void notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus(Short reDispatchTaskStatus) {
-        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus)
-                            .setSource(NodeService.CURRENT_NODE.getAddress()).setBody(String.valueOf(reDispatchTaskStatus));
-                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENT_NODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
-                    if (!ret) {
-                        LogErrorUtil.writeRpcErrorMsgToDb("broker通知leader，已经完成重新分配任务至新client以及salve的数据同步，请求更新数据同步状态 失败！", "com.github.liuche51.easyTaskX.cluster.follow.BrokerService.notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus");
-                    }
-                } catch (Exception e) {
-                    log.error("", e);
-                }
-            }
-        });
-    }
 }

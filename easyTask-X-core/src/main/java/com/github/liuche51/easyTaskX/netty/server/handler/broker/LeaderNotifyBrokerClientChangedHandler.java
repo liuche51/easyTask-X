@@ -9,15 +9,14 @@ import com.github.liuche51.easyTaskX.dao.ScheduleDao;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.SubmitTaskResult;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
-import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
+import com.github.liuche51.easyTaskX.enume.NodeStatusEnum;
 import com.github.liuche51.easyTaskX.enume.OperationTypeEnum;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.github.liuche51.easyTaskX.util.StringConstant;
+import com.github.liuche51.easyTaskX.util.Util;
 import com.google.protobuf.ByteString;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -37,20 +36,21 @@ public class LeaderNotifyBrokerClientChangedHandler extends BaseHandler {
                 while (temps.hasNext()) {
                     BaseNode bn = temps.next();
                     if (bn.getAddress().equals(items[1])) {
-                        BrokerUtil.notifyLeaderChangeRegNodeStatus();
                         NodeService.CURRENT_NODE.getClients().remove(bn);
                         //移除该客户端任务反馈发送队列，如果队列中有反馈的任务，则需要删除之
                         LinkedBlockingQueue<SubmitTaskResult> submitTaskResults = MasterService.WAIT_RESPONSE_CLINET_TASK_RESULT.get(items[1]);
-                        List<SubmitTaskResult> all=new ArrayList<>(submitTaskResults.size());
-                        if(submitTaskResults!=null&&submitTaskResults.size()>0){
-                            submitTaskResults.drainTo(all,Integer.MAX_VALUE);
+                        List<SubmitTaskResult> all = new ArrayList<>(submitTaskResults.size());
+                        if (submitTaskResults != null && submitTaskResults.size() > 0) {
+                            submitTaskResults.drainTo(all, Integer.MAX_VALUE);
                         }
                         MasterService.WAIT_RESPONSE_CLINET_TASK_RESULT.remove(items[1]);
-                        all.forEach(x->{
+                        all.forEach(x -> {
                             MasterService.addWAIT_DELETE_TASK(x.getId());
                         });
                         if (ScheduleDao.isExistByExecuter(bn.getAddress())) {
-                            BrokerService.notifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus(NodeSyncDataStatusEnum.SYNCING);
+                            Map<String, Integer> map = new HashMap<>(Util.getMapInitCapacity(2));
+                            map.put(StringConstant.NODESTATUS, NodeStatusEnum.RECOVERING);
+                            BrokerUtil.notifyLeaderChangeRegNodeStatus(map);
                             ReDispatchToClientTask task = new ReDispatchToClientTask(bn);
                             task.start();
                         }

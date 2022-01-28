@@ -1,5 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.follow;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
@@ -15,6 +16,7 @@ import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BrokerUtil {
@@ -49,14 +51,14 @@ public class BrokerUtil {
      *
      * @return
      */
-    public static void notifyLeaderChangeRegNodeStatus() {
+    public static void notifyLeaderChangeRegNodeStatus(Map<String,Integer> attr) {
         NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BrokerNotifyLeaderChangeRegNodeStatus).setSource(NodeService.getConfig().getAddress())
-                            .setBody(StringConstant.BROKER);
+                            .setBody(StringConstant.BROKER+StringConstant.CHAR_SPRIT_COMMA+ JSONObject.toJSONString(attr));
                     ByteStringPack respPack = new ByteStringPack();
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENT_NODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
                     if (!ret) {

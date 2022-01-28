@@ -4,14 +4,8 @@ import com.github.liuche51.easyTaskX.cluster.NodeService;
 
 import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegNode;
-import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.DataStatusEnum;
-import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.NodeStatusEnum;
-import com.github.liuche51.easyTaskX.enume.NodeSyncDataStatusEnum;
-import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
-import com.github.liuche51.easyTaskX.util.StringConstant;
-import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.util.exception.VotedException;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
 import org.slf4j.Logger;

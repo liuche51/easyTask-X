@@ -108,10 +108,6 @@ public class NettyInterfaceEnum {
      */
     public static final String BrokerNotifyClientSubmitTaskResult="BrokerNotifyClientSubmitTaskResult";
     /**
-     *broker通知leader，已经完成重新分配任务至新client以及salve的数据同步。请求更新数据同步状态
-     */
-    public static final String BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus="BrokerNotifyLeaderUpdateRegeditForBrokerReDispatchTaskStatus";
-    /**
      * Broker通知leader修改注册节点的状态信息
      */
     public static final String BrokerNotifyLeaderChangeRegNodeStatus="BrokerNotifyLeaderChangeRegNodeStatus";

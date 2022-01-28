@@ -18,7 +18,7 @@ public class RegNode extends BaseNode {
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private ZonedDateTime createTime;
     /**
-     * 数据一致性状态。
+     * 数据状态。
      * 1、正常状态0，slave数据异步同步master数据跟随正常。没有什么延迟
      * 2、未同步完成状态9，salve当前数据异步同步master存在较大延迟。
      */
@@ -26,8 +26,10 @@ public class RegNode extends BaseNode {
     /**
      * 节点状态。
      * 1、正常状态0，表示当前节点处于正常接受处理任务的状态。
-     * 2、恢复状态9，节点某些操作会被限制，直到恢复到正常状态。比如slave被选为新master，则其定时清除备份库数据就不能执行。
-     * 新选出的salve，需要重新从master同步数据，为了节约时间，这期间需要拿到master快照进行恢复
+     * 2、恢复状态9，节点关系有调整，需要恢复数据一致性。
+     * 此时节点某些操作会被限制，直到恢复到正常状态。
+     * ①比如slave被选为新master，则其定时清除备份库数据就不能执行。新选出的salve，需要重新从master同步数据，为了节约时间，这期间需要拿到master快照进行恢复。
+     * ②client宕机，其上执行的任务
      */
     private volatile int nodeStatus = NodeStatusEnum.NORMAL;
 

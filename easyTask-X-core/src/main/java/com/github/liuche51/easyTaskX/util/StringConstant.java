@@ -20,6 +20,7 @@ public class StringConstant {
 
     public static final String UPDATE_HEARTBEATS = "updateHeartbeats";
     public static final String ALIVE = "alive";
-
+    public static final String DATASTATUS="dataStatus";
+    public static final String NODESTATUS="nodeStatus";
 
 }

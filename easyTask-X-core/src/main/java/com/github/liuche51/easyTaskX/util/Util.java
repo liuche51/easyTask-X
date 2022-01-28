@@ -17,12 +17,15 @@ public class Util {
         str.append(Thread.currentThread().getId());
         return str.toString();
     }
+
     public static String generateTransactionId() {
-        return "T"+generateUniqueId();
+        return "T" + generateUniqueId();
     }
+
     public static String generateIdentityId() {
-        return "I"+generateUniqueId();
+        return "I" + generateUniqueId();
     }
+
     public static String getDefaultDbDirect() throws IOException {
         // 第二种：获取项目路径    D:\git\daotie\daotie
         File directory = new File("");// 参数为空
@@ -31,16 +34,18 @@ public class Util {
     }
 
     public static String getLocalIP() throws Exception {
-        if(isLinux()){
+        if (isLinux()) {
             return getLinuxLocalIP();
-        }else if(isWindows()){
+        } else if (isWindows()) {
             return getWindowsLocalIP();
-        }else
+        } else
             throw new Exception("Unknown System Type!Only support Linux and Windows System.");
     }
+
     /**
      * 获取windows下IP地址
      * 如果在Linux下，则结果都是127.0.0.1
+     *
      * @return
      * @throws UnknownHostException
      */
@@ -55,6 +60,7 @@ public class Util {
     /**
      * 获取Linux下的IP地址
      * 如果在windows下，则结果都是127.0.0.1
+     *
      * @return
      * @throws SocketException
      */
@@ -74,29 +80,44 @@ public class Util {
         }
         return null;
     }
+
     private static boolean isLinux() {
         return System.getProperty("os.name").toLowerCase().contains("linux");
     }
+
     private static boolean isWindows() {
         return System.getProperty("os.name").toLowerCase().contains("windows");
     }
 
     /**
      * 获取任务来源的拼接字符串
+     *
      * @param oldSource
      * @return
      */
     public static String getSource(String oldSource) throws Exception {
-        String source=StringConstant.EMPTY;
-        if(oldSource==null||oldSource== StringConstant.EMPTY)
-            source= NodeService.getConfig().getAddress();
+        String source = StringConstant.EMPTY;
+        if (oldSource == null || oldSource == StringConstant.EMPTY)
+            source = NodeService.getConfig().getAddress();
         else
-            source= NodeService.getConfig().getAddress()+"<-"+oldSource;
+            source = NodeService.getConfig().getAddress() + "<-" + oldSource;
         return source;
     }
-    public static boolean isDevEnvironment(String[] args){
-        if(args.length==2&&"env".equals(args[0])&&"dev".equals(args[1]))
+
+    public static boolean isDevEnvironment(String[] args) {
+        if (args.length == 2 && "env".equals(args[0]) && "dev".equals(args[1]))
             return true;
         else return false;
+    }
+
+    /**
+     * 获得Map合理初始容量大小
+     *
+     * @param size
+     * @return
+     */
+    public static int getMapInitCapacity(int size) {
+        int initCapacity = 1 + (int) (size / 0.75);//避免扩容操作
+        return initCapacity;
     }
 }
