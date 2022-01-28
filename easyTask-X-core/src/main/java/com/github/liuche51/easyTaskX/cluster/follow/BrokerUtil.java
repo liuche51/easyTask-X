@@ -11,6 +11,7 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
+import com.github.liuche51.easyTaskX.util.LogErrorUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
@@ -62,7 +63,7 @@ public class BrokerUtil {
                     ByteStringPack respPack = new ByteStringPack();
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENT_NODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
                     if (!ret) {
-                        log.info("normally exception!notifyLeaderChangeRegNodeStatus() failed.");
+                        LogErrorUtil.writeRpcErrorMsgToDb("Broker通知leader修改注册节点的状态信息。失败！", "com.github.liuche51.easyTaskX.cluster.follow.BrokerUtil.notifyLeaderChangeRegNodeStatus");
                     }
                 } catch (Exception e) {
                     log.error("", e);

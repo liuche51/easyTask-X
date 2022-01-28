@@ -59,7 +59,6 @@ public class VoteMaster {
                     slave.getMasters().remove(oldmaster.getAddress());
                     if(slave.getAddress().equals(newMaster.getAddress())){
                         slave.setNodeStatus(NodeStatusEnum.RECOVERING);
-                        slave.setDataStatus(DataStatusEnum.UNSYNC);
                     }
 
                 }

@@ -37,11 +37,6 @@ public class RegNode extends BaseNode {
         super(baseNode.getHost(), baseNode.getPort());
     }
 
-    public RegNode(String host, int port, Integer dataStatus) {
-        super(host, port);
-        this.dataStatus = dataStatus;
-    }
-
     public RegNode(String host, int port) {
         super(host, port);
     }

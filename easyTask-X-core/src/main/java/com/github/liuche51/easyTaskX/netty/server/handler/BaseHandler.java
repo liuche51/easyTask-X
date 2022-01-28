@@ -33,8 +33,6 @@ public abstract class BaseHandler {
                 put(NettyInterfaceEnum.BakLeaderRequestLeaderGetClusterMetaBinlogData,new BakLeaderRequestLeaderGetClusterMetaBinlogDataHandler());
                 put(NettyInterfaceEnum.BakLeaderQueryOtherBakLeaderDataStatus,new BakLeaderQueryOtherBakLeaderDataStatusHandler());
                 put(NettyInterfaceEnum.SlaveNotifyMasterHasSyncUnUseTask,new SlaveNotifyMasterHasSyncUnUseTaskHandler());
-               //master to leader
-                put(NettyInterfaceEnum.MasterNotifyLeaderChangeSlaveDataStatus,new MasterNotifyLeaderChangeSlaveDataStatusHandler());
                 //Follow to  leader
                 put(NettyInterfaceEnum.FollowHeartbeatToLeader,new FollowHeartbeatToLeaderHandler());
                 put(NettyInterfaceEnum.FollowRequestLeaderSendRegedit,new FollowRequestLeaderSendRegeditHandler());

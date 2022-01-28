@@ -172,8 +172,6 @@ public class VoteSlave {
             RegNode node = item.getValue();
             RegBroker slaveRegnode = LeaderService.BROKER_REGISTER_CENTER.get(node.getAddress());
             slaveRegnode.getMasters().put(master.getAddress(), new RegNode(master));
-            slaveRegnode.setDataStatus(DataStatusEnum.UNSYNC);
-            slaveRegnode.setNodeStatus(NodeStatusEnum.RECOVERING);
         }
     }
 

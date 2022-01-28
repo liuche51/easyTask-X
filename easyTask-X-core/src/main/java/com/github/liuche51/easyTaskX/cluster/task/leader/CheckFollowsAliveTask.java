@@ -61,7 +61,6 @@ public class CheckFollowsAliveTask extends TimerTask {
                     try {
                         //master节点失效,且有Slaves。选新master
                         if (DateUtils.isGreaterThanLoseTime(regNode.getLastHeartbeat())) {
-                            regNode.setNodeStatus(NodeStatusEnum.RECOVERING);
                             //如果有Slaves。则选出新master，并通知它们。没有则直接移出注册表
                             RegNode newMaster = null;
                             if (regNode.getSlaves().size() > 0) {

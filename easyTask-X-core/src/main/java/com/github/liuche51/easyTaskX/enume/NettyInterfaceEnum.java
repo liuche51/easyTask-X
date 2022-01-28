@@ -27,10 +27,6 @@ public class NettyInterfaceEnum {
      */
     public static final String MasterSyncDataToNewSlave="MasterSyncDataToNewSlave";
     /**
-     * master通知leader，变更slave与master数据同步状态
-     */
-    public static final String MasterNotifyLeaderChangeSlaveDataStatus="MasterNotifyLeaderChangeSlaveDataStatus";
-    /**
      * 获取数据库表信息接口
      */
     public static final String GetDBInfoByTaskId="GetDBInfoByTaskId";

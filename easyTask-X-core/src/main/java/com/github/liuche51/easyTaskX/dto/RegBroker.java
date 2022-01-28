@@ -28,10 +28,6 @@ public class RegBroker extends RegNode {
         super(host, port);
     }
 
-    public RegBroker(String host, int port, Integer dataStatus) {
-        super(host, port, dataStatus);
-    }
-
     public RegBroker(String address) {
         super(address);
     }

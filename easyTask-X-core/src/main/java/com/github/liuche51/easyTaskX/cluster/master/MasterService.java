@@ -85,26 +85,6 @@ public class MasterService {
     }
 
     /**
-     * master通知leader，变更slave与master数据同步状态
-     *
-     * @param dataStatus 1已完成同步。0同步中
-     */
-    public static void notifyNotifyLeaderChangeDataStatus(String salve, String dataStatus) {
-        Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-        try {
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.MasterNotifyLeaderChangeSlaveDataStatus).setSource(NodeService.getConfig().getAddress())
-                    .setBody(salve + StringConstant.CHAR_SPRIT_STRING + dataStatus);
-            ByteStringPack respPack = new ByteStringPack();
-            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENT_NODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
-            if (!ret) {
-                LogErrorUtil.writeRpcErrorMsgToDb("master通知leader变更salve与master数据同步状态。失败！", "com.github.liuche51.easyTaskX.cluster.master.MasterService.notifyNotifyLeaderChangeDataStatus");
-            }
-        } catch (Exception e) {
-            log.error("", e);
-        }
-    }
-
-    /**
      * 往所有broker发送队列里添加任务
      *
      * @param address

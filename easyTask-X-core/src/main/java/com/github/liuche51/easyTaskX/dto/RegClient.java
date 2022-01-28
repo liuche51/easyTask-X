@@ -22,10 +22,6 @@ public class RegClient extends RegNode {
         super(host, port);
     }
 
-    public RegClient(String host, int port, Integer dataStatus) {
-        super(host, port, dataStatus);
-    }
-
     public RegClient(String address) {
         super(address);
     }
