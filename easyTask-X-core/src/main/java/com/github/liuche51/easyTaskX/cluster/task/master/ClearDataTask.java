@@ -1,5 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.task.master;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
@@ -14,6 +15,7 @@ import com.github.liuche51.easyTaskX.enume.NodeStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.StringConstant;
+import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
 
 import java.sql.Timestamp;
@@ -88,14 +90,19 @@ public class ClearDataTask extends TimerTask {
     public static boolean requestLeaderNodeStatusIsNormal() {
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestLeaderGetNodeStatus).setSource(NodeService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestLeaderGetRegNodeStatus).setSource(NodeService.getConfig().getAddress())
                     .setBody(StringConstant.BROKER);
             ByteStringPack respPack = new ByteStringPack();
             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENT_NODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
             if (ret) {
                 String result = respPack.getRespbody().toStringUtf8();
-                if (String.valueOf(NodeStatusEnum.NORMAL).equals(result))
-                    return true;
+                if (!StringUtils.isNullOrEmpty(result)) {
+                    Map<String, Integer> map = JSONObject.parseObject(result, Map.class);
+                    Integer value = map.get(StringConstant.NODESTATUS);
+                    if (value.equals(NodeStatusEnum.NORMAL))
+                        return true;
+                }
+
             } else {
                 log.info("normally exception!requestLeaderNodeStatusIsNormal() failed.");
             }

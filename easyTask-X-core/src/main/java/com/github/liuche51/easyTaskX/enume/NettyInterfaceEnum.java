@@ -41,7 +41,7 @@ public class NettyInterfaceEnum {
     /**
      *follow请求leader，获取当前节点状态
      */
-    public static final String FollowRequestLeaderGetNodeStatus="FollowRequestLeaderGetNodeStatus";
+    public static final String FollowRequestLeaderGetRegNodeStatus="FollowRequestLeaderGetRegNodeStatus";
     /**
      * leader通知slaves已经选出新master
      */
