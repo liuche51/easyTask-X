@@ -7,6 +7,5 @@ import org.slf4j.LoggerFactory;
  * 客户端服务
  */
 public class ClientService {
-    private static final Logger log = LoggerFactory.getLogger(ClientService.class);
 
 }

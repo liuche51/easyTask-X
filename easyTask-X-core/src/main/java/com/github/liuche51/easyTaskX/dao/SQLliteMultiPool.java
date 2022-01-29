@@ -3,6 +3,7 @@ package com.github.liuche51.easyTaskX.dao;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.util.DbTableName;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * 单例模式
  */
 public class SQLliteMultiPool {
-    final static Logger logger = LoggerFactory.getLogger(SqliteHelper.class);
     private static final String driver = "org.sqlite.JDBC";
     private Map<String, ConcurrentLinkedQueue<Connection>> pools = new HashMap<>();
     private static SQLliteMultiPool singleton = null;
@@ -72,7 +72,7 @@ public class SQLliteMultiPool {
                 throw new Exception("数据库连接创建失败，返回null值");
             }
         } catch (Exception e) {
-            logger.error("sqlite init connection create fail", e);
+            LogUtil.error("sqlite init connection create fail", e);
         }
         return con;
     }
@@ -107,7 +107,7 @@ public class SQLliteMultiPool {
             try {
                 conn.close();
             } catch (SQLException e) {
-                logger.error("Sqlite connection close exception", e);
+                LogUtil.error("Sqlite connection close exception", e);
             }
         }
     }

@@ -11,7 +11,6 @@ import java.util.Scanner;
  * CMD客户端启动类
  */
 public class CMDApp {
-    private static Logger log = LoggerFactory.getLogger(CMDApp.class);
     private static final String CONNECT_HOST_ADDRESS = "connect host address:";
     private static final String CONNECT = "connect";
     private static final String EXIT = "exit";

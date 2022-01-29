@@ -4,6 +4,7 @@ import com.github.liuche51.easyTaskX.dao.dbinit.DbInit;
 import com.github.liuche51.easyTaskX.dto.db.LogError;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.DbTableName;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class LogErrorDao {
-    private static final Logger log = LoggerFactory.getLogger(LogErrorDao.class);
     /**
      * 访问的db名称
      */
@@ -52,7 +52,7 @@ public class LogErrorDao {
             String sql = contactSaveSql(logErrors);
             SqliteHelper.executeUpdateForSync(sql, dbName, lock);
         } catch (Exception e) {
-            log.error("", e);
+            LogUtil.error("", e);
         }
     }
 

@@ -29,7 +29,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class NodeService {
-    private static Logger log = LoggerFactory.getLogger(NodeService.class);
     private static EasyTaskConfig config = null;
     public static volatile boolean IS_STARTED = false;//是否已经启动
     public static volatile boolean IS_FIRST_STARTED = true;//当前节点是否属于首次启动注册到leader。默认是

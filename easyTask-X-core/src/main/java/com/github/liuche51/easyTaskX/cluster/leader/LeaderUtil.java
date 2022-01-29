@@ -8,10 +8,7 @@ import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.OperationTypeEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
-import com.github.liuche51.easyTaskX.util.LogErrorUtil;
-import com.github.liuche51.easyTaskX.util.StringConstant;
-import com.github.liuche51.easyTaskX.util.StringUtils;
-import com.github.liuche51.easyTaskX.util.Util;
+import com.github.liuche51.easyTaskX.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +16,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class LeaderUtil {
-    private static final Logger log = LoggerFactory.getLogger(VoteSlave.class);
 
     /**
      * 通知节点更新注册表信息
@@ -50,7 +46,7 @@ public class LeaderUtil {
                     }
 
                 } catch (Exception e) {
-                    log.error("", e);
+                    LogUtil.error("", e);
                 }
             }
         });
@@ -109,9 +105,9 @@ public class LeaderUtil {
                             .setSource(NodeService.CURRENT_NODE.getAddress()).setBody(bakLeader);
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, new Node(address).getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret)
-                        log.info("normally exception!notifyFollowBakLeaderChanged() failed.");
+                        LogUtil.info("normally exception!notifyFollowBakLeaderChanged() failed.");
                 } catch (Exception e) {
-                    log.error("", e);
+                    LogUtil.error("", e);
                 }
             }
         });
@@ -140,7 +136,7 @@ public class LeaderUtil {
                        LogErrorUtil.writeRpcErrorMsgToDb("Leader通知Clinets。Broker发生变更。失败！","com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil.notifyClinetChangedBroker");
                     }
                 } catch (Exception e) {
-                    log.error("", e);
+                    LogUtil.error("", e);
                 }
             }
         });
@@ -166,7 +162,7 @@ public class LeaderUtil {
                         LogErrorUtil.writeRpcErrorMsgToDb("Leader通知Broker。有Client注册变更消息。失败！","com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil.notifyBrokerChangedClient");
                     }
                 } catch (Exception e) {
-                    log.error("", e);
+                    LogUtil.error("", e);
                 }
             }
         });

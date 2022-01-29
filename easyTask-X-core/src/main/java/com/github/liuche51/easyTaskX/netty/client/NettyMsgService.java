@@ -8,6 +8,7 @@ import com.github.liuche51.easyTaskX.dto.db.LogError;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
 import com.github.liuche51.easyTaskX.enume.LogErrorTypeEnum;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
@@ -21,7 +22,6 @@ import java.util.concurrent.TimeUnit;
  * Netty客户端通信服务
  */
 public class NettyMsgService {
-    private static final Logger log = LoggerFactory.getLogger(NettyMsgService.class);
 
     /**
      * 发送同步消息
@@ -60,7 +60,7 @@ public class NettyMsgService {
     private static void sendMsgPrintLog(NettyClient conn, Object msg) {
         StringBuilder str = new StringBuilder("Client send to:");
         str.append(conn.getObjectAddress()).append(" msg : ").append(msg);
-        log.debug(str.toString());
+        LogUtil.debug(str.toString());
     }
 
     /**
@@ -85,15 +85,15 @@ public class NettyMsgService {
             } else
                 error = result.getMsg();
         } catch (Exception e) {
-            log.error("sendSyncMsgWithCount.tryCount=" + tryCount, e);
+            LogUtil.error("sendSyncMsgWithCount.tryCount=" + tryCount, e);
         } finally {
             tryCount--;
         }
-        log.info("normally exception!sendSyncMsgWithCount()-> error=" + error + ",tryCount=" + tryCount + ",objectHost=" + client.getObjectAddress());
+        LogUtil.info("normally exception!sendSyncMsgWithCount()-> error=" + error + ",tryCount=" + tryCount + ",objectHost=" + client.getObjectAddress());
         try {
             TimeUnit.SECONDS.sleep(waiteSecond);
         } catch (InterruptedException e) {
-            log.error("", e);
+            LogUtil.error("", e);
         }
         return sendSyncMsgWithCount(builder, client, tryCount, waiteSecond, respPack);
     }

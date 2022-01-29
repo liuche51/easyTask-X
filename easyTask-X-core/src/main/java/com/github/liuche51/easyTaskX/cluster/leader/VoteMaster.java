@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
  * 选Master
  */
 public class VoteMaster {
-    private static final Logger log = LoggerFactory.getLogger(VoteMaster.class);
 
     /**
      * leader从slaves中选择新的master

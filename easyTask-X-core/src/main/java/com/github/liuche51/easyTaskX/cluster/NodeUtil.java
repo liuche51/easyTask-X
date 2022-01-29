@@ -13,10 +13,7 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.zk.LeaderData;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
-import com.github.liuche51.easyTaskX.util.LogErrorUtil;
-import com.github.liuche51.easyTaskX.util.StringConstant;
-import com.github.liuche51.easyTaskX.util.StringUtils;
-import com.github.liuche51.easyTaskX.util.Util;
+import com.github.liuche51.easyTaskX.util.*;
 import com.github.liuche51.easyTaskX.zk.ZKService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NodeUtil {
-    private static final Logger log = LoggerFactory.getLogger(NodeUtil.class);
 
     /**
      * 清空所有表的记录
@@ -53,7 +49,7 @@ public class NodeUtil {
             BinlogScheduleDao.deleteAll();
             ScheduleBakDao.deleteAll();
         } catch (Exception e) {
-            log.error("deleteAllData exception!", e);
+            LogUtil.error("deleteAllData exception!", e);
         }
     }
 
@@ -84,7 +80,7 @@ public class NodeUtil {
             }
 
         } catch (Exception e) {
-            log.error("", e);
+            LogUtil.error("", e);
         }
         return false;
     }

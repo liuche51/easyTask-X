@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ZKUtil {
-    private static Logger log = LoggerFactory.getLogger(ZKUtil.class);
     //会话超时时间
     private static  int SESSION_TIMEOUT = 30 * 1000;
     //连接超时时间

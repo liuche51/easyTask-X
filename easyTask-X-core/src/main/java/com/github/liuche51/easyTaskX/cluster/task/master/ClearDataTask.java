@@ -13,10 +13,7 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.NodeStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
-import com.github.liuche51.easyTaskX.util.DateUtils;
-import com.github.liuche51.easyTaskX.util.StringConstant;
-import com.github.liuche51.easyTaskX.util.StringUtils;
-import com.github.liuche51.easyTaskX.util.Util;
+import com.github.liuche51.easyTaskX.util.*;
 
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
@@ -35,12 +32,12 @@ public class ClearDataTask extends TimerTask {
                 clearScheduleBakData();
                 clearSLAVE_SYNC_TASK_RECORD();
             } catch (Exception e) {
-                log.error("", e);
+                LogUtil.error("", e);
             }
             try {
                 TimeUnit.HOURS.sleep(NodeService.getConfig().getAdvanceConfig().getClearScheduleBakTime());
             } catch (InterruptedException e) {
-                log.error("", e);
+                LogUtil.error("", e);
             }
         }
     }
@@ -62,7 +59,7 @@ public class ClearDataTask extends TimerTask {
             }
             ScheduleBakDao.deleteNotInBySources(sources.toArray(new String[sources.size()]));
         } catch (Exception e) {
-            log.error("", e);
+            LogUtil.error("", e);
         }
     }
 
@@ -104,10 +101,10 @@ public class ClearDataTask extends TimerTask {
                 }
 
             } else {
-                log.info("normally exception!requestLeaderNodeStatusIsNormal() failed.");
+                LogUtil.info("normally exception!requestLeaderNodeStatusIsNormal() failed.");
             }
         } catch (Exception e) {
-            log.error("", e);
+            LogUtil.error("", e);
         }
         return false;
     }

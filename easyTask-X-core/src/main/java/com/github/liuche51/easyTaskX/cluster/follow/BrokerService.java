@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
  * Broker
  */
 public class BrokerService {
-    private static final Logger log = LoggerFactory.getLogger(BrokerService.class);
 
     /**
      * 节点对leader的心跳。
@@ -88,10 +87,10 @@ public class BrokerService {
                 dealUpdate(node);
                 return true;
             } else {
-                log.info("normally exception!requestUpdateRegedit() failed.");
+                LogUtil.info("normally exception!requestUpdateRegedit() failed.");
             }
         } catch (Exception e) {
-            log.error("", e);
+            LogUtil.error("", e);
         }
         return false;
     }

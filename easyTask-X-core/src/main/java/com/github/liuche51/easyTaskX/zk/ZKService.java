@@ -6,6 +6,7 @@ import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.dto.zk.LeaderData;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.apache.curator.framework.api.CuratorWatcher;
 import org.apache.curator.framework.recipes.cache.NodeCache;
@@ -16,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ZKService {
-    private static Logger log = LoggerFactory.getLogger(ZKService.class);
 
     /**
      * 当前节点注册为Leader节点
@@ -36,7 +36,7 @@ public class ZKService {
                 ZKUtil.getClient().create().withMode(CreateMode.EPHEMERAL).forPath(path, JSONObject.toJSONString(data).getBytes());
             }
         } catch (Exception e) {
-            log.error("", e);
+            LogUtil.error("", e);
         }
     }
 
@@ -68,10 +68,10 @@ public class ZKService {
                 String data = "null";
                 if (nodeCache.getCurrentData() != null)
                     data = new String(nodeCache.getCurrentData().getData());
-                log.info("listenLeaderDataNode()->leader节点变更事件触发!value={}", data);
+                LogUtil.info("listenLeaderDataNode()->leader节点变更事件触发!value={}", data);
                 // 防止节点被删除时发生错误
                 if (nodeCache.getCurrentData() == null) {
-                    log.error("nodeCache.getCurrentData() == null，可能该节点已被删除");
+                    LogUtil.error("nodeCache.getCurrentData() == null，可能该节点已被删除");
                     NodeService.CURRENT_NODE.setClusterLeader(null);
                 } else {
                     // 获取节点最新的数据
@@ -101,7 +101,7 @@ public class ZKService {
             return JSONObject.parseObject(bytes, clazz);
         } catch (Exception e) {
             //节点不存在了，属于正常情况。
-            log.info("normally exception!getDataByPath():" + e.getMessage());
+            LogUtil.info("normally exception!getDataByPath():" + e.getMessage());
         }
         return null;
     }

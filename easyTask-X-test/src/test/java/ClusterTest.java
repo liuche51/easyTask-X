@@ -14,7 +14,6 @@ import java.util.Map;
  * 集群测试。模拟三个节点的伪集群
  */
 public class ClusterTest {
-    private static Logger log = LoggerFactory.getLogger(ClusterTest.class);
 
     @Test
     public void startNode1() {
@@ -100,8 +99,8 @@ public class ClusterTest {
         }
     }
     private void printinfo() {
-        //log.info("集群节点信息：" + ClusterMonitor.getCURRENT_NODEInfo());
-        //log.info("数据库连接池信息：" + ClusterMonitor.getSqlitePoolInfo());
-        //log.info("Broker注册表:"+JSONObject.toJSONString(ClusterMonitor.getBrokerRegisterInfo()));
+        //LogUtil.info("集群节点信息：" + ClusterMonitor.getCURRENT_NODEInfo());
+        //LogUtil.info("数据库连接池信息：" + ClusterMonitor.getSqlitePoolInfo());
+        //LogUtil.info("Broker注册表:"+JSONObject.toJSONString(ClusterMonitor.getBrokerRegisterInfo()));
     }
 }

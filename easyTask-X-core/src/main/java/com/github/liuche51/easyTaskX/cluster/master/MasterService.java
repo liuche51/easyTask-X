@@ -16,6 +16,7 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.LogErrorUtil;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
@@ -32,7 +33,6 @@ import java.util.concurrent.TimeUnit;
  * master服务入口
  */
 public class MasterService {
-    private static final Logger log = LoggerFactory.getLogger(MasterService.class);
     /**
      * 等待入库同步的提交任务队列
      * 1、客户端提交任务到服务端，保存到此队列后，立即返回
@@ -102,7 +102,7 @@ public class MasterService {
                 addWAIT_DELETE_TASK(result.getId());
             }
         } catch (InterruptedException e) {
-            log.error("", e);
+            LogUtil.error("", e);
         }
 
     }
@@ -119,7 +119,7 @@ public class MasterService {
                 LogErrorUtil.writeQueueErrorMsgToDb("队列MasterService.WAIT_DELETE_TASK已满.", "com.github.liuche51.easyTaskX.cluster.master.MasterService.addWAIT_DELETE_TASK");
             }
         } catch (InterruptedException e) {
-            log.error("", e);
+            LogUtil.error("", e);
         }
     }
 

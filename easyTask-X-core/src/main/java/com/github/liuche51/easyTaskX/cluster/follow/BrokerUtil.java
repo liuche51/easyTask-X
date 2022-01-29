@@ -6,22 +6,18 @@ import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.ByteStringPack;
 import com.github.liuche51.easyTaskX.dto.MasterNode;
-import com.github.liuche51.easyTaskX.dto.Node;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
-import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.LogErrorUtil;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BrokerUtil {
-    private static final Logger log = LoggerFactory.getLogger(BrokerService.class);
 
     /**
      * 更新slave节点的MasterBinlogInfo信息
@@ -66,7 +62,7 @@ public class BrokerUtil {
                         LogErrorUtil.writeRpcErrorMsgToDb("Broker通知leader修改注册节点的状态信息。失败！", "com.github.liuche51.easyTaskX.cluster.follow.BrokerUtil.notifyLeaderChangeRegNodeStatus");
                     }
                 } catch (Exception e) {
-                    log.error("", e);
+                    LogUtil.error("", e);
                 }
             }
         });

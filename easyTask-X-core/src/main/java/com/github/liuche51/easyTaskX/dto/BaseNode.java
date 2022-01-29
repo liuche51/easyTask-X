@@ -3,13 +3,13 @@ package com.github.liuche51.easyTaskX.dto;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.client.NettyConnectionFactory;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
 public class BaseNode implements Serializable {
-    private static final Logger log = LoggerFactory.getLogger(BaseNode.class);
     private String host = "";
     private int port;
     public BaseNode(String host,int port){
@@ -60,8 +60,8 @@ public class BaseNode implements Serializable {
         try {
             return getClient();
         } catch (Exception e) {
-            log.info("getClientWithCount tryCount=" + tryCount + ",objectHost="+this.getAddress());
-            log.error("", e);
+            LogUtil.info("getClientWithCount tryCount=" + tryCount + ",objectHost="+this.getAddress());
+            LogUtil.error("", e);
             return getClientWithCount(tryCount);
         } finally {
             tryCount--;

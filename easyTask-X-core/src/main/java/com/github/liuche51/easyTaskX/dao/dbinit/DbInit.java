@@ -3,13 +3,13 @@ package com.github.liuche51.easyTaskX.dao.dbinit;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.dao.*;
 import com.github.liuche51.easyTaskX.util.DbTableName;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
 public class DbInit {
-    private static Logger log = LoggerFactory.getLogger(DbInit.class);
     public static boolean hasInit = false;//数据库是否已经初始化
 
     /**
@@ -33,10 +33,10 @@ public class DbInit {
             LogInit.initLogError();
             ClusterMetadataBinlogInit.initClusterMetadataBinlog();
             hasInit = true;
-            log.info("Sqlite DB 初始化完成");
+            LogUtil.info("Sqlite DB 初始化完成");
             return true;
         } catch (Exception e) {
-            log.error("easyTask db init fail.", e);
+            LogUtil.error("easyTask db init fail.", e);
             return false;
         }
     }

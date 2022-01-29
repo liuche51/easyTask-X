@@ -11,6 +11,7 @@ import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.google.protobuf.ByteString;
@@ -89,7 +90,7 @@ public class ClientNotifyLeaderDeleteTaskHandler extends BaseHandler {
             }
         } catch (Exception e) {
             this.result = Boolean.FALSE;
-            log.error("", e);
+            LogUtil.error("", e);
         }
     }
 }

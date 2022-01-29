@@ -12,6 +12,7 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.zk.LeaderData;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
@@ -50,12 +51,12 @@ public class HeartbeatsTask extends TimerTask {
                     ChannelFuture future = NettyMsgService.sendASyncMsg(leader.getClient(), builder.build());//这里使用异步即可。也不需要返回值
                 }
             } catch (Exception e) {
-                log.error("", e);
+                LogUtil.error("", e);
             }
             try {
                 TimeUnit.SECONDS.sleep(NodeService.getConfig().getAdvanceConfig().getHeartBeat());
             } catch (InterruptedException e) {
-                log.error("", e);
+                LogUtil.error("", e);
             }
         }
     }

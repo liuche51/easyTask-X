@@ -26,7 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class LeaderService {
-    private static final Logger log = LoggerFactory.getLogger(LeaderService.class);
     /**
      * 集群BROKER注册表LeaderNotifyClientUpdateBrokerChange
      */
@@ -103,7 +102,7 @@ public class LeaderService {
                         LogErrorUtil.writeRpcErrorMsgToDb("Leader通知Broker注册成功。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifyBrokerRegisterSucceeded");
                     }
                 } catch (Exception e) {
-                    log.error("", e);
+                    LogUtil.error("", e);
                 }
             }
         });
@@ -160,7 +159,7 @@ public class LeaderService {
             }
             return true;
         } catch (Exception e) {
-            log.error("", e);
+            LogUtil.error("", e);
         }
         return false;
     }

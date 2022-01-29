@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
  * 一次性运行的后台任务基类
  */
 public abstract class OnceTask extends Thread{
-    protected static final Logger log = LoggerFactory.getLogger(OnceTask.class);
     private volatile boolean exit = false;
     private volatile boolean finished = false;
 

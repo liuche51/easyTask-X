@@ -6,6 +6,7 @@ import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.enume.DataStatusEnum;
 import com.github.liuche51.easyTaskX.enume.NodeStatusEnum;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.exception.VotedException;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
 import org.slf4j.Logger;
@@ -21,7 +22,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * 使用多线程互斥机制
  */
 public class VoteSlave {
-    private static final Logger log = LoggerFactory.getLogger(VoteSlave.class);
     private static volatile boolean selecting = false;//选举状态。多线程控制
     private static ReentrantLock lock = new ReentrantLock();//选举互斥锁
 
@@ -43,7 +43,7 @@ public class VoteSlave {
             List<String> availableSlaves = VoteSlave.getAvailableSlave(regNode);
             List<RegNode> slaves = VoteSlave.voteSlaves(count, availableSlaves);
             if (slaves.size() < count) {
-                log.info("[{}] slaves.size() < count,so retry to initVoteSlaves()", regNode.getAddress());
+                LogUtil.info("[{}] slaves.size() < count,so retry to initVoteSlaves()", regNode.getAddress());
                 return initVoteSlaves(regNode);//数量不够递归重新选
             } else {
                 ConcurrentHashMap<String, RegNode> slaves2 = new ConcurrentHashMap<>(slaves.size());
@@ -109,7 +109,7 @@ public class VoteSlave {
             try {
                 return x.equals(regNode.getAddress());
             } catch (Exception e) {
-                log.error("", e);
+                LogUtil.error("", e);
                 return false;
             }
         }).findFirst();
@@ -125,7 +125,7 @@ public class VoteSlave {
         }
         if (availableFollows.size() < count - NodeService.CURRENT_NODE.getSlaves().size())//如果可选备库节点数量不足，则等待1s，然后重新选。注意：等待会阻塞整个服务可用性
         {
-            log.info("[{}] getAvailableSlave is not enough! only has {},current own {}", regNode.getAddress(), availableFollows.size(), regNode.getSlaves().size());
+            LogUtil.info("[{}] getAvailableSlave is not enough! only has {},current own {}", regNode.getAddress(), availableFollows.size(), regNode.getSlaves().size());
             TimeUnit.SECONDS.sleep(1L);
             return getAvailableSlave(regNode);
         } else

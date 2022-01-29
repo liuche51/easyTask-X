@@ -15,6 +15,7 @@ import com.github.liuche51.easyTaskX.enume.NodeStatusEnum;
 import com.github.liuche51.easyTaskX.enume.OperationTypeEnum;
 import com.github.liuche51.easyTaskX.enume.RegNodeTypeEnum;
 import com.github.liuche51.easyTaskX.util.DateUtils;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
 
@@ -36,12 +37,12 @@ public class CheckFollowsAliveTask extends TimerTask {
                 dealBrokerRegedit();
                 dealClientRegedit();
             } catch (Exception e) {
-                log.error("", e);
+                LogUtil.error("", e);
             }
             try {
                 TimeUnit.SECONDS.sleep(NodeService.getConfig().getAdvanceConfig().getHeartBeat());
             } catch (InterruptedException e) {
-                log.error("", e);
+                LogUtil.error("", e);
             }
         }
     }
@@ -87,9 +88,9 @@ public class CheckFollowsAliveTask extends TimerTask {
                                         LeaderService.notifyFollowsBakLeaderChanged();
                                     }
                                 } catch (VotingException e) {
-                                    log.info("normally exception!{}", e.getMessage());
+                                    LogUtil.info("normally exception!{}", e.getMessage());
                                 } catch (Exception e) {
-                                    log.error("", e);
+                                    LogUtil.error("", e);
                                 }
                             }
                             //已经有Slaves时
@@ -114,9 +115,9 @@ public class CheckFollowsAliveTask extends TimerTask {
                                                 LeaderService.notifyFollowsBakLeaderChanged();
                                             }
                                         } catch (VotingException e) {
-                                            log.info("normally exception!{}", e.getMessage());
+                                            LogUtil.info("normally exception!{}", e.getMessage());
                                         } catch (Exception e) {
-                                            log.error("", e);
+                                            LogUtil.error("", e);
                                         }
                                         //items.remove();这里不需要了。因为在voteNewSlave中已经移除了
                                     }
@@ -125,7 +126,7 @@ public class CheckFollowsAliveTask extends TimerTask {
 
                         }
                     } catch (Exception e) {
-                        log.error("", e);
+                        LogUtil.error("", e);
                     }
                 }
             });
@@ -154,7 +155,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                             BinlogClusterMetaDao.saveBatch(binlogClusterMetas);
                         }
                     } catch (Exception e) {
-                        log.error("", e);
+                        LogUtil.error("", e);
                     }
                 }
             });

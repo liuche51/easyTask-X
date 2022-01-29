@@ -8,6 +8,7 @@ import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.dto.db.ScheduleBak;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
 
 import java.util.ArrayList;
@@ -44,13 +45,13 @@ public class NewMasterSubmitBakTask extends OnceTask {
                         try {
                             MasterService.WAIT_SUBMIT_TASK.put(schedule);//模拟客户端重新提交任务。异常情况使用阻塞接口
                         } catch (InterruptedException e) {
-                            log.error("", e);
+                            LogUtil.error("", e);
                         }
                     });
                     ScheduleBakDao.deleteAll();
                 }
             } catch (Exception e) {
-                log.error("", e);
+                LogUtil.error("", e);
             }
         }
     }

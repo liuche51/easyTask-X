@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,6 @@ import org.sqlite.SQLiteException;
  * @author haoqipeng
  */
 public class SqliteHelper {
-    final static Logger logger = LoggerFactory.getLogger(SqliteHelper.class);
 
     private Connection connection;
     private Statement statement;
@@ -128,7 +128,7 @@ public class SqliteHelper {
                 connection = null;
             }
         } catch (SQLException e) {
-            logger.error("Sqlite数据库关闭时异常", e);
+            LogUtil.error("Sqlite数据库关闭时异常", e);
         }
     }
 
@@ -175,7 +175,7 @@ public class SqliteHelper {
      */
     public static void writeDatabaseLockedExceptionLog(SQLiteException e, String methond) throws SQLiteException {
         if (e.getMessage() != null && e.getMessage().contains("SQLITE_BUSY"))
-            logger.info("normally exception!" + methond + ":" + e.getMessage());
+            LogUtil.info("normally exception!" + methond + ":" + e.getMessage());
         else
             throw e;
     }

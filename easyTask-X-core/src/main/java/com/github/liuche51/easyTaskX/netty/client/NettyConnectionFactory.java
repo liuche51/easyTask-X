@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.netty.client;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.HashMap;
@@ -12,7 +13,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * Netty客户端连接池工厂
  */
 public class NettyConnectionFactory {
-    private static final Logger log = LoggerFactory.getLogger(NettyConnectionFactory.class);
     private Map<String, ConcurrentLinkedQueue<NettyClient>> pools = new HashMap<>(NodeService.getConfig().getBackupCount());
     private ReentrantLock lock = new ReentrantLock();
     private static NettyConnectionFactory singleton = null;
@@ -84,7 +84,7 @@ public class NettyConnectionFactory {
                 });
             }
         }catch (Exception e){
-            log.error("key="+key,e);
+            LogUtil.error("key="+key,e);
         }
         this.pools.remove(key);
     }

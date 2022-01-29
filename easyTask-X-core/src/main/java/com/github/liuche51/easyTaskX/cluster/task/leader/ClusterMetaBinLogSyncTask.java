@@ -4,6 +4,7 @@ import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.leader.BakLeaderService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -36,13 +37,13 @@ public class ClusterMetaBinLogSyncTask extends TimerTask {
                 BaseNode leader = NodeService.CURRENT_NODE.getClusterLeader();
                 BakLeaderService.requestLeaderSyncClusterMetaData(leader, this);
             } catch (Exception e) {
-                log.error("", e);
+                LogUtil.error("", e);
             }
             try {
                 if (new Date().getTime() - getLastRunTime().getTime() < 500)//防止频繁空转
                     TimeUnit.MILLISECONDS.sleep(500L);
             } catch (InterruptedException e) {
-                log.error("", e);
+                LogUtil.error("", e);
             }
         }
     }

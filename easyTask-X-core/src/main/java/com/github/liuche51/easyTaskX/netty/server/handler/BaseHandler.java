@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class BaseHandler {
-    protected static final Logger log = LoggerFactory.getLogger(BaseHandler.class);
     public static Map<String,BaseHandler> INSTANCES;
     static {
         INSTANCES=new HashMap<String,BaseHandler>(){

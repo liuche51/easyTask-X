@@ -7,6 +7,7 @@ import com.github.liuche51.easyTaskX.dto.SubmitTaskResult;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.enume.ScheduleStatusEnum;
 import com.github.liuche51.easyTaskX.enume.SubmitTaskResultStatusEnum;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import sun.security.krb5.internal.Ticket;
 
 import java.util.*;
@@ -43,7 +44,7 @@ public class MasterUpdateSubmitTaskStatusTask extends TimerTask {
                         if (new Date().getTime() - getLastRunTime().getTime() < 500)//防止频繁空转
                             TimeUnit.MILLISECONDS.sleep(500L);
                     } catch (InterruptedException e) {
-                        log.error("", e);
+                        LogUtil.error("", e);
                     }
                 }
 
@@ -53,11 +54,11 @@ public class MasterUpdateSubmitTaskStatusTask extends TimerTask {
                         try {
                             MasterService.SLAVE_RESPONSE_SUCCESS_TASK_RESULT.put(x);//这里因为是异常情况下。所以直接用阻塞的api即可。
                         } catch (InterruptedException interruptedException) {
-                            log.error("", e);
+                            LogUtil.error("", e);
                         }
                     });
                 }
-                log.error("", e);
+                LogUtil.error("", e);
             }
         }
     }

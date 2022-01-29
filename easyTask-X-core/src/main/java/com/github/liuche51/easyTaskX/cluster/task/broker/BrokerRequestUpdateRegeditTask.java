@@ -3,6 +3,7 @@ package com.github.liuche51.easyTaskX.cluster.task.broker;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 
 import java.util.concurrent.TimeUnit;
 
@@ -16,12 +17,12 @@ public class BrokerRequestUpdateRegeditTask extends TimerTask {
             try {
                 BrokerService.requestUpdateRegedit();
             } catch (Exception e) {
-                log.error("", e);
+                LogUtil.error("", e);
             }
             try {
                 TimeUnit.MINUTES.sleep(NodeService.getConfig().getAdvanceConfig().getFollowUpdateRegeditTime());
             } catch (InterruptedException e) {
-                log.error("", e);
+                LogUtil.error("", e);
             }
         }
     }

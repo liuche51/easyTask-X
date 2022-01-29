@@ -7,6 +7,7 @@ import com.github.liuche51.easyTaskX.dto.SubmitTaskResult;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.enume.ScheduleStatusEnum;
 import com.github.liuche51.easyTaskX.enume.SubmitTaskResultStatusEnum;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -31,7 +32,7 @@ public class MasterDeleteTaskTask extends TimerTask {
                         if (new Date().getTime() - getLastRunTime().getTime() < 500)//防止频繁空转
                             TimeUnit.MILLISECONDS.sleep(500L);
                     } catch (InterruptedException e) {
-                        log.error("", e);
+                        LogUtil.error("", e);
                     }
                 }
 
@@ -41,7 +42,7 @@ public class MasterDeleteTaskTask extends TimerTask {
                         MasterService.addWAIT_DELETE_TASK(x);
                     });
                 }
-                log.error("", e);
+                LogUtil.error("", e);
             }
         }
     }

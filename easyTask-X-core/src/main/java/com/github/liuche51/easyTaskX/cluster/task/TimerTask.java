@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 
 public abstract class TimerTask extends Thread{
-    protected static final Logger log = LoggerFactory.getLogger(TimerTask.class);
     //volatile修饰符用来保证其它线程读取的总是该变量的最新的值
     private volatile boolean exit = false;
     /**

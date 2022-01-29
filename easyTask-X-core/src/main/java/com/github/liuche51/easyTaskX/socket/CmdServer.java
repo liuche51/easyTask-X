@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.socket;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,6 @@ import java.net.Socket;
  * CMD客户端的服务端
  */
 public class CmdServer {
-    private static Logger log = LoggerFactory.getLogger(CmdServer.class);
 
     public static void init() {
         Thread task = new Thread(new Runnable() {
@@ -24,7 +24,7 @@ public class CmdServer {
                 try {
                     start();
                 } catch (IOException e) {
-                    log.error("init()-> exception!", e);
+                    LogUtil.error("init()-> exception!", e);
                 }
             }
         });
@@ -33,7 +33,7 @@ public class CmdServer {
 
     private static void start() throws IOException {
         ServerSocket server = new ServerSocket(NodeService.getConfig().getCmdPort());//启动端口提供服务
-        log.info("CmdServer started! on port {}", NodeService.getConfig().getCmdPort());
+        LogUtil.info("CmdServer started! on port {}", NodeService.getConfig().getCmdPort());
         while (true) {//循环监听客户端。如果当前客户端断开连接，则进入下一次客户连接等待
             Socket client = null;
             try {
@@ -48,7 +48,7 @@ public class CmdServer {
                         client.close();
                         break;
                     }
-                    log.info("received cmd client cmd:{}", cmd);
+                    LogUtil.info("received cmd client cmd:{}", cmd);
                     Command cm = CmdEngine.parse(cmd);
                     if (cm == null) {
                         out.println("invalid command!" + cmd);
@@ -59,7 +59,7 @@ public class CmdServer {
                     out.flush();
                 }
             } catch (Exception e) {
-                log.error("CMD Session exception!", e);
+                LogUtil.error("CMD Session exception!", e);
             } finally {
                 if (client != null)
                     client.close();

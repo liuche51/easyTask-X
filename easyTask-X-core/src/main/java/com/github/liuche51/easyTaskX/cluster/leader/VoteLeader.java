@@ -10,6 +10,7 @@ import com.github.liuche51.easyTaskX.dto.zk.LeaderData;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.LogErrorUtil;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.zk.ZKService;
@@ -29,11 +30,10 @@ import java.util.concurrent.TimeUnit;
  * 采用分布式锁的方式实现
  */
 public class VoteLeader {
-    private static Logger log = LoggerFactory.getLogger(VoteLeader.class);
     private static InterProcessMutex zkMutex = new InterProcessMutex(ZKUtil.getClient(), "/mutex");
 
     public static boolean competeLeader() {
-        log.info("leader 竞选开始!");
+        LogUtil.info("leader 竞选开始!");
         //如果自己元数据同步还没有达到已完成状态。则需要查询其他bakleader是否有已完成的。如果有则自己等待3秒后再竞选，否则自己就可以直接去竞选了。
         //这样有利于选出拥有最新元数据的bakleader。比如一个刚刚加入的bakleader此时元数据还处于同步状态，理论上不应该作为新leader候选人
         if (BakLeaderService.DATA_STATUS.equals(0)) {
@@ -41,7 +41,7 @@ public class VoteLeader {
                 try {
                     TimeUnit.MILLISECONDS.sleep(3000L);
                 } catch (InterruptedException e) {
-                    log.error("", e);
+                    LogUtil.error("", e);
                 }
             }
         }
@@ -57,13 +57,13 @@ public class VoteLeader {
 
             }
         } catch (Exception e) {
-            log.error("", e);
+            LogUtil.error("", e);
         } finally {
             if (hasLock) {
                 try {
                     zkMutex.release();//释放锁，会删除mutex节点下的子节点（参与竞争的节点信息），所以你可能看不到，因为存续时间非常短
                 } catch (Exception e) {
-                    log.error("", e);
+                    LogUtil.error("", e);
                 }
             }
 
@@ -99,7 +99,7 @@ public class VoteLeader {
                 }
             }
         } catch (Exception e) {
-            log.error("", e);
+            LogUtil.error("", e);
         }
         return false;
     }

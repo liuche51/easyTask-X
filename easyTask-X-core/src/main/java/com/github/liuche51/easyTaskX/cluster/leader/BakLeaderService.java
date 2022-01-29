@@ -19,7 +19,6 @@ import java.util.Comparator;
 import java.util.List;
 
 public class BakLeaderService {
-    private static final Logger log = LoggerFactory.getLogger(BakLeaderService.class);
     /**
      * 与leader元数据的数据一致性状态。0同步中，1已同步
      */

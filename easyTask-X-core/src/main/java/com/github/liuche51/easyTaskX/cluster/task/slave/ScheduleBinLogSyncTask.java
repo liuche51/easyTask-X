@@ -16,10 +16,7 @@ import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.ScheduleStatusEnum;
 import com.github.liuche51.easyTaskX.enume.SubmitTaskResultStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
-import com.github.liuche51.easyTaskX.util.DbTableName;
-import com.github.liuche51.easyTaskX.util.LogErrorUtil;
-import com.github.liuche51.easyTaskX.util.StringUtils;
-import com.github.liuche51.easyTaskX.util.Util;
+import com.github.liuche51.easyTaskX.util.*;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -48,7 +45,7 @@ public class ScheduleBinLogSyncTask extends TimerTask {
                                     item.getValue().setSyncing(true);
                                     requestMasterScheduleBinLogData(item.getValue(), item.getValue().getCurrentIndex());
                                 } catch (Exception e) {
-                                    log.error("", e);
+                                    LogUtil.error("", e);
                                 } finally {
                                     item.getValue().setSyncing(false); // 防止任务异常导致同步状态无法归位，而不能继续同步
                                 }
@@ -61,13 +58,13 @@ public class ScheduleBinLogSyncTask extends TimerTask {
                 }
 
             } catch (Exception e) {
-                log.error("", e);
+                LogUtil.error("", e);
             }
             try {
                 if (new Date().getTime() - getLastRunTime().getTime() < 500)//防止频繁空转
                     TimeUnit.MILLISECONDS.sleep(500L);
             } catch (InterruptedException e) {
-                log.error("", e);
+                LogUtil.error("", e);
             }
         }
     }
@@ -107,9 +104,9 @@ public class ScheduleBinLogSyncTask extends TimerTask {
                     String message = e.getMessage();
                     //防止重复处理。保证接口幂等性
                     if (message != null && message.contains("SQLITE_CONSTRAINT_PRIMARYKEY")) {
-                        log.info("normally exception!slave sync master's ScheduleBinLog primarykey repeated.");
+                        LogUtil.info("normally exception!slave sync master's ScheduleBinLog primarykey repeated.");
                     } else {
-                        log.error("sql=" + x.getSql(), e);
+                        LogUtil.error("sql=" + x.getSql(), e);
                         throw e;
                     }
                 }
@@ -134,7 +131,7 @@ public class ScheduleBinLogSyncTask extends TimerTask {
                 LogErrorUtil.writeQueueErrorMsgToDb("队列WAIT_RESPONSE_MASTER_TASK_RESULT已满.", "com.github.liuche51.easyTaskX.cluster.task.slave.ScheduleBinLogSyncTask.addWAIT_RESPONSE_MASTER_TASK_RESULT");
             }
         } catch (InterruptedException e) {
-            log.error("", e);
+            LogUtil.error("", e);
         }
     }
 
@@ -155,7 +152,7 @@ public class ScheduleBinLogSyncTask extends TimerTask {
                 LogErrorUtil.writeRpcErrorMsgToDb("slave通知master。还没正式使用的任务已经完成同步。失败！", "com.github.liuche51.easyTaskX.cluster.slave.SlaveService.notifyMasterHasSyncUnUseTask");
             }
         } catch (Exception e) {
-            log.error("", e);
+            LogUtil.error("", e);
         }
     }
 }

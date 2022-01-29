@@ -15,7 +15,6 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Slave服务入口
  */
 public class SlaveService {
-    private static final Logger log = LoggerFactory.getLogger(SlaveService.class);
     /**
      * 等待salve反馈给master的任务状态
      * 1、高可靠模式下使用

@@ -8,6 +8,7 @@ import com.github.liuche51.easyTaskX.dto.SubmitTaskResult;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.enume.ScheduleStatusEnum;
 import com.github.liuche51.easyTaskX.enume.SubmitTaskResultStatusEnum;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -50,7 +51,7 @@ public class MasterSubmitTask extends TimerTask {
                         if (new Date().getTime() - getLastRunTime().getTime() < 500)//防止频繁空转
                             TimeUnit.MILLISECONDS.sleep(500L);
                     } catch (InterruptedException e) {
-                        log.error("", e);
+                        LogUtil.error("", e);
                     }
                 }
 
@@ -60,7 +61,7 @@ public class MasterSubmitTask extends TimerTask {
                         MasterService.addWAIT_RESPONSE_CLINET_TASK_RESULT(x.getSource(), new SubmitTaskResult(x.getId(), SubmitTaskResultStatusEnum.FAILED, "Master 持久化任务异常!"));
                     });
                 }
-                log.error("", e);
+                LogUtil.error("", e);
             }
         }
     }

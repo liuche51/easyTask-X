@@ -16,7 +16,6 @@ import java.util.List;
  * 1、任务先入删除队列。异步删除
  */
 public class ClientNotifyBrokerDeleteTaskHandler extends BaseHandler {
-    protected static final Logger log = LoggerFactory.getLogger(ClientNotifyBrokerDeleteTaskHandler.class);
 
     @Override
     public ByteString process(Dto.Frame frame) throws Exception {

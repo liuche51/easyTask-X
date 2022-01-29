@@ -29,6 +29,10 @@ public class AdvanceConfig {
      */
     private int tryCount = 2;
     /**
+     * 是否debug模式。设置为TRUE，就可以看到完整日志跟踪信息
+     */
+    private boolean debug=false;
+    /**
      * binlog同步一次数据量。
      */
     private int binlogCount = 100;
@@ -130,6 +134,14 @@ public class AdvanceConfig {
 
     public int getBinlogCount() {
         return binlogCount;
+    }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
     }
 
     public void setBinlogCount(int binlogCount) {

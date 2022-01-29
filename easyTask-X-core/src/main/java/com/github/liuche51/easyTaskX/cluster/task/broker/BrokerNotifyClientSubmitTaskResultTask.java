@@ -13,6 +13,7 @@ import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.ScheduleStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.LogErrorUtil;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
 
@@ -55,7 +56,7 @@ public class BrokerNotifyClientSubmitTaskResultTask extends TimerTask {
                                         LogErrorUtil.writeRpcErrorMsgToDb("Broker通知客户端提交的任务同步结果反馈。失败！", "com.github.liuche51.easyTaskX.cluster.task.broker.BrokerNotifyClientSubmitTaskResultTask");
                                     }
                                 } catch (Exception e) {
-                                    log.error("", e);
+                                    LogUtil.error("", e);
                                 }
 
                             }
@@ -66,10 +67,10 @@ public class BrokerNotifyClientSubmitTaskResultTask extends TimerTask {
                     if (new Date().getTime() - getLastRunTime().getTime() < 500)//防止频繁空转
                         TimeUnit.MILLISECONDS.sleep(500L);
                 } catch (InterruptedException e) {
-                    log.error("", e);
+                    LogUtil.error("", e);
                 }
             } catch (Exception e) {
-                log.error("", e);
+                LogUtil.error("", e);
             }
 
         }
