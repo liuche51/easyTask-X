@@ -14,7 +14,7 @@ public class LogUtil {
      * @param o
      */
     public static void info(String s, Object... o) {
-        LogUtil.info(s, o);
+        log.info(s, o);
     }
 
     /**
@@ -24,7 +24,7 @@ public class LogUtil {
      * @param o
      */
     public static void error(String s, Object... o) {
-        LogUtil.error(s, o);
+        log.error(s, o);
     }
 
     /**
@@ -35,6 +35,6 @@ public class LogUtil {
      */
     public static void debug(String s, Object... o) {
         if (NodeService.getConfig().getAdvanceConfig().isDebug())
-            LogUtil.info(s, o);
+            log.info(s, o);
     }
 }

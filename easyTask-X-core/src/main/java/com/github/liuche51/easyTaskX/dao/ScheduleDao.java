@@ -48,7 +48,7 @@ public class ScheduleDao {
         return false;
     }
 
-    public static void saveBatch(List<Schedule> schedules) throws SQLException {
+    public static Long saveBatch(List<Schedule> schedules) throws SQLException {
         SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE, ScheduleDao.getLock());
         helper.beginTran();
         try {
@@ -62,8 +62,9 @@ public class ScheduleDao {
                 binlogSchedule.setStatus(x.getStatus());
                 binlogSchedules.add(binlogSchedule);
             });
-            BinlogScheduleDao.saveBatch(binlogSchedules, helper);
+            Long lastid = BinlogScheduleDao.saveBatch(binlogSchedules, helper);
             helper.commitTran();
+            return lastid;
         } finally {
             helper.destroyed();
         }
@@ -86,6 +87,7 @@ public class ScheduleDao {
         }
         return list;
     }
+
     public static List<Schedule> selectByTaskId(String taskId) throws SQLException {
         List<Schedule> list = new LinkedList<>();
         SqliteHelper helper = new SqliteHelper(dbName);
@@ -103,7 +105,8 @@ public class ScheduleDao {
         }
         return list;
     }
-        public static List<Schedule> selectByCount(int count) throws SQLException {
+
+    public static List<Schedule> selectByCount(int count) throws SQLException {
         List<Schedule> list = new LinkedList<>();
         SqliteHelper helper = new SqliteHelper(dbName);
         try {
@@ -161,7 +164,7 @@ public class ScheduleDao {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public static void updateByIds(String[] ids, Map<String, Object> values) throws SQLException {
+    public static Long updateByIds(String[] ids, Map<String, Object> values) throws SQLException {
         Iterator<Map.Entry<String, Object>> items2 = values.entrySet().iterator();
         //组装更新字段。
         StringBuilder updatestr = new StringBuilder();
@@ -184,22 +187,24 @@ public class ScheduleDao {
         try {
             helper.beginTran();
             helper.executeUpdate(sql);
-            BinlogScheduleDao.save(sql, StringConstant.EMPTY, ScheduleStatusEnum.NORMAL, helper);
+            Long lastid = BinlogScheduleDao.save(sql, StringConstant.EMPTY, ScheduleStatusEnum.NORMAL, helper);
             helper.commitTran();
+            return lastid;
         } finally {
             helper.destroyed();
         }
     }
 
-    public static void deleteByIds(String[] ids) throws SQLException {
+    public static Long deleteByIds(String[] ids) throws SQLException {
         SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE, ScheduleDao.getLock());
         try {
             helper.beginTran();
             String instr = SqliteHelper.getInConditionStr(ids);
             String sql = "delete FROM " + tableName + " where id in" + instr + ";";
             helper.executeUpdate(sql);
-            BinlogScheduleDao.save(sql, StringConstant.EMPTY, ScheduleStatusEnum.NORMAL, helper);
+            Long lastid = BinlogScheduleDao.save(sql, StringConstant.EMPTY, ScheduleStatusEnum.NORMAL, helper);
             helper.commitTran();
+            return lastid;
         } finally {
             helper.destroyed();
         }

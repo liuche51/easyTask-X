@@ -41,7 +41,7 @@ public class MasterSubmitTask extends TimerTask {
                             model2list.put(schedule.getId(), item);
                         }
                     }
-                    ScheduleDao.saveBatch(schedules);
+                    MasterService.BINLOG_LAST_INDEX=ScheduleDao.saveBatch(schedules);
                     MasterService.SLAVE_SYNC_TASK_RECORD.putAll(model2list);
                     molde1list.forEach(x -> {
                         MasterService.addWAIT_RESPONSE_CLINET_TASK_RESULT(x.getSource(), new SubmitTaskResult(x.getId(), SubmitTaskResultStatusEnum.SUCCESSED));

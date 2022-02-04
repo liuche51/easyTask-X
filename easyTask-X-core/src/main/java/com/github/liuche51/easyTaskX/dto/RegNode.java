@@ -18,7 +18,7 @@ public class RegNode extends BaseNode {
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private ZonedDateTime createTime;
     /**
-     * 数据状态。
+     * 数据状态。Slave使用
      * 1、正常状态0，slave数据异步同步master数据跟随正常。没有什么延迟
      * 2、未同步完成状态9，salve当前数据异步同步master存在较大延迟。
      */

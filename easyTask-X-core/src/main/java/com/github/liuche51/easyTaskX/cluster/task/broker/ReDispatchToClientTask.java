@@ -2,6 +2,7 @@ package com.github.liuche51.easyTaskX.cluster.task.broker;
 
 import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerUtil;
+import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
 import com.github.liuche51.easyTaskX.dao.ScheduleDao;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
@@ -54,7 +55,7 @@ public class ReDispatchToClientTask extends OnceTask {
                         Map<String, Object> values = new HashMap<>();
                         values.put("executer", newClient.getAddress());
                         String[] scheduleIds = list.stream().map(Schedule::getId).toArray(String[]::new);
-                        ScheduleDao.updateByIds(scheduleIds, values);
+                        MasterService.BINLOG_LAST_INDEX=ScheduleDao.updateByIds(scheduleIds, values);
                     }
                 } catch (Exception e) {
                     LogUtil.error("", e);

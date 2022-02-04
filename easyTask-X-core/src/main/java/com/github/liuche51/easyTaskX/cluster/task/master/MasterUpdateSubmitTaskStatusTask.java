@@ -33,7 +33,7 @@ public class MasterUpdateSubmitTaskStatusTask extends TimerTask {
                     if (ids.size() > 0) {
                         Map<String, Object> values = new HashMap<>();
                         values.put("status", ScheduleStatusEnum.NORMAL);
-                        ScheduleDao.updateByIds(ids.toArray(new String[]{}), values);
+                        MasterService.BINLOG_LAST_INDEX=ScheduleDao.updateByIds(ids.toArray(new String[]{}), values);
                         results.forEach(x->{ // 分别将处理成功的任务结果放入对应的客户端反馈队列中去。
                             MasterService.addWAIT_RESPONSE_CLINET_TASK_RESULT(x.getSource(),new SubmitTaskResult(x.getId(), SubmitTaskResultStatusEnum.SUCCESSED));
                         });

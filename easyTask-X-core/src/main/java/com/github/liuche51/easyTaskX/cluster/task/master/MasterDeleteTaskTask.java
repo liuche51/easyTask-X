@@ -26,7 +26,7 @@ public class MasterDeleteTaskTask extends TimerTask {
             try {
                 MasterService.WAIT_DELETE_TASK.drainTo(taskIds, 10);// 批量获取，为空不阻塞。
                 if (taskIds.size() > 0) {
-                    ScheduleDao.deleteByIds(taskIds.toArray(new String[]{}));
+                    MasterService.BINLOG_LAST_INDEX=ScheduleDao.deleteByIds(taskIds.toArray(new String[]{}));
                 } else {
                     try {
                         if (new Date().getTime() - getLastRunTime().getTime() < 500)//防止频繁空转

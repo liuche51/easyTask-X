@@ -27,8 +27,10 @@ public class FollowRequestLeaderGetRegNodeStatusHandler extends BaseHandler {
         switch (body) {
             case StringConstant.BROKER:
                 node = LeaderService.BROKER_REGISTER_CENTER.get(address);
+                break;
             case StringConstant.CLINET:
                 node = LeaderService.CLIENT_REGISTER_CENTER.get(address);
+                break;
             default:
                 break;
         }

@@ -2,8 +2,12 @@
 
 import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
 import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.dao.BinlogScheduleDao;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
+import com.github.liuche51.easyTaskX.dao.SqliteHelper;
+import com.github.liuche51.easyTaskX.dto.db.BinlogSchedule;
 import com.github.liuche51.easyTaskX.dto.db.ScheduleBak;
+import com.github.liuche51.easyTaskX.util.DbTableName;
 import org.junit.Test;
 import org.sqlite.SQLiteException;
 
@@ -34,24 +38,20 @@ public class UnitTest {
         }
 
     }
-    // 文件随机位置写入  耗时：1000ms
-    public static void randomWrite1(String path,String content) throws Exception {
-        RandomAccessFile raf=new RandomAccessFile(path,"rw");
-        Random random=new Random();
-        for(int i=0;i<100000;i++){
-            raf.seek(random.nextInt((int)raf.length())); // 在文件随机位置写入覆盖
-            raf.write((i+content+System.lineSeparator()).getBytes());
-        }
-        raf.close();
-    }
-    // 文件尾部位置写入  耗时：800ms
-    public static void randomWrite2(String path,String content) throws Exception {
-        RandomAccessFile raf=new RandomAccessFile(path,"rw");
-        for(int i=0;i<100000;i++){
-            raf.seek(raf.length()); // 总是在文件尾部追加
-            raf.write((i+content+System.lineSeparator()).getBytes());
-        }
-        raf.close();
+    @Test
+    public void test2() throws Exception {
+        EasyTaskConfig config=new EasyTaskConfig();
+        config.setTaskStorePath("C:/easyTaskX/node1");
+        NodeService.setConfig(config);
+        SqliteHelper helper=new SqliteHelper(DbTableName.SCHEDULE);
+        List<BinlogSchedule> schedules=new ArrayList<>();
+        BinlogSchedule schedul=new BinlogSchedule();
+        schedul.setStatus(1);
+        schedul.setScheduleId("111");
+        schedul.setSql("");
+        schedules.add(schedul);
+        Long aLong = BinlogScheduleDao.saveBatch(schedules, helper);
+        //BinlogScheduleDao.save("","111",1,helper);
     }
 }
 

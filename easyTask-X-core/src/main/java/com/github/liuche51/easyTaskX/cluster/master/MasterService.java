@@ -60,6 +60,11 @@ public class MasterService {
      * 3、需要一个线程定时清理因为异常情况导致的长期未移除的数据。避免内存溢出
      */
     public static ConcurrentHashMap<String, Map<String, Object>> SLAVE_SYNC_TASK_RECORD = new ConcurrentHashMap<>();
+    /**
+     * 当前master节点binlog自增长最大位置编号
+     * 1、用于判断其slave是否已经跟上数据同步
+     */
+    public static Long BINLOG_LAST_INDEX;
 
     /**
      * 新Master将失效的旧Master的备份任务数据删除掉
