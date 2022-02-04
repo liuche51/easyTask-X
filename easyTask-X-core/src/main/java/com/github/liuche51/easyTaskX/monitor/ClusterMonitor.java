@@ -6,9 +6,9 @@ import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.dao.SQLliteMultiPool;
-import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegClient;
+import com.github.liuche51.easyTaskX.dto.SlaveNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
@@ -53,9 +53,9 @@ public class ClusterMonitor {
         Map<String, Map<String, List>> map = new HashMap<>(3);
         Map<String, List> leaderInfo = DBMonitor.getInfoByTaskId(taskId);
         map.put(BrokerService.getConfig().getAddress(), leaderInfo);
-        Iterator<Map.Entry<String, BaseNode>> items = MasterService.SLAVES.entrySet().iterator();
+        Iterator<Map.Entry<String, SlaveNode>> items = MasterService.SLAVES.entrySet().iterator();
         while (items.hasNext()) {
-            BaseNode item = items.next().getValue();
+            SlaveNode item = items.next().getValue();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.GetDBInfoByTaskId).setSource(BrokerService.getConfig().getAddress())
                     .setBody(taskId);

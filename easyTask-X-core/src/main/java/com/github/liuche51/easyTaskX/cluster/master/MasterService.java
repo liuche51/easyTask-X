@@ -7,7 +7,7 @@ import com.github.liuche51.easyTaskX.cluster.task.master.MasterSubmitTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.MasterUpdateSubmitTaskStatusTask;
 import com.github.liuche51.easyTaskX.dao.BinlogScheduleDao;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
-import com.github.liuche51.easyTaskX.dto.BaseNode;
+import com.github.liuche51.easyTaskX.dto.SlaveNode;
 import com.github.liuche51.easyTaskX.dto.SubmitTaskResult;
 import com.github.liuche51.easyTaskX.dto.db.BinlogSchedule;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
@@ -28,7 +28,7 @@ public class MasterService {
     /**
      * 当前节点的所有slaves
      */
-    public static ConcurrentHashMap<String, BaseNode> SLAVES = new ConcurrentHashMap<String, BaseNode>();
+    public static ConcurrentHashMap<String, SlaveNode> SLAVES = new ConcurrentHashMap<String, SlaveNode>();
     /**
      * 等待入库同步的提交任务队列
      * 1、客户端提交任务到服务端，保存到此队列后，立即返回

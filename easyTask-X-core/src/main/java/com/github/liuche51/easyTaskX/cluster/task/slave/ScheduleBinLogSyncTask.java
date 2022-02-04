@@ -33,20 +33,20 @@ public class ScheduleBinLogSyncTask extends TimerTask {
         while (!isExit()) {
             setLastRunTime(new Date());
             try {
-                Iterator<Map.Entry<String, MasterNode>> items = SlaveService.MASTER_SYNC_BINLOG_INFO.entrySet().iterator();
+                Iterator<Map.Entry<String, MasterNode>> items = SlaveService.MASTERS.entrySet().iterator();
                 while (items.hasNext()) {
                     Map.Entry<String, MasterNode> item = items.next();
-                    if (!item.getValue().isSyncing()) {//保证每个master 一次只有一个异步任务同步日志。避免多线程导致SQL执行问题。
+                    if (!item.getValue().isBinlogSyncing()) {//保证每个master 一次只有一个异步任务同步日志。避免多线程导致SQL执行问题。
                         BrokerService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
                             @Override
                             public void run() {
                                 try {
-                                    item.getValue().setSyncing(true);
-                                    requestMasterScheduleBinLogData(item.getValue(), item.getValue().getCurrentIndex());
+                                    item.getValue().setBinlogSyncing(true);
+                                    requestMasterScheduleBinLogData(item.getValue(), item.getValue().getCurrentBinlogIndex());
                                 } catch (Exception e) {
                                     LogUtil.error("", e);
                                 } finally {
-                                    item.getValue().setSyncing(false); // 防止任务异常导致同步状态无法归位，而不能继续同步
+                                    item.getValue().setBinlogSyncing(false); // 防止任务异常导致同步状态无法归位，而不能继续同步
                                 }
                             }
                         });
@@ -92,8 +92,8 @@ public class ScheduleBinLogSyncTask extends TimerTask {
                 String sql = x.getSql().replace(DbTableName.SCHEDULE, DbTableName.SCHEDULE_BAK);
                 try {
                     ScheduleBakDao.executeSql(sql);
-                    MasterNode masterNode = SlaveService.MASTER_SYNC_BINLOG_INFO.get(master.getAddress());
-                    masterNode.setCurrentIndex(x.getId());
+                    MasterNode masterNode = SlaveService.MASTERS.get(master.getAddress());
+                    masterNode.setCurrentBinlogIndex(x.getId());
                     //如果当前binlog新增任务是需要等待slave同步确认的。则通知master已经完成同步
                     if (ScheduleStatusEnum.UNUSE == x.getStatus() && !StringUtils.isNullOrEmpty(x.getScheduleId())) {
                         addWAIT_RESPONSE_MASTER_TASK_RESULT(master.getAddress(),new SubmitTaskResult(x.getScheduleId(), SubmitTaskResultStatusEnum.SUCCESSED));

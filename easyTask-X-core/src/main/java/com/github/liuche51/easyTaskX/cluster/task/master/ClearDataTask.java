@@ -5,10 +5,9 @@ import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
-import com.github.liuche51.easyTaskX.dto.BaseNode;
-
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
 import com.github.liuche51.easyTaskX.dto.ByteStringPack;
+import com.github.liuche51.easyTaskX.dto.MasterNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.enume.NodeStatusEnum;
@@ -16,7 +15,10 @@ import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.*;
 
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -49,11 +51,11 @@ public class ClearDataTask extends TimerTask {
     private void clearScheduleBakData() {
         try {
             if (!requestLeaderNodeStatusIsNormal()) return;//只有正常状态才能清理。
-            Map<String, BaseNode> masters = SlaveService.MASTERS;
-            Iterator<Map.Entry<String, BaseNode>> items = masters.entrySet().iterator();//使用遍历+移除操作安全的迭代器方式
+            Map<String, MasterNode> masters = SlaveService.MASTERS;
+            Iterator<Map.Entry<String, MasterNode>> items = masters.entrySet().iterator();//使用遍历+移除操作安全的迭代器方式
             List<String> sources = new ArrayList<>(masters.size());
             while (items.hasNext()) {
-                Map.Entry<String, BaseNode> item = items.next();
+                Map.Entry<String, MasterNode> item = items.next();
                 sources.add(item.getValue().getAddress());
             }
             ScheduleBakDao.deleteNotInBySources(sources.toArray(new String[sources.size()]));

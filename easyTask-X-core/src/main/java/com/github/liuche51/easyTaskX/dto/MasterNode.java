@@ -1,20 +1,21 @@
 package com.github.liuche51.easyTaskX.dto;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * Master节点对象。
  * 1、目前用于slave对master的binlog订阅
  */
 public class MasterNode extends BaseNode {
     /**
-     * 当前master是否已经存在同步binlog的任务。
+     * 当前salve所同步的当前master是否已经存在同步binlog的任务。
+     * 1、防止多线程并发同步
+     * 2、salve使用
      */
-    private volatile boolean syncing = false;
+    private volatile boolean binlogSyncing = false;
     /**
-     * 当前已经同步日志的位置号。默认0，表示未开始
+     * 当前salve已经同步当前master日志的位置号。默认0，表示未开始
+     * 1、salve使用
      */
-    private long currentIndex = 0;
+    private long currentBinlogIndex = 0;
 
     public MasterNode(BaseNode baseNode) {
         super(baseNode.getHost(), baseNode.getPort());
@@ -28,19 +29,19 @@ public class MasterNode extends BaseNode {
         super(address);
     }
 
-    public boolean isSyncing() {
-        return syncing;
+    public boolean isBinlogSyncing() {
+        return binlogSyncing;
     }
 
-    public void setSyncing(boolean syncing) {
-        this.syncing = syncing;
+    public void setBinlogSyncing(boolean binlogSyncing) {
+        this.binlogSyncing = binlogSyncing;
     }
 
-    public long getCurrentIndex() {
-        return currentIndex;
+    public long getCurrentBinlogIndex() {
+        return currentBinlogIndex;
     }
 
-    public void setCurrentIndex(long currentIndex) {
-        this.currentIndex = currentIndex;
+    public void setCurrentBinlogIndex(long currentBinlogIndex) {
+        this.currentBinlogIndex = currentBinlogIndex;
     }
 }

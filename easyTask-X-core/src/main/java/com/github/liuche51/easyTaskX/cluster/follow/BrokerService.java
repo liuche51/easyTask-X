@@ -5,22 +5,31 @@ import com.github.liuche51.easyTaskX.cluster.NodeUtil;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
-import com.github.liuche51.easyTaskX.cluster.task.broker.*;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
-import com.github.liuche51.easyTaskX.cluster.task.master.*;
+import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerNotifyClientSubmitTaskResultTask;
+import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerRequestUpdateRegeditTask;
+import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerUpdateClientsTask;
+import com.github.liuche51.easyTaskX.cluster.task.broker.HeartbeatsTask;
+import com.github.liuche51.easyTaskX.cluster.task.master.ClearDataTask;
 import com.github.liuche51.easyTaskX.dao.dbinit.DbInit;
-import com.github.liuche51.easyTaskX.dto.*;
+import com.github.liuche51.easyTaskX.dto.BaseNode;
+import com.github.liuche51.easyTaskX.dto.ByteStringPack;
+import com.github.liuche51.easyTaskX.dto.MasterNode;
+import com.github.liuche51.easyTaskX.dto.SlaveNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.netty.server.NettyServer;
 import com.github.liuche51.easyTaskX.socket.CmdServer;
-import com.github.liuche51.easyTaskX.util.*;
+import com.github.liuche51.easyTaskX.util.LogUtil;
+import com.github.liuche51.easyTaskX.util.StringConstant;
+import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.zk.ZKService;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -212,19 +221,42 @@ public class BrokerService {
      */
     public static void dealUpdate(NodeDto.Node node) {
         BAK_LEADER = node.getBakleader();
+        //处理slaves
         NodeDto.NodeList slaveNodes = node.getSalves();
-        ConcurrentHashMap<String, BaseNode> slaves = new ConcurrentHashMap<>();
+        List<String> slavesAddress = new ArrayList<>(slaveNodes.getNodesList().size());
         slaveNodes.getNodesList().forEach(x -> {
-            slaves.put(x.getHost() + ":" + x.getPort(), new BaseNode(x.getHost(), x.getPort()));
+            slavesAddress.add(new SlaveNode(x.getHost(), x.getPort()).getAddress());
         });
+        //获取新加入的slave节点
+        slavesAddress.forEach(x -> {
+            if (!SlaveService.MASTERS.keySet().contains(x)) {
+                MasterService.SLAVES.put(x, new SlaveNode(x));
+            }
+        });
+        //删除已经失效的slave
+        MasterService.SLAVES.keySet().forEach(x -> {
+            if (!slavesAddress.contains(x)) {
+                MasterService.SLAVES.remove(x);
+            }
+        });
+        //处理masters
         NodeDto.NodeList masterNodes = node.getMasters();
-        ConcurrentHashMap<String, BaseNode> masters = new ConcurrentHashMap<>();
+        List<String> mastersAddress = new ArrayList<>(masterNodes.getNodesList().size());
         masterNodes.getNodesList().forEach(x -> {
-            masters.put(x.getHost() + ":" + x.getPort(), new BaseNode(x.getHost(), x.getPort()));
+            mastersAddress.add(new MasterNode(x.getHost(), x.getPort()).getAddress());
         });
-        MasterService.SLAVES = slaves;
-        SlaveService.MASTERS = masters;
-        BrokerUtil.updateMasterBinlogInfo(masters);
+        //获取新加入的master节点
+        mastersAddress.forEach(x -> {
+            if (!SlaveService.MASTERS.keySet().contains(x)) {
+                SlaveService.MASTERS.put(x, new MasterNode(x));
+            }
+        });
+        //删除已经失效的master
+        SlaveService.MASTERS.keySet().forEach(x -> {
+            if (!mastersAddress.contains(x)) {
+                SlaveService.MASTERS.remove(x);
+            }
+        });
     }
 
 }
