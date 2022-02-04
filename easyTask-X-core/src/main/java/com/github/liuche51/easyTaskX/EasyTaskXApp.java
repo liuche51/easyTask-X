@@ -1,14 +1,12 @@
 package com.github.liuche51.easyTaskX;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.apache.log4j.PropertyConfigurator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Properties;
@@ -29,7 +27,7 @@ public class EasyTaskXApp {
             initLogConfig();
         EasyTaskConfig config = loadConfig(args);
         LogUtil.info("AnnularQueue start config EasyTaskConfig=" + JSONObject.toJSONString(config));
-        NodeService.start(config);
+        BrokerService.start(config);
         LogUtil.info("===============================================================================");
         LogUtil.info("================== EasyTask-X Started Successfull！=============================");
         LogUtil.info("================================================================================");

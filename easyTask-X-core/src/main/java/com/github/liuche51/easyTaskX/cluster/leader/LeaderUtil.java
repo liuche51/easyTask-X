@@ -1,16 +1,14 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
+import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.dto.*;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
-import com.github.liuche51.easyTaskX.enume.OperationTypeEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -21,7 +19,7 @@ public class LeaderUtil {
      * 通知节点更新注册表信息
      */
     public static void notifyFollowUpdateRegedit(String address, String type) {
-        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+        BrokerService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -31,8 +29,8 @@ public class LeaderUtil {
                             NodeDto.Node.Builder nodeBuilder = packageBrokerRegeditInfo(node);
                             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                             builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyBrokerUpdateRegedit)
-                                    .setSource(NodeService.CURRENT_NODE.getAddress()).setBodyBytes(nodeBuilder.build().toByteString());
-                            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                                    .setSource(BrokerService.CURRENT_NODE.getAddress()).setBodyBytes(nodeBuilder.build().toByteString());
+                            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                             if (!ret) {
                                 LogErrorUtil.writeRpcErrorMsgToDb("Leader通知Follow节点更新注册表信息。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil.notifyFollowUpdateRegedit");
                             }
@@ -63,7 +61,7 @@ public class LeaderUtil {
     public static NodeDto.Node.Builder packageBrokerRegeditInfo(RegBroker node) {
         NodeDto.Node.Builder nodeBuilder = NodeDto.Node.newBuilder();
         //备用leader信息
-        nodeBuilder.setBakleader(JSONObject.toJSONString(NodeService.CURRENT_NODE.getSlaves()));
+        nodeBuilder.setBakleader(JSONObject.toJSONString(MasterService.SLAVES));
         //slaves
         NodeDto.NodeList.Builder slavesBuilder = NodeDto.NodeList.newBuilder();
         Iterator<Map.Entry<String, RegNode>> items2 = node.getSlaves().entrySet().iterator();
@@ -96,14 +94,14 @@ public class LeaderUtil {
      * @param bakLeader
      */
     public static void notifyFollowBakLeaderChanged(String address, String bakLeader) {
-        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+        BrokerService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyFollowUpdateBakLeaderInfo)
-                            .setSource(NodeService.CURRENT_NODE.getAddress()).setBody(bakLeader);
-                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, new Node(address).getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                            .setSource(BrokerService.CURRENT_NODE.getAddress()).setBody(bakLeader);
+                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, new BaseNode(address).getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret)
                         LogUtil.info("normally exception!notifyFollowBakLeaderChanged() failed.");
                 } catch (Exception e) {
@@ -121,7 +119,7 @@ public class LeaderUtil {
      * @param type   add、delete
      */
     public static void notifyClinetChangedBroker(RegClient client, String broker, String newMaster, String type) {
-        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+        BrokerService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -130,8 +128,8 @@ public class LeaderUtil {
                         str.append(StringConstant.CHAR_SPRIT_STRING).append(newMaster);
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyClientBrokerChanged)
-                            .setSource(NodeService.CURRENT_NODE.getAddress()).setBody(type + str.toString());//type+Broker地址+新master地址
-                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, client.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                            .setSource(BrokerService.CURRENT_NODE.getAddress()).setBody(type + str.toString());//type+Broker地址+新master地址
+                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, client.getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret) {
                        LogErrorUtil.writeRpcErrorMsgToDb("Leader通知Clinets。Broker发生变更。失败！","com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil.notifyClinetChangedBroker");
                     }
@@ -150,14 +148,14 @@ public class LeaderUtil {
      * @param type   add、delete
      */
     public static void notifyBrokerChangedClient(RegBroker broker, String client, String type) {
-        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+        BrokerService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyBrokerClientChanged)
-                            .setSource(NodeService.CURRENT_NODE.getAddress()).setBody(type + StringConstant.CHAR_SPRIT_STRING + client);
-                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, broker.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                            .setSource(BrokerService.CURRENT_NODE.getAddress()).setBody(type + StringConstant.CHAR_SPRIT_STRING + client);
+                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, broker.getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret) {
                         LogErrorUtil.writeRpcErrorMsgToDb("Leader通知Broker。有Client注册变更消息。失败！","com.github.liuche51.easyTaskX.cluster.leader.LeaderUtil.notifyBrokerChangedClient");
                     }

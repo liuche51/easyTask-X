@@ -1,7 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
-
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
+import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.enume.DataStatusEnum;
@@ -9,8 +9,6 @@ import com.github.liuche51.easyTaskX.enume.NodeStatusEnum;
 import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.exception.VotedException;
 import com.github.liuche51.easyTaskX.util.exception.VotingException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,7 +35,7 @@ public class VoteSlave {
     public static List<RegNode> initVoteSlaves(RegBroker regNode) throws Exception {
         if (selecting) throw new VotingException(String.format("[%s] is voting a new slave", regNode.getAddress()));
         selecting = true;
-        int count = NodeService.getConfig().getBackupCount();
+        int count = BrokerService.getConfig().getBackupCount();
         try {
             lock.lock();
             List<String> availableSlaves = VoteSlave.getAvailableSlave(regNode);
@@ -72,7 +70,7 @@ public class VoteSlave {
         try {
             lock.lock();
             //多线程下，如果follows已经选好，则让客户端重新提交任务。以后可以优化为获取选举后的follow
-            if (regNode.getSlaves().size() >= NodeService.getConfig().getBackupCount())
+            if (regNode.getSlaves().size() >= BrokerService.getConfig().getBackupCount())
                 throw new VotedException(String.format("[%s] has voted a new slave.", regNode.getAddress()));
             List<String> availableFollows = getAvailableSlave(regNode);
             slaves = voteSlaves(1, availableFollows);
@@ -98,7 +96,7 @@ public class VoteSlave {
      * @return
      */
     private static List<String> getAvailableSlave(RegBroker regNode) throws Exception {
-        int count = NodeService.getConfig().getBackupCount();
+        int count = BrokerService.getConfig().getBackupCount();
         Iterator<Map.Entry<String, RegBroker>> items = LeaderService.BROKER_REGISTER_CENTER.entrySet().iterator();
         List<String> availableFollows = new ArrayList<>(LeaderService.BROKER_REGISTER_CENTER.size());
         while (items.hasNext()) {
@@ -123,7 +121,7 @@ public class VoteSlave {
             if (temp1.isPresent())
                 availableFollows.remove(temp1.get());
         }
-        if (availableFollows.size() < count - NodeService.CURRENT_NODE.getSlaves().size())//如果可选备库节点数量不足，则等待1s，然后重新选。注意：等待会阻塞整个服务可用性
+        if (availableFollows.size() < count - MasterService.SLAVES.size())//如果可选备库节点数量不足，则等待1s，然后重新选。注意：等待会阻塞整个服务可用性
         {
             LogUtil.info("[{}] getAvailableSlave is not enough! only has {},current own {}", regNode.getAddress(), availableFollows.size(), regNode.getSlaves().size());
             TimeUnit.SECONDS.sleep(1L);

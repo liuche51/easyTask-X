@@ -1,9 +1,8 @@
 package com.github.liuche51.easyTaskX.netty.client;
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.util.LogUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -13,7 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Netty客户端连接池工厂
  */
 public class NettyConnectionFactory {
-    private Map<String, ConcurrentLinkedQueue<NettyClient>> pools = new HashMap<>(NodeService.getConfig().getBackupCount());
+    private Map<String, ConcurrentLinkedQueue<NettyClient>> pools = new HashMap<>(BrokerService.getConfig().getBackupCount());
     private ReentrantLock lock = new ReentrantLock();
     private static NettyConnectionFactory singleton = null;
 
@@ -65,7 +64,7 @@ public class NettyConnectionFactory {
         String key = conn.getHost() + ":" + conn.getPort();
         ConcurrentLinkedQueue<NettyClient> pool = pools.get(key);
         //连接没有被关闭的才可以放入池中
-        if (conn.getClientChannel()!=null&&conn.getClientChannel().isActive()&&pool.size() < NodeService.getConfig().getAdvanceConfig().getNettyPoolSize()) {
+        if (conn.getClientChannel()!=null&&conn.getClientChannel().isActive()&&pool.size() < BrokerService.getConfig().getAdvanceConfig().getNettyPoolSize()) {
             pool.add(conn);
         } else {
             conn.close();

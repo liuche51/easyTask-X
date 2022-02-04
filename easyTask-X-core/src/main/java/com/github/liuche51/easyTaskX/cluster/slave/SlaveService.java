@@ -3,6 +3,7 @@ package com.github.liuche51.easyTaskX.cluster.slave;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.slave.ScheduleBinLogSyncTask;
 import com.github.liuche51.easyTaskX.cluster.task.slave.SlaveNotifyMasterHasSyncUnUseTaskTask;
+import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.MasterNode;
 import com.github.liuche51.easyTaskX.dto.SubmitTaskResult;
 import org.slf4j.Logger;
@@ -15,6 +16,10 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Slave服务入口
  */
 public class SlaveService {
+    /**
+     * 当前节点的所有masters
+     */
+    public static ConcurrentHashMap<String, BaseNode> MASTERS = new ConcurrentHashMap<>();
     /**
      * 等待salve反馈给master的任务状态
      * 1、高可靠模式下使用

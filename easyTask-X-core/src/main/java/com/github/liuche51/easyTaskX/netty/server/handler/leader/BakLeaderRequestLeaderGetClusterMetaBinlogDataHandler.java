@@ -1,18 +1,15 @@
 package com.github.liuche51.easyTaskX.netty.server.handler.leader;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
-import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.dto.db.BinlogClusterMeta;
-import com.github.liuche51.easyTaskX.dto.db.BinlogSchedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.google.protobuf.ByteString;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -32,7 +29,7 @@ public class BakLeaderRequestLeaderGetClusterMetaBinlogDataHandler extends BaseH
             LinkedBlockingQueue<String> bakleaderMetaQueue = LeaderService.followsHeartbeats.get(frame.getSource());
             if(bakleaderMetaQueue!=null){
                 binlogClusterMetas=new LinkedList<>();
-                for(int i = 0; i<NodeService.getConfig().getAdvanceConfig().getBinlogCount();i++){
+                for(int i = 0; i< BrokerService.getConfig().getAdvanceConfig().getBinlogCount(); i++){
                     String element = bakleaderMetaQueue.poll();
                     if(!StringUtils.isNullOrEmpty(element)){
                         String[] ret=element.split(StringConstant.CHAR_SPRIT_COMMA);// regnode,address,time

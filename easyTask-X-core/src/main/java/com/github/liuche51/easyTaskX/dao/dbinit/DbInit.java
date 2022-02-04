@@ -1,11 +1,7 @@
 package com.github.liuche51.easyTaskX.dao.dbinit;
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
-import com.github.liuche51.easyTaskX.dao.*;
-import com.github.liuche51.easyTaskX.util.DbTableName;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.util.LogUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -22,7 +18,7 @@ public class DbInit {
             return true;
         try {
             //创建db存储文件夹
-            File file = new File(NodeService.getConfig().getTaskStorePath());
+            File file = new File(BrokerService.getConfig().getTaskStorePath());
             if (!file.exists()) {
                 file.mkdirs();
             }

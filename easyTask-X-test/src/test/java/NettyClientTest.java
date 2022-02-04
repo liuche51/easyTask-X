@@ -1,13 +1,12 @@
-
-import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
-import com.github.liuche51.easyTaskX.dto.Node;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
+import com.github.liuche51.easyTaskX.dto.BaseNode;
+import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
-import com.github.liuche51.easyTaskX.netty.client.NettyClient;
-import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
+import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.client.NettyConnectionFactory;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.StringConstant;
@@ -88,7 +87,7 @@ public class NettyClientTest {
             EasyTaskConfig config=new EasyTaskConfig();
             config.getAdvanceConfig().setTimeOut(30);
             config.getAdvanceConfig().setNettyPoolSize(2);
-            NodeService.setConfig(config);
+            BrokerService.setConfig(config);
             while (true){
                 ScheduleDto.Schedule.Builder builder=ScheduleDto.Schedule.newBuilder();
                 String id=String.valueOf(System.currentTimeMillis());
@@ -126,23 +125,23 @@ public class NettyClientTest {
     @Test
     public void getList() throws Exception {
         EasyTaskConfig config=new EasyTaskConfig();
-        NodeService.setConfig(config);
+        BrokerService.setConfig(config);
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
         builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestLeaderSendRegedit).setSource("127.0.0.1:2021")
         .setBody(StringConstant.BROKER);
-        Dto.Frame frame = NettyMsgService.sendSyncMsg(new Node("127.0.0.1",2021).getClient(), builder.build());
+        Dto.Frame frame = NettyMsgService.sendSyncMsg(new BaseNode("127.0.0.1",2021).getClient(), builder.build());
         ResultDto.Result result = ResultDto.Result.parseFrom(frame.getBodyBytes());
         if (StringConstant.TRUE.equals(result.getResult())) {
             NodeDto.Node node=NodeDto.Node.parseFrom(result.getBodyBytes());
             NodeDto.NodeList clientNodes=node.getClients();
-            ConcurrentHashMap<String, Node> clients=new ConcurrentHashMap<>();
+            ConcurrentHashMap<String, BaseNode> clients=new ConcurrentHashMap<>();
             clientNodes.getNodesList().forEach(x->{
-                clients.put(x.getHost()+":"+x.getPort(),new Node(x.getHost(),x.getPort()));
+                clients.put(x.getHost()+":"+x.getPort(),new BaseNode(x.getHost(),x.getPort()));
             });
             NodeDto.NodeList followNodes=node.getClients();
-            ConcurrentHashMap<String,Node> follows=new ConcurrentHashMap<>();
+            ConcurrentHashMap<String,BaseNode> follows=new ConcurrentHashMap<>();
             followNodes.getNodesList().forEach(x->{
-                follows.put(x.getHost()+":"+x.getPort(),new Node(x.getHost(),x.getPort()));
+                follows.put(x.getHost()+":"+x.getPort(),new BaseNode(x.getHost(),x.getPort()));
             });
         }
     }

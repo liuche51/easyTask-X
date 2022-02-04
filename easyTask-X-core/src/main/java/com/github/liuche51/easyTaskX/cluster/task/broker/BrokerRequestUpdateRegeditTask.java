@@ -1,6 +1,5 @@
 package com.github.liuche51.easyTaskX.cluster.task.broker;
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.util.LogUtil;
@@ -20,7 +19,7 @@ public class BrokerRequestUpdateRegeditTask extends TimerTask {
                 LogUtil.error("", e);
             }
             try {
-                TimeUnit.MINUTES.sleep(NodeService.getConfig().getAdvanceConfig().getFollowUpdateRegeditTime());
+                TimeUnit.MINUTES.sleep(BrokerService.getConfig().getAdvanceConfig().getFollowUpdateRegeditTime());
             } catch (InterruptedException e) {
                 LogUtil.error("", e);
             }

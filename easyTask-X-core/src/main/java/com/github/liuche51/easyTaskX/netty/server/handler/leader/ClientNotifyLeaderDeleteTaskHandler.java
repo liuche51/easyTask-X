@@ -1,9 +1,8 @@
 package com.github.liuche51.easyTaskX.netty.server.handler.leader;
 
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
-import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.StringListDto;
@@ -15,8 +14,6 @@ import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
 import com.google.protobuf.ByteString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.List;
@@ -42,7 +39,7 @@ public class ClientNotifyLeaderDeleteTaskHandler extends BaseHandler {
         final CountDownLatch countDown = new CountDownLatch(LeaderService.BROKER_REGISTER_CENTER.size() + LeaderService.CLIENT_REGISTER_CENTER.size());
         Iterator<String> brokers = LeaderService.BROKER_REGISTER_CENTER.keySet().iterator();
         while (brokers.hasNext()) {
-            NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+            BrokerService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -55,7 +52,7 @@ public class ClientNotifyLeaderDeleteTaskHandler extends BaseHandler {
         }
         Iterator<String> clients = LeaderService.CLIENT_REGISTER_CENTER.keySet().iterator();
         while (clients.hasNext()) {
-            NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+            BrokerService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -66,7 +63,7 @@ public class ClientNotifyLeaderDeleteTaskHandler extends BaseHandler {
                 }
             });
         }
-        boolean await = countDown.await(NodeService.getConfig().getAdvanceConfig().getTimeOut(), TimeUnit.SECONDS);
+        boolean await = countDown.await(BrokerService.getConfig().getAdvanceConfig().getTimeOut(), TimeUnit.SECONDS);
         if (!this.result || !await) { // 节点处理有错误或超时
             return ByteString.copyFromUtf8(StringConstant.FALSE);
         } else {
@@ -81,7 +78,7 @@ public class ClientNotifyLeaderDeleteTaskHandler extends BaseHandler {
                 builder0.addList(x);
             });
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.ClientNotifyLeaderDeleteTask).setSource(NodeService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.ClientNotifyLeaderDeleteTask).setSource(BrokerService.getConfig().getAddress())
                     .setBodyBytes(builder0.build().toByteString());
             NettyClient client = new BaseNode(address).getClientWithCount(1);
             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, client, 1, 0, null);

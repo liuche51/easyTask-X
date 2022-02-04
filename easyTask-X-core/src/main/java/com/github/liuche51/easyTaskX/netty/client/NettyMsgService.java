@@ -1,21 +1,15 @@
 package com.github.liuche51.easyTaskX.netty.client;
 
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
-import com.github.liuche51.easyTaskX.dao.LogErrorDao;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.dto.ByteStringPack;
-import com.github.liuche51.easyTaskX.dto.db.LogError;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ResultDto;
-import com.github.liuche51.easyTaskX.enume.LogErrorTypeEnum;
 import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,7 +28,7 @@ public class NettyMsgService {
         ChannelPromise promise = conn.getClientChannel().newPromise();
         conn.getHandler().setPromise(promise);
         conn.getClientChannel().writeAndFlush(msg);
-        promise.await(NodeService.getConfig().getAdvanceConfig().getTimeOut(), TimeUnit.SECONDS);//等待固定的时间，超时就认为失败，需要重发
+        promise.await(BrokerService.getConfig().getAdvanceConfig().getTimeOut(), TimeUnit.SECONDS);//等待固定的时间，超时就认为失败，需要重发
         try {
             Dto.Frame frame = (Dto.Frame) conn.getHandler().getResponse();
             return frame;

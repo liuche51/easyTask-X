@@ -1,6 +1,5 @@
-import com.github.liuche51.easyTaskX.cluster.NodeService;
-import com.github.liuche51.easyTaskX.dto.Node;
-
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
+import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.junit.Test;
 
@@ -11,8 +10,8 @@ public class LeaderServiceTest {
     @Test
     public void initSelectFollows() {
         try {
-            NodeService.getConfig().setBackupCount(2);
-            NodeService.CURRENT_NODE=new Node("127.0.0.1",2020);
+            BrokerService.getConfig().setBackupCount(2);
+            BrokerService.CURRENT_NODE=new BaseNode("127.0.0.1",2020);
             //SliceLeaderService.initSelectFollows();
         } catch (Exception e) {
             e.printStackTrace();
@@ -22,8 +21,8 @@ public class LeaderServiceTest {
     @Test
     public void notifyFollowsLeaderPosition(){
         try {
-        List<Node> list=new LinkedList<>();
-        Node node1=new Node(Util.getLocalIP(),2021);
+        List<BaseNode> list=new LinkedList<>();
+            BaseNode node1=new BaseNode(Util.getLocalIP(),2021);
         list.add(node1);
        // LeaderUtil.notifyFollowsLeaderPosition(list,3);
             while (true){

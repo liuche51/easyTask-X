@@ -1,7 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.task.slave;
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
-import com.github.liuche51.easyTaskX.cluster.master.MasterService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
@@ -36,7 +35,7 @@ public class SlaveNotifyMasterHasSyncUnUseTaskTask extends TimerTask {
                     Map.Entry<String, LinkedBlockingQueue<SubmitTaskResult>> item = items.next();
                     item.getValue().drainTo(results, 10);
                     if (results.size() > 0) {
-                        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+                        BrokerService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
                             @Override
                             public void run() {
                                 try {
@@ -49,8 +48,8 @@ public class SlaveNotifyMasterHasSyncUnUseTaskTask extends TimerTask {
                                     });
                                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.SlaveNotifyMasterHasSyncUnUseTask)
-                                            .setSource(NodeService.CURRENT_NODE.getAddress()).setBodyBytes(builder0.build().toByteString());//任务ID,状态,错误信息
-                                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, new BaseNode(item.getKey()).getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                                            .setSource(BrokerService.CURRENT_NODE.getAddress()).setBodyBytes(builder0.build().toByteString());//任务ID,状态,错误信息
+                                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, new BaseNode(item.getKey()).getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                                     if (!ret) {
                                         LogErrorUtil.writeRpcErrorMsgToDb("Slave通知Master提交的任务同步结果反馈。失败！", "com.github.liuche51.easyTaskX.cluster.task.slave.SlaveNotifyMasterSubmitTaskResultTask");
                                     }

@@ -1,9 +1,9 @@
 package com.github.liuche51.easyTaskX.cluster.task.master;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
+import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 
@@ -15,7 +15,6 @@ import com.github.liuche51.easyTaskX.enume.NodeStatusEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.*;
 
-import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -35,7 +34,7 @@ public class ClearDataTask extends TimerTask {
                 LogUtil.error("", e);
             }
             try {
-                TimeUnit.HOURS.sleep(NodeService.getConfig().getAdvanceConfig().getClearScheduleBakTime());
+                TimeUnit.HOURS.sleep(BrokerService.getConfig().getAdvanceConfig().getClearScheduleBakTime());
             } catch (InterruptedException e) {
                 LogUtil.error("", e);
             }
@@ -50,7 +49,7 @@ public class ClearDataTask extends TimerTask {
     private void clearScheduleBakData() {
         try {
             if (!requestLeaderNodeStatusIsNormal()) return;//只有正常状态才能清理。
-            Map<String, BaseNode> masters = NodeService.CURRENT_NODE.getMasters();
+            Map<String, BaseNode> masters = SlaveService.MASTERS;
             Iterator<Map.Entry<String, BaseNode>> items = masters.entrySet().iterator();//使用遍历+移除操作安全的迭代器方式
             List<String> sources = new ArrayList<>(masters.size());
             while (items.hasNext()) {
@@ -87,10 +86,10 @@ public class ClearDataTask extends TimerTask {
     public static boolean requestLeaderNodeStatusIsNormal() {
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestLeaderGetRegNodeStatus).setSource(NodeService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestLeaderGetRegNodeStatus).setSource(BrokerService.getConfig().getAddress())
                     .setBody(StringConstant.BROKER);
             ByteStringPack respPack = new ByteStringPack();
-            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENT_NODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
+            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, BrokerService.CLUSTER_LEADER.getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
             if (ret) {
                 String result = respPack.getRespbody().toStringUtf8();
                 if (!StringUtils.isNullOrEmpty(result)) {

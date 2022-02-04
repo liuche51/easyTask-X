@@ -1,11 +1,12 @@
 package com.github.liuche51.easyTaskX.util;
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.*;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Util {
@@ -98,9 +99,9 @@ public class Util {
     public static String getSource(String oldSource) throws Exception {
         String source = StringConstant.EMPTY;
         if (oldSource == null || oldSource == StringConstant.EMPTY)
-            source = NodeService.getConfig().getAddress();
+            source = BrokerService.getConfig().getAddress();
         else
-            source = NodeService.getConfig().getAddress() + "<-" + oldSource;
+            source = BrokerService.getConfig().getAddress() + "<-" + oldSource;
         return source;
     }
 

@@ -1,9 +1,7 @@
 package com.github.liuche51.easyTaskX.socket;
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.util.LogUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,8 +30,8 @@ public class CmdServer {
     }
 
     private static void start() throws IOException {
-        ServerSocket server = new ServerSocket(NodeService.getConfig().getCmdPort());//启动端口提供服务
-        LogUtil.info("CmdServer started! on port {}", NodeService.getConfig().getCmdPort());
+        ServerSocket server = new ServerSocket(BrokerService.getConfig().getCmdPort());//启动端口提供服务
+        LogUtil.info("CmdServer started! on port {}", BrokerService.getConfig().getCmdPort());
         while (true) {//循环监听客户端。如果当前客户端断开连接，则进入下一次客户连接等待
             Socket client = null;
             try {

@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.dto.db;
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 
 public class Schedule {
@@ -179,7 +179,7 @@ public class Schedule {
         ScheduleDto.Schedule.Builder builder=ScheduleDto.Schedule.newBuilder();
         builder.setId(this.id).setClassPath(this.classPath).setExecuteTime(this.executeTime)
                 .setTaskType(this.taskType).setPeriod(this.period).setUnit(this.unit)
-                .setParam(this.param).setSource(NodeService.getConfig().getAddress())
+                .setParam(this.param).setSource(BrokerService.getConfig().getAddress())
                 .setExecuter(this.executer).setStatus(this.status);
         return builder.build();
     }

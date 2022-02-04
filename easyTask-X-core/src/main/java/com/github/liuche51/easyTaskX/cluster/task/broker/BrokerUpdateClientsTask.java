@@ -1,7 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.task.broker;
 
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.ByteStringPack;
@@ -25,16 +25,16 @@ public class BrokerUpdateClientsTask extends TimerTask {
         while (!isExit()) {
             try {
                Dto.Frame.Builder builder= Dto.Frame.newBuilder();
-                builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BrokerRequestLeaderSendClients).setSource(NodeService.getConfig().getAddress());
+                builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BrokerRequestLeaderSendClients).setSource(BrokerService.getConfig().getAddress());
                 ByteStringPack pack=new ByteStringPack();
-                boolean ret= NettyMsgService.sendSyncMsgWithCount(builder,NodeService.CURRENT_NODE.getClusterLeader().getClient(),1,0,pack);
+                boolean ret= NettyMsgService.sendSyncMsgWithCount(builder, BrokerService.CLUSTER_LEADER.getClient(),1,0,pack);
                 if(ret){
                    StringListDto.StringList list=StringListDto.StringList.parseFrom(pack.getRespbody()) ;
                    List<String> brokers=list.getListList();
-                   NodeService.CURRENT_NODE.getClients().clear();
+                   BrokerService.CLIENTS.clear();
                    if(brokers!=null){
                        brokers.forEach(x->{
-                           NodeService.CURRENT_NODE.getClients().add(new BaseNode(x));
+                           BrokerService.CLIENTS.add(new BaseNode(x));
                        });
                    }
                 }
@@ -42,7 +42,7 @@ public class BrokerUpdateClientsTask extends TimerTask {
                 LogUtil.error("", e);
             }
             try {
-                TimeUnit.HOURS.sleep(NodeService.getConfig().getAdvanceConfig().getUpdateClientsTime());
+                TimeUnit.HOURS.sleep(BrokerService.getConfig().getAdvanceConfig().getUpdateClientsTime());
             } catch (InterruptedException e) {
                 LogUtil.error("", e);
             }

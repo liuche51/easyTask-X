@@ -1,6 +1,5 @@
 package com.github.liuche51.easyTaskX.cluster.master;
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.MasterDeleteTaskTask;
@@ -8,19 +7,12 @@ import com.github.liuche51.easyTaskX.cluster.task.master.MasterSubmitTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.MasterUpdateSubmitTaskStatusTask;
 import com.github.liuche51.easyTaskX.dao.BinlogScheduleDao;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
-import com.github.liuche51.easyTaskX.dto.ByteStringPack;
+import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.SubmitTaskResult;
 import com.github.liuche51.easyTaskX.dto.db.BinlogSchedule;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
-import com.github.liuche51.easyTaskX.dto.proto.Dto;
-import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
-import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.LogErrorUtil;
 import com.github.liuche51.easyTaskX.util.LogUtil;
-import com.github.liuche51.easyTaskX.util.StringConstant;
-import com.github.liuche51.easyTaskX.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -34,17 +26,21 @@ import java.util.concurrent.TimeUnit;
  */
 public class MasterService {
     /**
+     * 当前节点的所有slaves
+     */
+    public static ConcurrentHashMap<String, BaseNode> SLAVES = new ConcurrentHashMap<String, BaseNode>();
+    /**
      * 等待入库同步的提交任务队列
      * 1、客户端提交任务到服务端，保存到此队列后，立即返回
      * 2、服务端异步通知任务最终是否提交成功
      */
-    public static LinkedBlockingQueue<Schedule> WAIT_SUBMIT_TASK = new LinkedBlockingQueue<>(NodeService.getConfig().getAdvanceConfig().getTaskQueueCapacity());
+    public static LinkedBlockingQueue<Schedule> WAIT_SUBMIT_TASK = new LinkedBlockingQueue<>(BrokerService.getConfig().getAdvanceConfig().getTaskQueueCapacity());
     /**
      * 等待删除的任务队列
      * 1、客户端或服务端内部提交删除任务到服务端，保存到此队列后，立即返回
      * 2、服务端异步通知任务最终是否提交成功
      */
-    public static LinkedBlockingQueue<String> WAIT_DELETE_TASK = new LinkedBlockingQueue<>(NodeService.getConfig().getAdvanceConfig().getTaskQueueCapacity());
+    public static LinkedBlockingQueue<String> WAIT_DELETE_TASK = new LinkedBlockingQueue<>(BrokerService.getConfig().getAdvanceConfig().getTaskQueueCapacity());
     /**
      * 等待服务端反馈给客户端的任务状态
      */
@@ -52,7 +48,7 @@ public class MasterService {
     /**
      * 高可靠模式下，Slave反馈给Master任务同步结果
      */
-    public static LinkedBlockingQueue<SubmitTaskResult> SLAVE_RESPONSE_SUCCESS_TASK_RESULT = new LinkedBlockingQueue<>(NodeService.getConfig().getAdvanceConfig().getTaskQueueCapacity());
+    public static LinkedBlockingQueue<SubmitTaskResult> SLAVE_RESPONSE_SUCCESS_TASK_RESULT = new LinkedBlockingQueue<>(BrokerService.getConfig().getAdvanceConfig().getTaskQueueCapacity());
     /**
      * master和slave同步提交任务状态记录
      * 1、高可靠模式下使用
@@ -85,7 +81,7 @@ public class MasterService {
      * @throws SQLException
      */
     public static List<BinlogSchedule> getScheduleBinlogByIndex(long index) throws SQLException {
-        List<BinlogSchedule> binlogSchedules = BinlogScheduleDao.getScheduleBinlogByIndex(index, NodeService.getConfig().getAdvanceConfig().getBinlogCount());
+        List<BinlogSchedule> binlogSchedules = BinlogScheduleDao.getScheduleBinlogByIndex(index, BrokerService.getConfig().getAdvanceConfig().getBinlogCount());
         return binlogSchedules;
     }
 
@@ -97,11 +93,11 @@ public class MasterService {
     public static void addWAIT_RESPONSE_CLINET_TASK_RESULT(String address, SubmitTaskResult result) {
         LinkedBlockingQueue<SubmitTaskResult> queue = WAIT_RESPONSE_CLINET_TASK_RESULT.get(address);
         if (queue == null) {// 防止数据不一致导致未能正确添加Clinet的队列
-            WAIT_RESPONSE_CLINET_TASK_RESULT.put(address, new LinkedBlockingQueue<SubmitTaskResult>(NodeService.getConfig().getAdvanceConfig().getTaskQueueCapacity()));
+            WAIT_RESPONSE_CLINET_TASK_RESULT.put(address, new LinkedBlockingQueue<SubmitTaskResult>(BrokerService.getConfig().getAdvanceConfig().getTaskQueueCapacity()));
             queue = WAIT_RESPONSE_CLINET_TASK_RESULT.get(address);
         }
         try {
-            boolean offer = queue.offer(result, NodeService.getConfig().getAdvanceConfig().getTimeOut(), TimeUnit.SECONDS);//插入队列，队列满时，超时抛出异常，以便能检查到原因
+            boolean offer = queue.offer(result, BrokerService.getConfig().getAdvanceConfig().getTimeOut(), TimeUnit.SECONDS);//插入队列，队列满时，超时抛出异常，以便能检查到原因
             if (offer == false) {
                 LogErrorUtil.writeQueueErrorMsgToDb("队列WAIT_RESPONSE_CLINET_TASK_RESULT已满.", "com.github.liuche51.easyTaskX.cluster.master.MasterService.addWAIT_RESPONSE_CLINET_TASK_RESULT");
                 addWAIT_DELETE_TASK(result.getId());
@@ -119,7 +115,7 @@ public class MasterService {
      */
     public static void addWAIT_DELETE_TASK(String taskId) {
         try {
-            boolean offer = MasterService.WAIT_DELETE_TASK.offer(taskId, NodeService.getConfig().getAdvanceConfig().getTimeOut(), TimeUnit.SECONDS);//插入队列，队列满时，超时抛出异常，以便能检查到原因
+            boolean offer = MasterService.WAIT_DELETE_TASK.offer(taskId, BrokerService.getConfig().getAdvanceConfig().getTimeOut(), TimeUnit.SECONDS);//插入队列，队列满时，超时抛出异常，以便能检查到原因
             if (offer == false) {
                 LogErrorUtil.writeQueueErrorMsgToDb("队列MasterService.WAIT_DELETE_TASK已满.", "com.github.liuche51.easyTaskX.cluster.master.MasterService.addWAIT_DELETE_TASK");
             }

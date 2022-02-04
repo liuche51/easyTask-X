@@ -1,7 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.task.slave;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
@@ -38,7 +37,7 @@ public class ScheduleBinLogSyncTask extends TimerTask {
                 while (items.hasNext()) {
                     Map.Entry<String, MasterNode> item = items.next();
                     if (!item.getValue().isSyncing()) {//保证每个master 一次只有一个异步任务同步日志。避免多线程导致SQL执行问题。
-                        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+                        BrokerService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
                             @Override
                             public void run() {
                                 try {
@@ -80,10 +79,10 @@ public class ScheduleBinLogSyncTask extends TimerTask {
      */
     private static void requestMasterScheduleBinLogData(MasterNode master, Long index) throws Exception {
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.SlaveRequestMasterGetScheduleBinlogData).setSource(NodeService.getConfig().getAddress())
+        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.SlaveRequestMasterGetScheduleBinlogData).setSource(BrokerService.getConfig().getAddress())
                 .setBody(String.valueOf(index));
         ByteStringPack respPack = new ByteStringPack();
-        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, master.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
+        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, master.getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
         if (ret) {
             List<BinlogSchedule> binlogScheduleList = JSONObject.parseArray(respPack.getRespbody().toString(), BinlogSchedule.class);
             if (binlogScheduleList == null || binlogScheduleList.size() == 0)
@@ -122,11 +121,11 @@ public class ScheduleBinLogSyncTask extends TimerTask {
     private static void addWAIT_RESPONSE_MASTER_TASK_RESULT(String master, SubmitTaskResult submitTaskResult) {
         LinkedBlockingQueue<SubmitTaskResult> queue = SlaveService.WAIT_RESPONSE_MASTER_TASK_RESULT.get(master);
         if (queue == null) {
-            SlaveService.WAIT_RESPONSE_MASTER_TASK_RESULT.put(master, new LinkedBlockingQueue<SubmitTaskResult>(NodeService.getConfig().getAdvanceConfig().getTaskQueueCapacity()));
+            SlaveService.WAIT_RESPONSE_MASTER_TASK_RESULT.put(master, new LinkedBlockingQueue<SubmitTaskResult>(BrokerService.getConfig().getAdvanceConfig().getTaskQueueCapacity()));
             queue = SlaveService.WAIT_RESPONSE_MASTER_TASK_RESULT.get(queue);
         }
         try {
-            boolean offer = queue.offer(submitTaskResult, NodeService.getConfig().getAdvanceConfig().getTimeOut(), TimeUnit.SECONDS);//插入队列，队列满时，超时抛出异常，以便能检查到原因
+            boolean offer = queue.offer(submitTaskResult, BrokerService.getConfig().getAdvanceConfig().getTimeOut(), TimeUnit.SECONDS);//插入队列，队列满时，超时抛出异常，以便能检查到原因
             if (offer == false) {
                 LogErrorUtil.writeQueueErrorMsgToDb("队列WAIT_RESPONSE_MASTER_TASK_RESULT已满.", "com.github.liuche51.easyTaskX.cluster.task.slave.ScheduleBinLogSyncTask.addWAIT_RESPONSE_MASTER_TASK_RESULT");
             }
@@ -144,10 +143,10 @@ public class ScheduleBinLogSyncTask extends TimerTask {
     private static void notifyMasterHasSyncUnUseTask(String scheduleId, BaseNode master) {
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
         try {
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.SlaveNotifyMasterHasSyncUnUseTask).setSource(NodeService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.SlaveNotifyMasterHasSyncUnUseTask).setSource(BrokerService.getConfig().getAddress())
                     .setBody(scheduleId);
             ByteStringPack respPack = new ByteStringPack();
-            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, master.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
+            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, master.getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
             if (!ret) {
                 LogErrorUtil.writeRpcErrorMsgToDb("slave通知master。还没正式使用的任务已经完成同步。失败！", "com.github.liuche51.easyTaskX.cluster.slave.SlaveService.notifyMasterHasSyncUnUseTask");
             }

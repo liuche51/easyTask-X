@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.task.broker;
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerUtil;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
@@ -41,7 +41,7 @@ public class ReDispatchToClientTask extends OnceTask {
             while (!isExit()) {
                 try {
                     //获取批次数据
-                    List<Schedule> list = ScheduleDao.selectByExecuter(this.oldClient.getAddress(), NodeService.getConfig().getAdvanceConfig().getReDispatchBatchCount());
+                    List<Schedule> list = ScheduleDao.selectByExecuter(this.oldClient.getAddress(), BrokerService.getConfig().getAdvanceConfig().getReDispatchBatchCount());
                     if (list.size() == 0) {//如果已经同步完，通知leader更新注册表状态并则跳出循环
                         Map<String,Integer> map=new HashMap<>(Util.getMapInitCapacity(2));
                         map.put(StringConstant.NODESTATUS, NodeStatusEnum.NORMAL);
@@ -80,10 +80,10 @@ public class ReDispatchToClientTask extends OnceTask {
             builder0.addSchedules(s);
         }
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BrokerNotifyClientExecuteNewTask).setSource(NodeService.getConfig().getAddress())
+        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BrokerNotifyClientExecuteNewTask).setSource(BrokerService.getConfig().getAddress())
                 .setBodyBytes(builder0.build().toByteString());
         NettyClient client = newClient.getClientWithCount(1);
-        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, client, NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, client, BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
         return ret;
     }
 
@@ -94,7 +94,7 @@ public class ReDispatchToClientTask extends OnceTask {
      * @throws Exception
      */
     private BaseNode findNewClient(BaseNode oldClient) throws Exception {
-        CopyOnWriteArrayList<BaseNode> clients = NodeService.CURRENT_NODE.getClients();
+        CopyOnWriteArrayList<BaseNode> clients = BrokerService.CLIENTS;
         BaseNode selectedNode = null;
         if (clients == null || clients.size() == 0)
             throw new Exception("clients==null||clients.size()==0");

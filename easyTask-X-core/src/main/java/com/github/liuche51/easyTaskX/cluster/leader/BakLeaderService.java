@@ -1,7 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.slave.SlaveUtil;
 import com.github.liuche51.easyTaskX.cluster.task.leader.ClusterMetaBinLogSyncTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
@@ -11,8 +11,6 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,15 +31,15 @@ public class BakLeaderService {
      */
     public static void requestLeaderSyncClusterMetaData(BaseNode leader, ClusterMetaBinLogSyncTask task) throws Exception {
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BakLeaderRequestLeaderGetClusterMetaBinlogData).setSource(NodeService.getConfig().getAddress())
+        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BakLeaderRequestLeaderGetClusterMetaBinlogData).setSource(BrokerService.getConfig().getAddress())
                 .setBody(String.valueOf(task.getCurrentIndex()));
         ByteStringPack respPack = new ByteStringPack();
-        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
+        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
         if (ret) {
             List<BinlogClusterMeta> binlogClusterMetas = JSONObject.parseArray(respPack.getRespbody().toString(), BinlogClusterMeta.class);
-            if (binlogClusterMetas == null || binlogClusterMetas.size() < NodeService.getConfig().getAdvanceConfig().getBinlogCount()) {
+            if (binlogClusterMetas == null || binlogClusterMetas.size() < BrokerService.getConfig().getAdvanceConfig().getBinlogCount()) {
                 BakLeaderService.DATA_STATUS = 1;
-            } else if (binlogClusterMetas != null && binlogClusterMetas.size() >= NodeService.getConfig().getAdvanceConfig().getBinlogCount()) {
+            } else if (binlogClusterMetas != null && binlogClusterMetas.size() >= BrokerService.getConfig().getAdvanceConfig().getBinlogCount()) {
                 BakLeaderService.DATA_STATUS = 0;
             }
             if (binlogClusterMetas == null || binlogClusterMetas.size() == 0) return;

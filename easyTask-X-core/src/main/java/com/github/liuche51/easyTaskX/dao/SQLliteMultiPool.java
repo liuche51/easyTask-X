@@ -1,12 +1,9 @@
 package com.github.liuche51.easyTaskX.dao;
 
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.util.DbTableName;
 import com.github.liuche51.easyTaskX.util.LogUtil;
-import com.github.liuche51.easyTaskX.util.StringConstant;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -45,7 +42,7 @@ public class SQLliteMultiPool {
         pools.put(DbTableName.SCHEDULE, new ConcurrentLinkedQueue<Connection>());
         pools.put(DbTableName.SCHEDULE_BAK, new ConcurrentLinkedQueue<Connection>());
         pools.put(DbTableName.LOG_ERROR, new ConcurrentLinkedQueue<Connection>());
-        for (int i = 0; i < NodeService.getConfig().getAdvanceConfig().getsQLlitePoolSize(); i++) {
+        for (int i = 0; i < BrokerService.getConfig().getAdvanceConfig().getsQLlitePoolSize(); i++) {
             Connection con1 = createConnection(DbTableName.SCHEDULE);
             Connection con2 = createConnection(DbTableName.SCHEDULE_BAK);
             Connection con3 = createConnection(DbTableName.LOG_ERROR);
@@ -67,7 +64,7 @@ public class SQLliteMultiPool {
         Connection con = null;
         try {
             //注意“/”符号目前测试兼容Windows和Linux，不要改成“\”符号不兼容Linux
-            con = DriverManager.getConnection("jdbc:sqlite:" + NodeService.getConfig().getTaskStorePath() + "/" + dbName + ".db");
+            con = DriverManager.getConnection("jdbc:sqlite:" + BrokerService.getConfig().getTaskStorePath() + "/" + dbName + ".db");
             if (con == null) {
                 throw new Exception("数据库连接创建失败，返回null值");
             }
@@ -101,7 +98,7 @@ public class SQLliteMultiPool {
     public void freeConnection(Connection conn,String dbName) throws SQLException {
         conn.setAutoCommit(true);//此链接可能操作事务而打开。所以放回连接池前重新设置为自动事务
         ConcurrentLinkedQueue<Connection> pool = pools.get(dbName);
-        if (pool.size() < NodeService.getConfig().getAdvanceConfig().getsQLlitePoolSize()) {
+        if (pool.size() < BrokerService.getConfig().getAdvanceConfig().getsQLlitePoolSize()) {
             pool.add(conn);
         } else {
             try {

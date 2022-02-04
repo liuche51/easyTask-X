@@ -1,7 +1,7 @@
 package com.github.liuche51.easyTaskX.netty.server;
 
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.util.LogUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -10,8 +10,6 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 
@@ -40,7 +38,7 @@ public class NettyServer {
 	 * 启动服务
 	 */
 	public ChannelFuture run() {
-		InetSocketAddress address = new InetSocketAddress(NodeService.getConfig().getServerPort());
+		InetSocketAddress address = new InetSocketAddress(BrokerService.getConfig().getServerPort());
 		ChannelFuture f = null;
 		try {
 			ServerBootstrap b = new ServerBootstrap();

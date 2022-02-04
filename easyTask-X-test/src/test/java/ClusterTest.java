@@ -1,11 +1,9 @@
 import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,7 +67,7 @@ public class ClusterTest {
     private void initData(EasyTaskConfig config,String name) throws Exception {
         config.getAdvanceConfig().setSQLlitePoolSize(5);
         config.setZkAddress("127.0.0.1:2181");
-        NodeService.start(config);
+        BrokerService.start(config);
         Schedule schedule=new Schedule();
         schedule.setId(Util.generateUniqueId());
         schedule.setClassPath("XXXXX");
@@ -84,7 +82,7 @@ public class ClusterTest {
         };
         schedule.setParam(JSONObject.toJSONString(param));
         schedule.setPeriod(10);
-        schedule.setSource("127.0.0.1:"+ NodeService.getConfig().getServerPort());
+        schedule.setSource("127.0.0.1:"+ BrokerService.getConfig().getServerPort());
         schedule.setTaskType("PERIOD");
         schedule.setUnit("SECONDS");
         //ClusterService.submitTask(schedule);

@@ -1,6 +1,5 @@
 package com.github.liuche51.easyTaskX.netty.server.handler.broker;
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerUtil;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
@@ -29,14 +28,14 @@ public class LeaderNotifyBrokerClientChangedHandler extends BaseHandler {
         String[] items = body.split(StringConstant.CHAR_SPRIT_STRING);//type+地址
         switch (items[0]) {
             case OperationTypeEnum.ADD: // 这里无需添加 WAIT_RESPONSE_CLINET_TASK_RESULT队列，有实际数据添加到队列时，再新增队列
-                NodeService.CURRENT_NODE.getClients().add(new BaseNode(items[1]));
+                BrokerService.CLIENTS.add(new BaseNode(items[1]));
                 break;
             case OperationTypeEnum.DELETE:
-                Iterator<BaseNode> temps = NodeService.CURRENT_NODE.getClients().iterator();
+                Iterator<BaseNode> temps = BrokerService.CLIENTS.iterator();
                 while (temps.hasNext()) {
                     BaseNode bn = temps.next();
                     if (bn.getAddress().equals(items[1])) {
-                        NodeService.CURRENT_NODE.getClients().remove(bn);
+                        BrokerService.CLIENTS.remove(bn);
                         //移除该客户端任务反馈发送队列，如果队列中有反馈的任务，则需要删除之
                         LinkedBlockingQueue<SubmitTaskResult> submitTaskResults = MasterService.WAIT_RESPONSE_CLINET_TASK_RESULT.get(items[1]);
                         List<SubmitTaskResult> all = new ArrayList<>(submitTaskResults.size());

@@ -2,7 +2,7 @@ package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.ByteStringPack;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
@@ -16,13 +16,8 @@ import com.github.liuche51.easyTaskX.util.Util;
 import com.github.liuche51.easyTaskX.zk.ZKService;
 import com.github.liuche51.easyTaskX.zk.ZKUtil;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -51,7 +46,7 @@ public class VoteLeader {
                 hasLock = true;
                 LeaderData data = ZKService.getLeaderData(false);
                 if (data == null || StringUtils.isNullOrEmpty(data.getHost())) {//leader节点为空时才需要选新leader
-                    ZKService.registerLeader(new LeaderData(NodeService.CURRENT_NODE.getHost(), NodeService.CURRENT_NODE.getPort()));
+                    ZKService.registerLeader(new LeaderData(BrokerService.CURRENT_NODE.getHost(), BrokerService.CURRENT_NODE.getPort()));
                     return true;
                 }
 
@@ -79,16 +74,16 @@ public class VoteLeader {
     private static boolean haveOtherBakLeaderFinishedSync() {
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BakLeaderQueryOtherBakLeaderDataStatus).setSource(NodeService.getConfig().getAddress());
-            String bakLeader = NodeService.CURRENT_NODE.getBakLeader();
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BakLeaderQueryOtherBakLeaderDataStatus).setSource(BrokerService.getConfig().getAddress());
+            String bakLeader = BrokerService.BAK_LEADER;
             if (!StringUtils.isNullOrEmpty(bakLeader)) {
                 Map<String, BaseNode> bakLeaders = JSONObject.parseObject(bakLeader, new TypeReference<Map<String, BaseNode>>() {
                 });
                 for (BaseNode bak : bakLeaders.values()) {
-                    if (bak.getAddress().equals(NodeService.CURRENT_NODE.getAddress()))//排除查询自己
+                    if (bak.getAddress().equals(BrokerService.CURRENT_NODE.getAddress()))//排除查询自己
                         continue;
                     ByteStringPack respPack = new ByteStringPack();
-                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, bak.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
+                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, bak.getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
                     if (ret) {
                         if ("1".equals(respPack.getRespbody().toString())) {
                             return true;

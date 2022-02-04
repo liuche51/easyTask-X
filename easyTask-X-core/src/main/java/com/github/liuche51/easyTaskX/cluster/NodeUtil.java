@@ -1,6 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.dao.BinlogScheduleDao;
 import com.github.liuche51.easyTaskX.dao.HistoryScheduleDao;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
@@ -63,12 +64,12 @@ public class NodeUtil {
             LeaderData node = ZKService.getLeaderData(false);
             if (node != null && !StringUtils.isNullOrEmpty(node.getHost())) {//获取leader信息成功
                 BaseNode leader = new BaseNode(node.getHost(), node.getPort());
-                NodeService.CURRENT_NODE.setClusterLeader(leader);
+                BrokerService.CLUSTER_LEADER=leader;
                 Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                 builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowNotifyLeaderHasRestart)
                         .setSource(StringConstant.BROKER);
                 ByteStringPack pack = new ByteStringPack();
-                boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, pack);
+                boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, pack);
                 if (!ret) {
                     LogErrorUtil.writeRpcErrorMsgToDb("Broker因重启询问leader是否自己还处于存活状态。失败！", "com.github.liuche51.easyTaskX.cluster.NodeUtil.isAliveInCluster");
                 } else {

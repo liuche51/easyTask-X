@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.task.broker;
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.leader.CheckFollowsAliveTask;
 import com.github.liuche51.easyTaskX.cluster.task.leader.ClusterMetaBinLogSyncTask;
@@ -29,24 +29,24 @@ public class HeartbeatsTask extends TimerTask {
     public void run() {
         while (!isExit()) {
             try {
-                BaseNode leader = NodeService.CURRENT_NODE.getClusterLeader();
+                BaseNode leader = BrokerService.CLUSTER_LEADER;
                 if (leader == null) {//启动时还没获取leader信息，所以需要去zk获取
                     LeaderData node = ZKService.getLeaderData(false);
                     if (node != null && !StringUtils.isNullOrEmpty(node.getHost())) {//获取leader信息成功
                         leader = new BaseNode(node.getHost(), node.getPort());
-                        NodeService.CURRENT_NODE.setClusterLeader(leader);
+                        BrokerService.CLUSTER_LEADER=leader;
                     }
                     //如果当前备用leader信息是空的，说明是集群首次运行。则每个节点都可以进入选举.
                     //或者自身是备用leader，则有权去竞选新leader
-                    else if (StringUtils.isNullOrEmpty(NodeService.CURRENT_NODE.getBakLeader())
-                            || NodeService.CURRENT_NODE.getBakLeader().contains(NodeService.CURRENT_NODE.getAddress())) {
+                    else if (StringUtils.isNullOrEmpty(BrokerService.BAK_LEADER)
+                            || BrokerService.BAK_LEADER.contains(BrokerService.CURRENT_NODE.getAddress())) {
                         VoteLeader.competeLeader();
                     }
                 } else {
                     enableOrdisableLeaderCheckFollowsAliveTask(leader);
                     enableOrdisableClusterMetaBinLogSyncTask(leader);
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowHeartbeatToLeader).setSource(NodeService.getConfig().getAddress())
+                    builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowHeartbeatToLeader).setSource(BrokerService.getConfig().getAddress())
                             .setBody(StringConstant.BROKER);//服务端节点
                     ChannelFuture future = NettyMsgService.sendASyncMsg(leader.getClient(), builder.build());//这里使用异步即可。也不需要返回值
                 }
@@ -54,7 +54,7 @@ public class HeartbeatsTask extends TimerTask {
                 LogUtil.error("", e);
             }
             try {
-                TimeUnit.SECONDS.sleep(NodeService.getConfig().getAdvanceConfig().getHeartBeat());
+                TimeUnit.SECONDS.sleep(BrokerService.getConfig().getAdvanceConfig().getHeartBeat());
             } catch (InterruptedException e) {
                 LogUtil.error("", e);
             }
@@ -69,11 +69,11 @@ public class HeartbeatsTask extends TimerTask {
     private static void enableOrdisableLeaderCheckFollowsAliveTask(BaseNode leader) {
         if (leader == null) return;
         //如果当前节点是leader，且没有运行follow存活检查任务，则启动一个任务/
-        if (NodeService.CURRENT_NODE.getAddress().equals(leader.getAddress()) && !CheckFollowsAliveTask.hasRuning) {
-            NodeService.timerTasks.add(LeaderService.startCheckFollowAliveTask());
+        if (BrokerService.CURRENT_NODE.getAddress().equals(leader.getAddress()) && !CheckFollowsAliveTask.hasRuning) {
+            BrokerService.timerTasks.add(LeaderService.startCheckFollowAliveTask());
         }
         //如果当前节点不是leader，且任务在运行中，则关闭。
-        if (!NodeService.CURRENT_NODE.getAddress().equals(leader.getAddress()) && CheckFollowsAliveTask.hasRuning) {
+        if (!BrokerService.CURRENT_NODE.getAddress().equals(leader.getAddress()) && CheckFollowsAliveTask.hasRuning) {
             CheckFollowsAliveTask.hasRuning = false;
         }
     }
@@ -83,11 +83,11 @@ public class HeartbeatsTask extends TimerTask {
      */
     private static void enableOrdisableClusterMetaBinLogSyncTask(BaseNode leader) {
         //如果当前节点是bakleader，且不是leader，且没有运行对leader的心跳binlog任务，则启动一个任务/
-        if (NodeService.CURRENT_NODE.getBakLeader().contains(NodeService.CURRENT_NODE.getAddress())&&!NodeService.CURRENT_NODE.getAddress().equals(leader.getAddress()) && !ClusterMetaBinLogSyncTask.hasRuning) {
-            NodeService.timerTasks.add(LeaderService.startCheckFollowAliveTask());
+        if (BrokerService.BAK_LEADER.contains(BrokerService.CURRENT_NODE.getAddress())&&!BrokerService.CURRENT_NODE.getAddress().equals(leader.getAddress()) && !ClusterMetaBinLogSyncTask.hasRuning) {
+            BrokerService.timerTasks.add(LeaderService.startCheckFollowAliveTask());
         }
         //如果当前节点不是bakleader，且也不是leader，且任务在运行中，则立即停止。防止当前节点不再是bakleader或leader还保存有
-        if (!NodeService.CURRENT_NODE.getBakLeader().contains(NodeService.CURRENT_NODE.getAddress())&&!NodeService.CURRENT_NODE.getAddress().equals(leader.getAddress()) && CheckFollowsAliveTask.hasRuning) {
+        if (!BrokerService.BAK_LEADER.contains(BrokerService.CURRENT_NODE.getAddress())&&!BrokerService.CURRENT_NODE.getAddress().equals(leader.getAddress()) && CheckFollowsAliveTask.hasRuning) {
             ClusterMetaBinLogSyncTask.hasRuning = false;
             LeaderService.BROKER_REGISTER_CENTER.clear();
             LeaderService.CLIENT_REGISTER_CENTER.clear();

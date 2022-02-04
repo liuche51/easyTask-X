@@ -1,6 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.task.leader;
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.leader.BakLeaderService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.BaseNode;
@@ -34,7 +34,7 @@ public class ClusterMetaBinLogSyncTask extends TimerTask {
         while (!isExit()) {
             setLastRunTime(new Date());
             try {
-                BaseNode leader = NodeService.CURRENT_NODE.getClusterLeader();
+                BaseNode leader = BrokerService.CLUSTER_LEADER;
                 BakLeaderService.requestLeaderSyncClusterMetaData(leader, this);
             } catch (Exception e) {
                 LogUtil.error("", e);

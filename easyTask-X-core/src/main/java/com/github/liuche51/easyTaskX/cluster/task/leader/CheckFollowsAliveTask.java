@@ -1,7 +1,7 @@
 package com.github.liuche51.easyTaskX.cluster.task.leader;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteMaster;
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
 import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
@@ -11,7 +11,6 @@ import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegClient;
 import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.dto.db.BinlogClusterMeta;
-import com.github.liuche51.easyTaskX.enume.NodeStatusEnum;
 import com.github.liuche51.easyTaskX.enume.OperationTypeEnum;
 import com.github.liuche51.easyTaskX.enume.RegNodeTypeEnum;
 import com.github.liuche51.easyTaskX.util.DateUtils;
@@ -40,7 +39,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                 LogUtil.error("", e);
             }
             try {
-                TimeUnit.SECONDS.sleep(NodeService.getConfig().getAdvanceConfig().getHeartBeat());
+                TimeUnit.SECONDS.sleep(BrokerService.getConfig().getAdvanceConfig().getHeartBeat());
             } catch (InterruptedException e) {
                 LogUtil.error("", e);
             }
@@ -56,7 +55,7 @@ public class CheckFollowsAliveTask extends TimerTask {
         while (items.hasNext()) {
             Map.Entry<String, RegBroker> item = items.next();
             RegBroker regNode = item.getValue();
-            NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+            BrokerService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -83,7 +82,7 @@ public class CheckFollowsAliveTask extends TimerTask {
                                     LeaderService.notifyFollowsUpdateRegedit(newSlaves, StringConstant.BROKER);
                                     BinlogClusterMetaDao.saveBatch(addBinlogClusterMetaForVotingAllSlaves(regNode));
                                     //如果当前节点是Leader自己选slave，则需要通知所有其他所有Follows更新备用Leader信息。以及写入bakleader心跳信息队列
-                                    if (regNode.getAddress().equals(NodeService.CURRENT_NODE.getClusterLeader().getAddress())) {
+                                    if (regNode.getAddress().equals(BrokerService.CLUSTER_LEADER.getAddress())) {
                                         LeaderService.changeFollowsHeartbeats();
                                         LeaderService.notifyFollowsBakLeaderChanged();
                                     }
@@ -105,13 +104,13 @@ public class CheckFollowsAliveTask extends TimerTask {
                                         try {
                                             RegNode newSlave = VoteSlave.voteNewSlave(regNode, slave);
                                             //如果当前节点是Leader自己选slave，则需要触发bakleader心跳信息队列
-                                            if (regNode.getAddress().equals(NodeService.CURRENT_NODE.getClusterLeader().getAddress())) {
+                                            if (regNode.getAddress().equals(BrokerService.CLUSTER_LEADER.getAddress())) {
                                                 LeaderService.changeFollowsHeartbeats();
                                             }
                                             LeaderService.notifyFollowsUpdateRegedit(Arrays.asList(regNode,newSlave), StringConstant.BROKER);
                                             BinlogClusterMetaDao.saveBatch(addBinlogClusterMetaForVotingNewSlave(regNode,newSlave));
                                             //如果当前节点是Leader自己变更slave，则需要通知所有其他所有Follows更新备用Leader信息
-                                            if (regNode.getAddress().equals(NodeService.CURRENT_NODE.getClusterLeader().getAddress())) {
+                                            if (regNode.getAddress().equals(BrokerService.CLUSTER_LEADER.getAddress())) {
                                                 LeaderService.notifyFollowsBakLeaderChanged();
                                             }
                                         } catch (VotingException e) {
@@ -142,7 +141,7 @@ public class CheckFollowsAliveTask extends TimerTask {
         while (items.hasNext()) {
             Map.Entry<String, RegClient> item = items.next();
             RegClient regNode = item.getValue();
-            NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+            BrokerService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
                 @Override
                 public void run() {
                     try {

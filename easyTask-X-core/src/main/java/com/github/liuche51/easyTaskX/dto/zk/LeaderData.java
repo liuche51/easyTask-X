@@ -1,10 +1,10 @@
 package com.github.liuche51.easyTaskX.dto.zk;
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 
 public class LeaderData {
     private String host;
-    private int port= NodeService.getConfig().getServerPort();
+    private int port= BrokerService.getConfig().getServerPort();
     /**
      * 最近一次心跳时间
      */

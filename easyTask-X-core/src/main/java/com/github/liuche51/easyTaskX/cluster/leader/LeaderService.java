@@ -1,24 +1,20 @@
 package com.github.liuche51.easyTaskX.cluster.leader;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.cluster.NodeService;
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
+import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.dao.BinlogClusterMetaDao;
-import com.github.liuche51.easyTaskX.dao.BinlogScheduleDao;
 import com.github.liuche51.easyTaskX.dao.LogErrorDao;
 import com.github.liuche51.easyTaskX.dto.*;
 import com.github.liuche51.easyTaskX.cluster.task.leader.CheckFollowsAliveTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.db.BinlogClusterMeta;
-import com.github.liuche51.easyTaskX.dto.db.BinlogSchedule;
 import com.github.liuche51.easyTaskX.dto.db.LogError;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
-import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
 import com.github.liuche51.easyTaskX.enume.LogErrorTypeEnum;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -73,7 +69,7 @@ public class LeaderService {
      * 通知Follow更新备用leader信息
      */
     public static void notifyFollowsBakLeaderChanged() {
-        String bakLeader = JSONObject.toJSONString(NodeService.CURRENT_NODE.getSlaves());
+        String bakLeader = JSONObject.toJSONString(MasterService.SLAVES);
         Iterator<String> items = LeaderService.BROKER_REGISTER_CENTER.keySet().iterator();
         while (items.hasNext()) {
             LeaderUtil.notifyFollowBakLeaderChanged(items.next(), bakLeader);
@@ -90,14 +86,14 @@ public class LeaderService {
      * @param broker
      */
     public static void notifyBrokerRegisterSucceeded(BaseNode broker) {
-        NodeService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
+        BrokerService.getConfig().getAdvanceConfig().getClusterPool().submit(new Runnable() {
             @Override
             public void run() {
                 try {
                     Dto.Frame.Builder builder = Dto.Frame.newBuilder();
                     builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotifyBrokerRegisterSucceeded)
-                            .setSource(NodeService.CURRENT_NODE.getAddress());
-                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, broker.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                            .setSource(BrokerService.CURRENT_NODE.getAddress());
+                    boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, broker.getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret) {
                         LogErrorUtil.writeRpcErrorMsgToDb("Leader通知Broker注册成功。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifyBrokerRegisterSucceeded");
                     }
@@ -146,13 +142,13 @@ public class LeaderService {
     public static boolean notifySlaveVotedNewMaster(Map<String, RegNode> slaves, String newMaster, String oldMaster) {
         Dto.Frame.Builder builder = Dto.Frame.newBuilder();
         try {
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotiySlaveVotedNewMaster).setSource(NodeService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.LeaderNotiySlaveVotedNewMaster).setSource(BrokerService.getConfig().getAddress())
                     .setBody(oldMaster + StringConstant.CHAR_SPRIT_STRING + newMaster);
             Iterator<Map.Entry<String, RegNode>> items = slaves.entrySet().iterator();
             while (items.hasNext()) {
                 Map.Entry<String, RegNode> item = items.next();
                 RegNode node = item.getValue();
-                boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+                boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                 if (!ret) {
                     LogErrorUtil.writeRpcErrorMsgToDb("leader通知slaves。旧Master失效，leader已选新Master。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifySlaveVotedNewMaster");
                 }
@@ -170,7 +166,7 @@ public class LeaderService {
     public static TimerTask startCheckFollowAliveTask() {
         CheckFollowsAliveTask task = new CheckFollowsAliveTask();
         task.start();
-        NodeService.timerTasks.add(task);
+        BrokerService.timerTasks.add(task);
         return task;
     }
 
@@ -179,18 +175,18 @@ public class LeaderService {
      */
     public static void changeFollowsHeartbeats() {
         //找到新加入的slave队列
-        Iterator<String> items = NodeService.CURRENT_NODE.getSlaves().keySet().iterator();
+        Iterator<String> items = MasterService.SLAVES.keySet().iterator();
         while (items.hasNext()) {
             String key = items.next();
             if (!followsHeartbeats.containsKey(key)) {
-                followsHeartbeats.put(key, new LinkedBlockingQueue<String>(NodeService.getConfig().getAdvanceConfig().getFollowsHeartbeatsQueueCapacity()));
+                followsHeartbeats.put(key, new LinkedBlockingQueue<String>(BrokerService.getConfig().getAdvanceConfig().getFollowsHeartbeatsQueueCapacity()));
             }
         }
         // 找到需要移除的失效队列
         Iterator<String> items2 = followsHeartbeats.keySet().iterator();
         while (items2.hasNext()) {
             String key = items2.next();
-            if (!NodeService.CURRENT_NODE.getSlaves().containsKey(key)) {
+            if (!MasterService.SLAVES.containsKey(key)) {
                 followsHeartbeats.remove(key);
             }
         }
@@ -221,6 +217,6 @@ public class LeaderService {
      * @throws SQLException
      */
     public static List<BinlogClusterMeta> getBinlogClusterMetaByIndex(long index) throws SQLException {
-        return BinlogClusterMetaDao.getBinlogClusterMetaByIndex(index, NodeService.getConfig().getAdvanceConfig().getBinlogCount());
+        return BinlogClusterMetaDao.getBinlogClusterMetaByIndex(index, BrokerService.getConfig().getAdvanceConfig().getBinlogCount());
     }
 }

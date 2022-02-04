@@ -1,37 +1,144 @@
 package com.github.liuche51.easyTaskX.cluster.follow;
 
-import com.alibaba.fastjson.JSONObject;
-import com.github.liuche51.easyTaskX.cluster.NodeService;
-import com.github.liuche51.easyTaskX.cluster.leader.VoteSlave;
+import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
+import com.github.liuche51.easyTaskX.cluster.NodeUtil;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
+import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
 import com.github.liuche51.easyTaskX.cluster.task.broker.*;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.*;
-import com.github.liuche51.easyTaskX.dao.ScheduleDao;
-import com.github.liuche51.easyTaskX.dao.SqliteHelper;
+import com.github.liuche51.easyTaskX.dao.dbinit.DbInit;
 import com.github.liuche51.easyTaskX.dto.*;
-import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
-import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
-import com.github.liuche51.easyTaskX.enume.ScheduleStatusEnum;
-import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
+import com.github.liuche51.easyTaskX.netty.server.NettyServer;
+import com.github.liuche51.easyTaskX.socket.CmdServer;
 import com.github.liuche51.easyTaskX.util.*;
-import com.github.liuche51.easyTaskX.util.exception.VotingException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.github.liuche51.easyTaskX.zk.ZKService;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Broker
  */
 public class BrokerService {
+
+    /**
+     * leader
+     */
+    public static BaseNode CLUSTER_LEADER = null;
+    /**
+     * 集群备用leader
+     * 用来判断leader宕机后，是否参与竞选新leader。如果有值说明当前集群有备用leader，则自己不参与竞选
+     * 让备用leader竞选
+     */
+    public static String BAK_LEADER;
+    /**
+     * 当前节点所有可用的clients
+     */
+    public static CopyOnWriteArrayList<BaseNode> CLIENTS = new CopyOnWriteArrayList<BaseNode>();
+    private static EasyTaskConfig CONFIG = null;
+    public static volatile boolean IS_STARTED = false;//是否已经启动
+    public static volatile boolean IS_FIRST_STARTED = true;//当前节点是否属于首次启动注册到leader。默认是
+    /**
+     * 当前集群节点的Node对象
+     */
+    public static BaseNode CURRENT_NODE;
+
+    /**
+     * 集群一次性任务线程集合。
+     * 系统没有重启只是初始化了集群initCURRENT_NODE()。此时也需要立即停止运行的一次性后台任务
+     * 需要定时检查其中的线程是否已经运行完，完了需要移除线程对象，释放内存资源
+     */
+    public static List<OnceTask> onceTasks = new LinkedList<OnceTask>();
+    /**
+     * 集群定时任务线程集合。
+     * 系统没有重启只是初始化了集群initCURRENT_NODE()。此时需要停止之前的定时任务，重新启动新的
+     */
+    public static List<TimerTask> timerTasks = new LinkedList<TimerTask>();
+
+
+    public static EasyTaskConfig getConfig() {
+        return CONFIG;
+    }
+
+
+    public static void setConfig(EasyTaskConfig config) {
+        CONFIG = config;
+    }
+
+    /**
+     * 启动节点。
+     * 线程互斥
+     *
+     * @param config
+     * @throws Exception
+     */
+    public static synchronized void start(EasyTaskConfig config) throws Exception {
+        //避免重复执行
+        if (IS_STARTED)
+            return;
+        if (config == null)
+            throw new Exception("config is null,please set a EasyTaskConfig!");
+        EasyTaskConfig.validateNecessary(config);
+        CONFIG = config;
+        DbInit.init();//初始化数据库
+        NettyServer.getInstance().run();//启动组件的Netty服务端口
+        CmdServer.init();//启动命令服务的socket端口
+        initCURRENT_NODE(true);//初始化本节点的集群服务
+        IS_STARTED = true;
+    }
+
+    /**
+     * 初始化当前节点的集群。
+     * (系统重启或因心网络问题被leader踢出，然后又恢复了)
+     *
+     * @param isFirstStarted 是否首次初始化。进程重启属于首次
+     * @return
+     */
+    public static void initCURRENT_NODE(boolean isFirstStarted) throws Exception {
+        clearThreadTask();
+        if (isFirstStarted && !NodeUtil.isAliveInCluster())
+            NodeUtil.clearAllData();
+        CURRENT_NODE = new BaseNode(Util.getLocalIP(), CONFIG.getServerPort());
+        timerTasks.add(BrokerService.startHeartBeat());
+        timerTasks.add(clearDataTask());
+        timerTasks.add(BrokerService.startUpdateRegeditTask());
+        timerTasks.add(BrokerService.startBrokerUpdateClientsTask());
+        timerTasks.add(BrokerService.startBrokerNotifyClientSubmitTaskResultTask());
+        timerTasks.add(SlaveService.startScheduleBinLogSyncTask());
+        timerTasks.add(SlaveService.startSlaveNotifyMasterSubmitTaskResultTask());
+        timerTasks.add(MasterService.startMasterSubmitTask());
+        timerTasks.add(MasterService.startMasterUpdateSubmitTaskStatusTask());
+        timerTasks.add(MasterService.startMasterDeleteTaskTask());
+        ZKService.listenLeaderDataNode();
+    }
+
+
+    public static TimerTask clearDataTask() {
+        ClearDataTask task = new ClearDataTask();
+        task.start();
+        return task;
+    }
+
+    /**
+     * 清理掉所有定时或后台线程任务
+     */
+    public static void clearThreadTask() {
+        timerTasks.forEach(x -> {//先停止目前所有内部定时任务线程工作
+            x.setExit(true);
+        });
+        timerTasks.clear();
+        onceTasks.forEach(x -> {
+            x.setExit(true);
+        });
+        onceTasks.clear();
+    }
 
     /**
      * 节点对leader的心跳。
@@ -78,10 +185,10 @@ public class BrokerService {
     public static boolean requestUpdateRegedit() {
         try {
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestLeaderSendRegedit).setSource(NodeService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.FollowRequestLeaderSendRegedit).setSource(CONFIG.getAddress())
                     .setBody(StringConstant.BROKER);
             ByteStringPack respPack = new ByteStringPack();
-            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, NodeService.CURRENT_NODE.getClusterLeader().getClient(), NodeService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
+            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, CLUSTER_LEADER.getClient(), CONFIG.getAdvanceConfig().getTryCount(), 5, respPack);
             if (ret) {
                 NodeDto.Node node = NodeDto.Node.parseFrom(respPack.getRespbody());
                 dealUpdate(node);
@@ -104,19 +211,19 @@ public class BrokerService {
      * @param node
      */
     public static void dealUpdate(NodeDto.Node node) {
-        NodeService.CURRENT_NODE.setBakLeader(node.getBakleader());
+        BAK_LEADER = node.getBakleader();
         NodeDto.NodeList slaveNodes = node.getSalves();
         ConcurrentHashMap<String, BaseNode> slaves = new ConcurrentHashMap<>();
         slaveNodes.getNodesList().forEach(x -> {
-            slaves.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
+            slaves.put(x.getHost() + ":" + x.getPort(), new BaseNode(x.getHost(), x.getPort()));
         });
         NodeDto.NodeList masterNodes = node.getMasters();
         ConcurrentHashMap<String, BaseNode> masters = new ConcurrentHashMap<>();
         masterNodes.getNodesList().forEach(x -> {
-            masters.put(x.getHost() + ":" + x.getPort(), new Node(x.getHost(), x.getPort()));
+            masters.put(x.getHost() + ":" + x.getPort(), new BaseNode(x.getHost(), x.getPort()));
         });
-        NodeService.CURRENT_NODE.setSlaves(slaves);
-        NodeService.CURRENT_NODE.setMasters(masters);
+        MasterService.SLAVES = slaves;
+        SlaveService.MASTERS = masters;
         BrokerUtil.updateMasterBinlogInfo(masters);
     }
 

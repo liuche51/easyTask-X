@@ -1,15 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.task.master;
 
-import com.github.liuche51.easyTaskX.cluster.NodeService;
-import com.github.liuche51.easyTaskX.cluster.leader.BakLeaderService;
-import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
-import com.github.liuche51.easyTaskX.dao.BinlogScheduleDao;
-import com.github.liuche51.easyTaskX.dao.ScheduleDao;
-import com.github.liuche51.easyTaskX.dto.BaseNode;
-import com.github.liuche51.easyTaskX.dto.SubmitTaskResult;
-import com.github.liuche51.easyTaskX.enume.ScheduleStatusEnum;
-import com.github.liuche51.easyTaskX.enume.SubmitTaskResultStatusEnum;
 import com.github.liuche51.easyTaskX.util.LogUtil;
 
 import java.util.*;

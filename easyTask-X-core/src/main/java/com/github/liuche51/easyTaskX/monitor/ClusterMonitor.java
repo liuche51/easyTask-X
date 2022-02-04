@@ -2,12 +2,11 @@ package com.github.liuche51.easyTaskX.monitor;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.github.liuche51.easyTaskX.cluster.NodeService;
-import com.github.liuche51.easyTaskX.dto.BaseNode;
-import com.github.liuche51.easyTaskX.dto.Node;
-
+import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.leader.LeaderService;
+import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.dao.SQLliteMultiPool;
+import com.github.liuche51.easyTaskX.dto.BaseNode;
 import com.github.liuche51.easyTaskX.dto.RegBroker;
 import com.github.liuche51.easyTaskX.dto.RegClient;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
@@ -21,7 +20,10 @@ import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
 
 import java.sql.Connection;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -35,7 +37,7 @@ public class ClusterMonitor {
      * @return
      */
     public static String getCURRENT_NODEInfo() {
-        return JSONObject.toJSONString(NodeService.CURRENT_NODE);
+        return JSONObject.toJSONString(BrokerService.CURRENT_NODE);
     }
 
     public static String getSqlitePoolInfo() {
@@ -50,14 +52,14 @@ public class ClusterMonitor {
     public static Map<String, Map<String, List>> getDBTraceInfoByTaskId(String taskId) throws Exception {
         Map<String, Map<String, List>> map = new HashMap<>(3);
         Map<String, List> leaderInfo = DBMonitor.getInfoByTaskId(taskId);
-        map.put(NodeService.getConfig().getAddress(), leaderInfo);
-        Iterator<Map.Entry<String, BaseNode>> items = NodeService.CURRENT_NODE.getSlaves().entrySet().iterator();
+        map.put(BrokerService.getConfig().getAddress(), leaderInfo);
+        Iterator<Map.Entry<String, BaseNode>> items = MasterService.SLAVES.entrySet().iterator();
         while (items.hasNext()) {
             BaseNode item = items.next().getValue();
             Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.GetDBInfoByTaskId).setSource(NodeService.getConfig().getAddress())
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.GetDBInfoByTaskId).setSource(BrokerService.getConfig().getAddress())
                     .setBody(taskId);
-            NettyClient client = item.getClientWithCount(NodeService.getConfig().getAdvanceConfig().getTryCount());
+            NettyClient client = item.getClientWithCount(BrokerService.getConfig().getAdvanceConfig().getTryCount());
             Object ret = NettyMsgService.sendSyncMsg(client,builder.build());
             Dto.Frame frame = (Dto.Frame) ret;
             ResultDto.Result result = ResultDto.Result.parseFrom(frame.getBodyBytes());
@@ -72,7 +74,7 @@ public class ClusterMonitor {
         return map;
     }
     public static Map<String, String> getNettyClientPoolInfo(){
-        Map<String, String> map=new HashMap<>(NodeService.getConfig().getBackupCount());
+        Map<String, String> map=new HashMap<>(BrokerService.getConfig().getBackupCount());
         Map<String, ConcurrentLinkedQueue<NettyClient>> pools=NettyConnectionFactory.getInstance().getPools();
         Iterator<Map.Entry<String, ConcurrentLinkedQueue<NettyClient>>> items=pools.entrySet().iterator();
         while (items.hasNext()){
