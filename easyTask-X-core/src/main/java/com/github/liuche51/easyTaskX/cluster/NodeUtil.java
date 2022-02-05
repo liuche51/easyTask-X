@@ -16,8 +16,6 @@ import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.util.*;
 import com.github.liuche51.easyTaskX.zk.ZKService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +69,7 @@ public class NodeUtil {
                 ByteStringPack pack = new ByteStringPack();
                 boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, leader.getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, pack);
                 if (!ret) {
-                    LogErrorUtil.writeRpcErrorMsgToDb("Broker因重启询问leader是否自己还处于存活状态。失败！", "com.github.liuche51.easyTaskX.cluster.NodeUtil.isAliveInCluster");
+                    ImportantErrorLogUtil.writeRpcErrorMsgToDb("Broker因重启询问leader是否自己还处于存活状态。失败！", "com.github.liuche51.easyTaskX.cluster.NodeUtil.isAliveInCluster");
                 } else {
                     String result = pack.getRespbody().toStringUtf8();
                     if (StringConstant.ALIVE.equals(result)) {

@@ -9,7 +9,7 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.zk.LeaderData;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
-import com.github.liuche51.easyTaskX.util.LogErrorUtil;
+import com.github.liuche51.easyTaskX.util.ImportantErrorLogUtil;
 import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
@@ -89,7 +89,7 @@ public class VoteLeader {
                             return true;
                         }
                     } else {
-                        LogErrorUtil.writeRpcErrorMsgToDb("Leader通知Broker注册成功。失败！", "com.github.liuche51.easyTaskX.cluster.leader.VoteLeader.haveOtherBakLeaderFinishedSync");
+                        ImportantErrorLogUtil.writeRpcErrorMsgToDb("Leader通知Broker注册成功。失败！", "com.github.liuche51.easyTaskX.cluster.leader.VoteLeader.haveOtherBakLeaderFinishedSync");
                     }
                 }
             }

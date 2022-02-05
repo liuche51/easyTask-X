@@ -4,6 +4,7 @@ import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.MasterDeleteTaskTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.MasterSubmitTask;
+import com.github.liuche51.easyTaskX.cluster.task.master.MasterUpdateSlaveDataStatusTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.MasterUpdateSubmitTaskStatusTask;
 import com.github.liuche51.easyTaskX.dao.BinlogScheduleDao;
 import com.github.liuche51.easyTaskX.dao.ScheduleBakDao;
@@ -11,7 +12,7 @@ import com.github.liuche51.easyTaskX.dto.SlaveNode;
 import com.github.liuche51.easyTaskX.dto.SubmitTaskResult;
 import com.github.liuche51.easyTaskX.dto.db.BinlogSchedule;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
-import com.github.liuche51.easyTaskX.util.LogErrorUtil;
+import com.github.liuche51.easyTaskX.util.ImportantErrorLogUtil;
 import com.github.liuche51.easyTaskX.util.LogUtil;
 
 import java.sql.SQLException;
@@ -60,7 +61,15 @@ public class MasterService {
      * 当前master节点binlog自增长最大位置编号
      * 1、用于判断其slave是否已经跟上数据同步
      */
-    public static Long BINLOG_LAST_INDEX;
+    public static long BINLOG_LAST_INDEX = 0;
+
+    public static void initMaster() {
+        try {
+            BINLOG_LAST_INDEX = BinlogScheduleDao.getLastID();
+        } catch (SQLException e) {
+            LogUtil.error("", e);
+        }
+    }
 
     /**
      * 新Master将失效的旧Master的备份任务数据删除掉
@@ -99,7 +108,7 @@ public class MasterService {
         try {
             boolean offer = queue.offer(result, BrokerService.getConfig().getAdvanceConfig().getTimeOut(), TimeUnit.SECONDS);//插入队列，队列满时，超时抛出异常，以便能检查到原因
             if (offer == false) {
-                LogErrorUtil.writeQueueErrorMsgToDb("队列WAIT_RESPONSE_CLINET_TASK_RESULT已满.", "com.github.liuche51.easyTaskX.cluster.master.MasterService.addWAIT_RESPONSE_CLINET_TASK_RESULT");
+                ImportantErrorLogUtil.writeQueueErrorMsgToDb("队列WAIT_RESPONSE_CLINET_TASK_RESULT已满.", "com.github.liuche51.easyTaskX.cluster.master.MasterService.addWAIT_RESPONSE_CLINET_TASK_RESULT");
                 addWAIT_DELETE_TASK(result.getId());
             }
         } catch (InterruptedException e) {
@@ -117,7 +126,7 @@ public class MasterService {
         try {
             boolean offer = MasterService.WAIT_DELETE_TASK.offer(taskId, BrokerService.getConfig().getAdvanceConfig().getTimeOut(), TimeUnit.SECONDS);//插入队列，队列满时，超时抛出异常，以便能检查到原因
             if (offer == false) {
-                LogErrorUtil.writeQueueErrorMsgToDb("队列MasterService.WAIT_DELETE_TASK已满.", "com.github.liuche51.easyTaskX.cluster.master.MasterService.addWAIT_DELETE_TASK");
+                ImportantErrorLogUtil.writeQueueErrorMsgToDb("队列MasterService.WAIT_DELETE_TASK已满.", "com.github.liuche51.easyTaskX.cluster.master.MasterService.addWAIT_DELETE_TASK");
             }
         } catch (InterruptedException e) {
             LogUtil.error("", e);
@@ -147,6 +156,14 @@ public class MasterService {
      */
     public static TimerTask startMasterDeleteTaskTask() {
         MasterDeleteTaskTask task = new MasterDeleteTaskTask();
+        task.start();
+        return task;
+    }
+    /**
+     * 启动master上报leader当前其slave数据状态定时任务
+     */
+    public static TimerTask startMasterUpdateSlaveDataStatusTask() {
+        MasterUpdateSlaveDataStatusTask task = new MasterUpdateSlaveDataStatusTask();
         task.start();
         return task;
     }

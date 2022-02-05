@@ -1,7 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class AdvanceConfig {
     /**
@@ -144,7 +143,9 @@ public class AdvanceConfig {
         this.debug = debug;
     }
 
-    public void setBinlogCount(int binlogCount) {
+    public void setBinlogCount(int binlogCount) throws Exception {
+        if ( this.binlogCount < 1)
+            throw new Exception("binlogCount must >=1");
         this.binlogCount = binlogCount;
     }
 

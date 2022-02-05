@@ -9,7 +9,7 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.StringListDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
-import com.github.liuche51.easyTaskX.util.LogErrorUtil;
+import com.github.liuche51.easyTaskX.util.ImportantErrorLogUtil;
 import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
@@ -51,7 +51,7 @@ public class SlaveNotifyMasterHasSyncUnUseTaskTask extends TimerTask {
                                             .setSource(BrokerService.CURRENT_NODE.getAddress()).setBodyBytes(builder0.build().toByteString());//任务ID,状态,错误信息
                                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, new BaseNode(item.getKey()).getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                                     if (!ret) {
-                                        LogErrorUtil.writeRpcErrorMsgToDb("Slave通知Master提交的任务同步结果反馈。失败！", "com.github.liuche51.easyTaskX.cluster.task.slave.SlaveNotifyMasterSubmitTaskResultTask");
+                                        ImportantErrorLogUtil.writeRpcErrorMsgToDb("Slave通知Master提交的任务同步结果反馈。失败！", "com.github.liuche51.easyTaskX.cluster.task.slave.SlaveNotifyMasterSubmitTaskResultTask");
                                     }
                                 } catch (Exception e) {
                                     LogUtil.error("", e);

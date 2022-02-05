@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * 各种系统重大异常记录
  */
-public class LogErrorUtil {
+public class ImportantErrorLogUtil {
     public static void writeRpcErrorMsgToDb(String content, String detail) {
         LogError logError = new LogError(content, detail, LogErrorTypeEnum.RPC);
         LogErrorDao.saveBatch(Arrays.asList(logError));

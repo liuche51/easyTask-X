@@ -9,6 +9,7 @@ import com.github.liuche51.easyTaskX.util.DbTableName;
 import org.junit.Test;
 
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,6 +50,12 @@ public class UnitTest {
         schedules.add(schedul);
         Long aLong = BinlogScheduleDao.saveBatch(schedules, helper);
         //BinlogScheduleDao.save("","111",1,helper);
+    }
+    @Test
+    public void test3(){
+        ZonedDateTime lastForceNotifyTime=ZonedDateTime.now().minusMinutes(2);
+        boolean after = ZonedDateTime.now().minusMinutes(5).isAfter(lastForceNotifyTime);
+        int y=0;
     }
 }
 

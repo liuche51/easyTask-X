@@ -53,7 +53,11 @@ public class BrokerService {
     public static CopyOnWriteArrayList<BaseNode> CLIENTS = new CopyOnWriteArrayList<BaseNode>();
     private static EasyTaskConfig CONFIG = null;
     public static volatile boolean IS_STARTED = false;//是否已经启动
-    public static volatile boolean IS_FIRST_STARTED = true;//当前节点是否属于首次启动注册到leader。默认是
+    /**
+     * 当前节点是否属于首次启动注册到leader。默认是
+     * 1、进程假死，或网络问题导致节点被leader踢出，然后要以新的节点加入集群时使用
+     */
+    public static volatile boolean IS_FIRST_STARTED = true;
     /**
      * 当前集群节点的Node对象
      */
@@ -105,7 +109,8 @@ public class BrokerService {
 
     /**
      * 初始化当前节点的集群。
-     * (系统重启或因心网络问题被leader踢出，然后又恢复了)
+     * 1、系统重启或因心网络问题被leader踢出，然后又恢复了
+     * 2、需要支持进程没死，然后重新初始化，可反复执行。以新的节点加入集群
      *
      * @param isFirstStarted 是否首次初始化。进程重启属于首次
      * @return
@@ -115,6 +120,7 @@ public class BrokerService {
         if (isFirstStarted && !NodeUtil.isAliveInCluster())
             NodeUtil.clearAllData();
         CURRENT_NODE = new BaseNode(Util.getLocalIP(), CONFIG.getServerPort());
+        MasterService.initMaster();
         timerTasks.add(BrokerService.startHeartBeat());
         timerTasks.add(clearDataTask());
         timerTasks.add(BrokerService.startUpdateRegeditTask());
@@ -125,6 +131,7 @@ public class BrokerService {
         timerTasks.add(MasterService.startMasterSubmitTask());
         timerTasks.add(MasterService.startMasterUpdateSubmitTaskStatusTask());
         timerTasks.add(MasterService.startMasterDeleteTaskTask());
+        timerTasks.add(MasterService.startMasterUpdateSlaveDataStatusTask());
         ZKService.listenLeaderDataNode();
     }
 

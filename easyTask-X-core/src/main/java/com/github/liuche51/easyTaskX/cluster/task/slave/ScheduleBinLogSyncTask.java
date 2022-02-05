@@ -127,7 +127,7 @@ public class ScheduleBinLogSyncTask extends TimerTask {
         try {
             boolean offer = queue.offer(submitTaskResult, BrokerService.getConfig().getAdvanceConfig().getTimeOut(), TimeUnit.SECONDS);//插入队列，队列满时，超时抛出异常，以便能检查到原因
             if (offer == false) {
-                LogErrorUtil.writeQueueErrorMsgToDb("队列WAIT_RESPONSE_MASTER_TASK_RESULT已满.", "com.github.liuche51.easyTaskX.cluster.task.slave.ScheduleBinLogSyncTask.addWAIT_RESPONSE_MASTER_TASK_RESULT");
+                ImportantErrorLogUtil.writeQueueErrorMsgToDb("队列WAIT_RESPONSE_MASTER_TASK_RESULT已满.", "com.github.liuche51.easyTaskX.cluster.task.slave.ScheduleBinLogSyncTask.addWAIT_RESPONSE_MASTER_TASK_RESULT");
             }
         } catch (InterruptedException e) {
             LogUtil.error("", e);
@@ -148,7 +148,7 @@ public class ScheduleBinLogSyncTask extends TimerTask {
             ByteStringPack respPack = new ByteStringPack();
             boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, master.getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, respPack);
             if (!ret) {
-                LogErrorUtil.writeRpcErrorMsgToDb("slave通知master。还没正式使用的任务已经完成同步。失败！", "com.github.liuche51.easyTaskX.cluster.slave.SlaveService.notifyMasterHasSyncUnUseTask");
+                ImportantErrorLogUtil.writeRpcErrorMsgToDb("slave通知master。还没正式使用的任务已经完成同步。失败！", "com.github.liuche51.easyTaskX.cluster.slave.SlaveService.notifyMasterHasSyncUnUseTask");
             }
         } catch (Exception e) {
             LogUtil.error("", e);

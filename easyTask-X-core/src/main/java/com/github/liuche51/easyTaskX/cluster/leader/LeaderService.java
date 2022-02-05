@@ -95,7 +95,7 @@ public class LeaderService {
                             .setSource(BrokerService.CURRENT_NODE.getAddress());
                     boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, broker.getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                     if (!ret) {
-                        LogErrorUtil.writeRpcErrorMsgToDb("Leader通知Broker注册成功。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifyBrokerRegisterSucceeded");
+                        ImportantErrorLogUtil.writeRpcErrorMsgToDb("Leader通知Broker注册成功。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifyBrokerRegisterSucceeded");
                     }
                 } catch (Exception e) {
                     LogUtil.error("", e);
@@ -150,7 +150,7 @@ public class LeaderService {
                 RegNode node = item.getValue();
                 boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, node.getClient(), BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
                 if (!ret) {
-                    LogErrorUtil.writeRpcErrorMsgToDb("leader通知slaves。旧Master失效，leader已选新Master。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifySlaveVotedNewMaster");
+                    ImportantErrorLogUtil.writeRpcErrorMsgToDb("leader通知slaves。旧Master失效，leader已选新Master。失败！", "com.github.liuche51.easyTaskX.cluster.leader.LeaderService.notifySlaveVotedNewMaster");
                 }
             }
             return true;

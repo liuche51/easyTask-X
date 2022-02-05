@@ -105,12 +105,28 @@ public class BinlogScheduleDao {
         return sql.concat(";");
     }
 
-    private static Long getLastID(SqliteHelper helper) throws SQLException {
+    public static long getLastID() throws SQLException {
+        SqliteHelper helper = new SqliteHelper(dbName);
+        try {
+            ResultSet resultSet = helper.executeQuery("select max(id) as maxid from " + tableName + ";");
+            while (resultSet.next()) {
+                long id = resultSet.getLong("maxid");
+                return id;
+            }
+        } catch (SQLiteException e) {
+            SqliteHelper.writeDatabaseLockedExceptionLog(e, "BinlogScheduleDao->getLastID");
+        } finally {
+            helper.destroyed();
+        }
+        return 0;
+    }
+
+    private static long getLastID(SqliteHelper helper) throws SQLException {
         ResultSet resultSet = helper.executeQuery("select last_insert_rowid() as maxid from " + tableName + ";");
         while (resultSet.next()) {
             long id = resultSet.getLong("maxid");
             return id;
         }
-        return null;
+        return 0;
     }
 }
