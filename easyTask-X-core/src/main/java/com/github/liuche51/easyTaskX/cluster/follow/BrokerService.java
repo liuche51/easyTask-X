@@ -1,7 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster.follow;
 
 import com.github.liuche51.easyTaskX.cluster.EasyTaskConfig;
-import com.github.liuche51.easyTaskX.cluster.NodeUtil;
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
@@ -117,8 +116,8 @@ public class BrokerService {
      */
     public static void initCURRENT_NODE(boolean isFirstStarted) throws Exception {
         clearThreadTask();
-        if (isFirstStarted && !NodeUtil.isAliveInCluster())
-            NodeUtil.clearAllData();
+        if (isFirstStarted && !BrokerUtil.isAliveInCluster())
+            BrokerUtil.clearAllData();
         CURRENT_NODE = new BaseNode(Util.getLocalIP(), CONFIG.getServerPort());
         MasterService.initMaster();
         timerTasks.add(BrokerService.startHeartBeat());
