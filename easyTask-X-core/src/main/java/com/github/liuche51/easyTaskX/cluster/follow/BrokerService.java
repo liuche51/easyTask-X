@@ -9,18 +9,20 @@ import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerNotifyClientSubmi
 import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerRequestUpdateRegeditTask;
 import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerUpdateClientsTask;
 import com.github.liuche51.easyTaskX.cluster.task.broker.HeartbeatsTask;
+import com.github.liuche51.easyTaskX.cluster.task.master.AnnularQueueTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.ClearDataTask;
 import com.github.liuche51.easyTaskX.dao.dbinit.DbInit;
-import com.github.liuche51.easyTaskX.dto.BaseNode;
-import com.github.liuche51.easyTaskX.dto.ByteStringPack;
-import com.github.liuche51.easyTaskX.dto.MasterNode;
-import com.github.liuche51.easyTaskX.dto.SlaveNode;
+import com.github.liuche51.easyTaskX.dto.*;
+import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.NodeDto;
+import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.NettyInterfaceEnum;
+import com.github.liuche51.easyTaskX.netty.client.NettyClient;
 import com.github.liuche51.easyTaskX.netty.client.NettyMsgService;
 import com.github.liuche51.easyTaskX.netty.server.NettyServer;
 import com.github.liuche51.easyTaskX.socket.CmdServer;
+import com.github.liuche51.easyTaskX.util.ImportantErrorLogUtil;
 import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.Util;
@@ -29,6 +31,7 @@ import com.github.liuche51.easyTaskX.zk.ZKService;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -120,6 +123,7 @@ public class BrokerService {
             BrokerUtil.clearAllData();
         CURRENT_NODE = new BaseNode(Util.getLocalIP(), CONFIG.getServerPort());
         MasterService.initMaster();
+        timerTasks.add(startAnnularQueueTask());
         timerTasks.add(BrokerService.startHeartBeat());
         timerTasks.add(clearDataTask());
         timerTasks.add(BrokerService.startUpdateRegeditTask());
@@ -133,7 +137,14 @@ public class BrokerService {
         timerTasks.add(MasterService.startMasterUpdateSlaveDataStatusTask());
         ZKService.listenLeaderDataNode();
     }
-
+    /**
+     * 启动任务执行器
+     */
+    public static TimerTask startAnnularQueueTask() {
+        AnnularQueueTask task = AnnularQueueTask.getInstance();
+        task.start();
+        return task;
+    }
 
     public static TimerTask clearDataTask() {
         ClearDataTask task = new ClearDataTask();
@@ -263,6 +274,31 @@ public class BrokerService {
                 SlaveService.MASTERS.remove(x);
             }
         });
+    }
+    /**
+     * Broker通知Client接受执行新任务
+     *
+     * @param innerTask
+     * @return
+     * @throws Exception
+     */
+    public static void notifyClientExecuteNewTask(InnerTask innerTask){
+        ScheduleDto.Schedule schedule= null;
+        try {
+            schedule = innerTask.toScheduleDto();
+            BaseNode randomClient = BrokerUtil.getARandomClient();
+            Dto.Frame.Builder builder = Dto.Frame.newBuilder();
+            builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BrokerNotifyClientExecuteNewTask).setSource(BrokerService.getConfig().getAddress())
+                    .setBodyBytes(schedule.toByteString());
+            NettyClient nclient = randomClient.getClientWithCount(1);
+            boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, nclient, BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
+            if (!ret) {
+                ImportantErrorLogUtil.writeRpcErrorMsgToDb("Broker通知Client接受执行新任务。失败！", "com.github.liuche51.easyTaskX.cluster.follow.BrokerService.notifyClientExecuteNewTask");
+            }
+        } catch (Exception e) {
+            LogUtil.error("",e);
+        }
+
     }
 
 }

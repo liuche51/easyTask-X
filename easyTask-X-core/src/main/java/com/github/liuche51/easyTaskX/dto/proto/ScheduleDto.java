@@ -153,6 +153,21 @@ public final class ScheduleDto {
      * <code>optional int32 submit_model = 11;</code>
      */
     int getSubmitModel();
+
+    // optional string immediatelyType = 12;
+    /**
+     * <code>optional string immediatelyType = 12;</code>
+     */
+    boolean hasImmediatelyType();
+    /**
+     * <code>optional string immediatelyType = 12;</code>
+     */
+    String getImmediatelyType();
+    /**
+     * <code>optional string immediatelyType = 12;</code>
+     */
+    com.google.protobuf.ByteString
+        getImmediatelyTypeBytes();
   }
   /**
    * Protobuf type {@code Schedule}
@@ -258,6 +273,11 @@ public final class ScheduleDto {
             case 88: {
               bitField0_ |= 0x00000400;
               submitModel_ = input.readInt32();
+              break;
+            }
+            case 98: {
+              bitField0_ |= 0x00000800;
+              immediatelyType_ = input.readBytes();
               break;
             }
           }
@@ -665,6 +685,49 @@ public final class ScheduleDto {
       return submitModel_;
     }
 
+    // optional string immediatelyType = 12;
+    public static final int IMMEDIATELYTYPE_FIELD_NUMBER = 12;
+    private Object immediatelyType_;
+    /**
+     * <code>optional string immediatelyType = 12;</code>
+     */
+    public boolean hasImmediatelyType() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    /**
+     * <code>optional string immediatelyType = 12;</code>
+     */
+    public String getImmediatelyType() {
+      Object ref = immediatelyType_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          immediatelyType_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string immediatelyType = 12;</code>
+     */
+    public com.google.protobuf.ByteString
+        getImmediatelyTypeBytes() {
+      Object ref = immediatelyType_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (String) ref);
+        immediatelyType_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private void initFields() {
       id_ = "";
       classPath_ = "";
@@ -677,6 +740,7 @@ public final class ScheduleDto {
       executer_ = "";
       status_ = 0;
       submitModel_ = 0;
+      immediatelyType_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -722,6 +786,9 @@ public final class ScheduleDto {
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         output.writeInt32(11, submitModel_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeBytes(12, getImmediatelyTypeBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -775,6 +842,10 @@ public final class ScheduleDto {
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(11, submitModel_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(12, getImmediatelyTypeBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -914,6 +985,8 @@ public final class ScheduleDto {
         bitField0_ = (bitField0_ & ~0x00000200);
         submitModel_ = 0;
         bitField0_ = (bitField0_ & ~0x00000400);
+        immediatelyType_ = "";
+        bitField0_ = (bitField0_ & ~0x00000800);
         return this;
       }
 
@@ -986,6 +1059,10 @@ public final class ScheduleDto {
           to_bitField0_ |= 0x00000400;
         }
         result.submitModel_ = submitModel_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        result.immediatelyType_ = immediatelyType_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1048,6 +1125,11 @@ public final class ScheduleDto {
         }
         if (other.hasSubmitModel()) {
           setSubmitModel(other.getSubmitModel());
+        }
+        if (other.hasImmediatelyType()) {
+          bitField0_ |= 0x00000800;
+          immediatelyType_ = other.immediatelyType_;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -1722,6 +1804,80 @@ public final class ScheduleDto {
       public Builder clearSubmitModel() {
         bitField0_ = (bitField0_ & ~0x00000400);
         submitModel_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional string immediatelyType = 12;
+      private Object immediatelyType_ = "";
+      /**
+       * <code>optional string immediatelyType = 12;</code>
+       */
+      public boolean hasImmediatelyType() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional string immediatelyType = 12;</code>
+       */
+      public String getImmediatelyType() {
+        Object ref = immediatelyType_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          immediatelyType_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      /**
+       * <code>optional string immediatelyType = 12;</code>
+       */
+      public com.google.protobuf.ByteString
+          getImmediatelyTypeBytes() {
+        Object ref = immediatelyType_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (String) ref);
+          immediatelyType_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string immediatelyType = 12;</code>
+       */
+      public Builder setImmediatelyType(
+          String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000800;
+        immediatelyType_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string immediatelyType = 12;</code>
+       */
+      public Builder clearImmediatelyType() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        immediatelyType_ = getDefaultInstance().getImmediatelyType();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string immediatelyType = 12;</code>
+       */
+      public Builder setImmediatelyTypeBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000800;
+        immediatelyType_ = value;
         onChanged();
         return this;
       }
@@ -2430,13 +2586,14 @@ public final class ScheduleDto {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\021ScheduleDto.proto\"\305\001\n\010Schedule\022\n\n\002id\030\001" +
+      "\n\021ScheduleDto.proto\"\336\001\n\010Schedule\022\n\n\002id\030\001" +
       " \001(\t\022\021\n\tclassPath\030\002 \001(\t\022\023\n\013executeTime\030\003" +
       " \001(\003\022\020\n\010taskType\030\004 \001(\t\022\016\n\006period\030\005 \001(\003\022\014" +
       "\n\004unit\030\006 \001(\t\022\r\n\005param\030\007 \001(\t\022\016\n\006source\030\010 " +
       "\001(\t\022\020\n\010executer\030\t \001(\t\022\016\n\006status\030\n \001(\005\022\024\n" +
-      "\014submit_model\030\013 \001(\005\",\n\014ScheduleList\022\034\n\ts" +
-      "chedules\030\001 \003(\0132\t.ScheduleB\rB\013ScheduleDto"
+      "\014submit_model\030\013 \001(\005\022\027\n\017immediatelyType\030\014" +
+      " \001(\t\",\n\014ScheduleList\022\034\n\tschedules\030\001 \003(\0132" +
+      "\t.ScheduleB\rB\013ScheduleDto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2448,7 +2605,7 @@ public final class ScheduleDto {
           internal_static_Schedule_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_Schedule_descriptor,
-              new String[] { "Id", "ClassPath", "ExecuteTime", "TaskType", "Period", "Unit", "Param", "Source", "Executer", "Status", "SubmitModel", });
+              new String[] { "Id", "ClassPath", "ExecuteTime", "TaskType", "Period", "Unit", "Param", "Source", "Executer", "Status", "SubmitModel", "ImmediatelyType", });
           internal_static_ScheduleList_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_ScheduleList_fieldAccessorTable = new

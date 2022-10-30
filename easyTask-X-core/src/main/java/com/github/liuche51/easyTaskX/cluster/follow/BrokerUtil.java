@@ -19,6 +19,9 @@ import com.github.liuche51.easyTaskX.zk.ZKService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class BrokerUtil {
     /**
@@ -107,5 +110,26 @@ public class BrokerUtil {
                 }
             }
         });
+    }
+
+
+    /**
+     * 随机获取一个Client
+     *
+     * @return
+     * @throws Exception
+     */
+    public static BaseNode getARandomClient() throws Exception {
+        CopyOnWriteArrayList<BaseNode> clients = BrokerService.CLIENTS;
+        BaseNode selectedNode = null;
+        if (clients == null || clients.size() == 0)
+            throw new Exception("clients==null||clients.size()==0");
+        else if (clients.size() > 1) {
+            Random random = new Random();
+            int index = random.nextInt(clients.size());//随机生成的随机数范围就变成[0,size)。
+            selectedNode = clients.get(index);
+        } else
+            selectedNode = clients.get(0);
+        return selectedNode;
     }
 }

@@ -11,6 +11,7 @@ message Schedule {
   optional string executer = 9;
   optional int32 status = 10;
   optional int32 submit_model = 11;
+  optional string immediatelyType = 12;
 
 }
 message ScheduleList {

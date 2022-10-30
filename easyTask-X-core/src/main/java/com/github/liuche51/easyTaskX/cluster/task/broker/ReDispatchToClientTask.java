@@ -65,49 +65,4 @@ public class ReDispatchToClientTask extends OnceTask {
         }
     }
 
-    /**
-     * Broker通知Client接受执行新任务
-     *
-     * @param newClient
-     * @param schedules
-     * @return
-     * @throws Exception
-     */
-    private boolean notifyClientExecuteNewTask(BaseNode newClient, List<Schedule> schedules) throws Exception {
-        ScheduleDto.ScheduleList.Builder builder0 = ScheduleDto.ScheduleList.newBuilder();
-        for (Schedule schedule : schedules) {
-            ScheduleDto.Schedule s = schedule.toScheduleDto();
-            builder0.addSchedules(s);
-        }
-        Dto.Frame.Builder builder = Dto.Frame.newBuilder();
-        builder.setIdentity(Util.generateIdentityId()).setInterfaceName(NettyInterfaceEnum.BrokerNotifyClientExecuteNewTask).setSource(BrokerService.getConfig().getAddress())
-                .setBodyBytes(builder0.build().toByteString());
-        NettyClient client = newClient.getClientWithCount(1);
-        boolean ret = NettyMsgService.sendSyncMsgWithCount(builder, client, BrokerService.getConfig().getAdvanceConfig().getTryCount(), 5, null);
-        return ret;
-    }
-
-    /**
-     * 随机获取一个Client
-     *
-     * @return
-     * @throws Exception
-     */
-    private BaseNode findNewClient(BaseNode oldClient) throws Exception {
-        CopyOnWriteArrayList<BaseNode> clients = BrokerService.CLIENTS;
-        BaseNode selectedNode = null;
-        if (clients == null || clients.size() == 0)
-            throw new Exception("clients==null||clients.size()==0");
-        else if (clients.size() > 1) {
-            Random random = new Random();
-            int index = random.nextInt(clients.size());//随机生成的随机数范围就变成[0,size)。
-            selectedNode = clients.get(index);
-        } else
-            selectedNode = clients.get(0);
-        if (oldClient.getAddress().equals(selectedNode.getAddress())) {
-            TimeUnit.SECONDS.sleep(1);//此处防止不满足条件时重复高频递归本方法
-            return findNewClient(oldClient);
-        }
-        return selectedNode;
-    }
 }

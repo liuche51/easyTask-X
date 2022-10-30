@@ -2,6 +2,8 @@ package com.github.liuche51.easyTaskX.netty.server.handler.broker;
 
 
 import com.github.liuche51.easyTaskX.cluster.master.MasterService;
+import com.github.liuche51.easyTaskX.cluster.task.master.AnnularQueueTask;
+import com.github.liuche51.easyTaskX.dto.InnerTask;
 import com.github.liuche51.easyTaskX.dto.db.Schedule;
 import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
@@ -23,7 +25,10 @@ public class ClientSubmitTaskToBrokerHandler extends BaseHandler {
         for(ScheduleDto.Schedule dto:schedulesList){
             Schedule schedule=Schedule.valueOf(dto);
             MasterService.WAIT_SUBMIT_TASK.put(schedule);//这里使用阻塞接口插入队列。不能因为队列暂时满了，而丢弃元素或返回异常，效率低
+            InnerTask innerTask=InnerTask.parseFromScheduleDto(dto);
+            AnnularQueueTask.getInstance().submitAddSlice(innerTask);
         }
+
         return null;
     }
 }
