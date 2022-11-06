@@ -70,7 +70,7 @@ public class AnnularQueueTask extends TimerTask {
                 //slice.getList().size()数量多时，会非常耗时。生产下需要关闭此处
                 // LogUtil.debug("已执行时间分片:{}，任务数量:{}", second, slice.getList() == null ? 0 : slice.getList().size());
                 lastSecond = second;
-                BrokerService.getConfig().getDispatchs().submit(new Runnable() {
+                BrokerService.getConfig().getAdvanceConfig().getDispatchs().submit(new Runnable() {
                     public void run() {
                         ConcurrentHashMap<String, InnerTask> list = slice.getList();
                         List<InnerTask> periodSchedules = new LinkedList<>();
@@ -80,7 +80,7 @@ public class AnnularQueueTask extends TimerTask {
                             InnerTask innerTask = item.getValue();
                             //判断任务是否可以本次执行
                             if (currenttime >= innerTask.getExecuteTime()) {
-                                BrokerService.getConfig().getWorkers().submit(new Runnable() {
+                                BrokerService.getConfig().getAdvanceConfig().getWorkers().submit(new Runnable() {
                                     @Override
                                     public void run() {
                                         BrokerService.notifyClientExecuteNewTask(innerTask);
@@ -145,7 +145,7 @@ public class AnnularQueueTask extends TimerTask {
         //分布式立即执行的任务，第一次不走时间分片环形队列，直接提交执行。
         if (innerTask.getImmediatelyType().equals(ImmediatelyType.DISTRIB)) {
             LogUtil.debug("分布式立即执行类工作任务:{}已提交代理执行", innerTask.getId());
-            BrokerService.getConfig().getWorkers().submit(new Runnable() {
+            BrokerService.getConfig().getAdvanceConfig().getWorkers().submit(new Runnable() {
                 @Override
                 public void run() {
                     BrokerService.notifyClientExecuteNewTask(innerTask);

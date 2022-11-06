@@ -36,14 +36,6 @@ public class EasyTaskConfig {
     private int cmdPort = 3030;
 
     /**
-     * 环形队列任务调度线程池
-     */
-    private ExecutorService dispatchs = null;
-    /**
-     * 环形队列工作任务线程池
-     */
-    private ExecutorService workers = null;
-    /**
      * 高级配置项
      */
     private AdvanceConfig advanceConfig=new AdvanceConfig();
@@ -111,21 +103,7 @@ public class EasyTaskConfig {
         this.cmdPort = cmdPort;
     }
 
-    public ExecutorService getDispatchs() {
-        return dispatchs;
-    }
 
-    public void setDispatchs(ExecutorService dispatchs) {
-        this.dispatchs = dispatchs;
-    }
-
-    public ExecutorService getWorkers() {
-        return workers;
-    }
-
-    public void setWorkers(ExecutorService workers) {
-        this.workers = workers;
-    }
 
     public AdvanceConfig getAdvanceConfig() {
         return advanceConfig;
@@ -148,9 +126,9 @@ public class EasyTaskConfig {
             throw new Exception("taskStorePath is necessary!");
         if (config.getAdvanceConfig().getClusterPool() == null)
             config.getAdvanceConfig().setClusterPool(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2));
-        if (config.dispatchs == null)
-            config.dispatchs = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        if (config.workers == null)
-            config.workers = Executors.newCachedThreadPool();
+        if (config.getAdvanceConfig().getDispatchs() == null)
+            config.getAdvanceConfig().setDispatchs( Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()));
+        if (config.getAdvanceConfig().getWorkers() == null)
+            config.getAdvanceConfig().setWorkers(Executors.newCachedThreadPool());
     }
 }

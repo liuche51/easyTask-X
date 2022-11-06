@@ -6,6 +6,7 @@ import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
 import com.github.liuche51.easyTaskX.enume.ImmediatelyType;
 import com.github.liuche51.easyTaskX.enume.TaskType;
 import com.github.liuche51.easyTaskX.enume.TimeUnit;
+import com.github.liuche51.easyTaskX.util.DateUtils;
 
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -28,7 +29,8 @@ public class InnerTask {
     private String source;
     private String broker;//任务所属
     private Map<String, String> param;
-
+    private ZonedDateTime startTime;
+    private ZonedDateTime endTime;
     public long getExecuteTime() {
         return executeTime;
     }
@@ -117,6 +119,22 @@ public class InnerTask {
         this.broker = broker;
     }
 
+    public ZonedDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(ZonedDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public ZonedDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(ZonedDateTime endTime) {
+        this.endTime = endTime;
+    }
+
     /**
      * 获取周期性任务下次执行时间。已当前时间为基准计算下次而不是上次截止执行时间
      *
@@ -162,8 +180,10 @@ public class InnerTask {
     public ScheduleDto.Schedule toScheduleDto() throws Exception {
         ScheduleDto.Schedule.Builder builder = ScheduleDto.Schedule.newBuilder();
         builder.setId(this.getId()).setClassPath(this.getTaskClassPath()).setExecuteTime(this.getExecuteTime())
-                .setTaskType(this.getTaskType().name()).setImmediatelyType(this.getImmediatelyType().name()).setPeriod(this.period).setUnit(this.getUnit().name())
-                .setParam(JSONObject.toJSONString(this.getParam())).setSource(BrokerService.getConfig().getAddress());
+                .setTaskType(this.getTaskType().name()).setImmediatelyType(this.getImmediatelyType().name())
+                .setPeriod(this.period).setUnit(this.getUnit().name()).setStartTime(DateUtils.getTimeStamp(this.startTime))
+                .setEndTime(DateUtils.getTimeStamp(this.endTime)).setParam(JSONObject.toJSONString(this.getParam()))
+                .setSource(BrokerService.getConfig().getAddress());
         return builder.build();
     }
     /**
@@ -182,6 +202,8 @@ public class InnerTask {
         task.setImmediatelyType(ImmediatelyType.getByValue(schedule.getImmediatelyType()));
         task.setUnit(TimeUnit.getByValue(schedule.getUnit()));
         task.setTaskClassPath(schedule.getClassPath());
+        task.setStartTime(DateUtils.parse(schedule.getStartTime()));
+        task.setEndTime(DateUtils.parse(schedule.getEndTime()));
         //task.setGroup();
         return task;
     }

@@ -32,6 +32,11 @@ public class AdvanceConfig {
      */
     private boolean debug=false;
     /**
+     * 任务跟踪日志存储形式。需要开启debug，默认null，表示记录在日志文件中。
+     * 1、其他还有内存存储（memory），local(本地磁盘db存储)，ext（外部扩展存储，比如接入mq、es、db等）
+     */
+    private String taskTraceStoreModel=null;
+    /**
      * binlog同步一次数据量。
      */
     private int binlogCount = 100;
@@ -65,6 +70,15 @@ public class AdvanceConfig {
      * 从leader更新Clients列表间隔时间。单位小时。
      */
     private int updateClientsTime = 1;
+
+    /**
+     * 环形队列任务调度线程池
+     */
+    private ExecutorService dispatchs = null;
+    /**
+     * 环形队列工作任务线程池
+     */
+    private ExecutorService workers = null;
     /**
      * 集群公用程池
      */
@@ -143,6 +157,14 @@ public class AdvanceConfig {
         this.debug = debug;
     }
 
+    public String getTaskTraceStoreModel() {
+        return taskTraceStoreModel;
+    }
+
+    public void setTaskTraceStoreModel(String taskTraceStoreModel) {
+        this.taskTraceStoreModel = taskTraceStoreModel;
+    }
+
     public void setBinlogCount(int binlogCount) throws Exception {
         if ( this.binlogCount < 1)
             throw new Exception("binlogCount must >=1");
@@ -211,5 +233,20 @@ public class AdvanceConfig {
 
     public void setClusterPool(ExecutorService clusterPool) {
         this.clusterPool = clusterPool;
+    }
+    public ExecutorService getDispatchs() {
+        return dispatchs;
+    }
+
+    public void setDispatchs(ExecutorService dispatchs) {
+        this.dispatchs = dispatchs;
+    }
+
+    public ExecutorService getWorkers() {
+        return workers;
+    }
+
+    public void setWorkers(ExecutorService workers) {
+        this.workers = workers;
     }
 }
