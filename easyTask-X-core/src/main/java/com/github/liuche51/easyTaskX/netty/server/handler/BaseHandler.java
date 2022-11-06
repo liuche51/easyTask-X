@@ -23,7 +23,6 @@ public abstract class BaseHandler {
             {
                 //Client to Broker
                 put(NettyInterfaceEnum.ClientSubmitTaskToBroker,new ClientSubmitTaskToBrokerHandler());
-                put(NettyInterfaceEnum.ClientNotifyBrokerDeleteTask,new ClientNotifyBrokerDeleteTaskHandler());
                 //Client to Leader
                 put(NettyInterfaceEnum.ClientRequestLeaderSendBrokers,new ClientRequestLeaderSendBrokersHandler());
                 put(NettyInterfaceEnum.ClientNotifyLeaderDeleteTask,new ClientNotifyLeaderDeleteTaskHandler());

@@ -163,8 +163,7 @@ public class InnerTask {
         ScheduleDto.Schedule.Builder builder = ScheduleDto.Schedule.newBuilder();
         builder.setId(this.getId()).setClassPath(this.getTaskClassPath()).setExecuteTime(this.getExecuteTime())
                 .setTaskType(this.getTaskType().name()).setImmediatelyType(this.getImmediatelyType().name()).setPeriod(this.period).setUnit(this.getUnit().name())
-                .setParam(JSONObject.toJSONString(this.getParam())).setSource(BrokerService.getConfig().getAddress())
-                .setExecuter(this.getBroker());
+                .setParam(JSONObject.toJSONString(this.getParam())).setSource(BrokerService.getConfig().getAddress());
         return builder.build();
     }
     /**

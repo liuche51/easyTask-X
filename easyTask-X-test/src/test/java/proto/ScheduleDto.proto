@@ -8,10 +8,11 @@ message Schedule {
   optional string unit = 6;
   optional  string param = 7;
   optional string source = 8;
-  optional string executer = 9;
-  optional int32 status = 10;
-  optional int32 submit_model = 11;
-  optional string immediatelyType = 12;
+  optional int32 status = 9;
+  optional int32 submit_model = 10;
+  optional string immediatelyType = 11;
+  optional int64 startTime=12;
+  optional int64 endTime=13;
 
 }
 message ScheduleList {

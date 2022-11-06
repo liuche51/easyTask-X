@@ -1,6 +1,10 @@
 package com.github.liuche51.easyTaskX.dto.db;
 
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
+import com.github.liuche51.easyTaskX.util.DateUtils;
+import com.github.liuche51.easyTaskX.util.StringUtils;
+
+import java.time.ZonedDateTime;
 
 public class ScheduleBak {
     private String id;
@@ -11,10 +15,6 @@ public class ScheduleBak {
     private String unit;
     private String param;
     private String source;
-    /**
-     * 当前任务执行的Client
-     */
-    private String executer;
     private String transactionId;
     private String createTime;
     private String modifyTime;
@@ -22,6 +22,8 @@ public class ScheduleBak {
      * 任务状态。1正常，0暂时不可用
      */
     private int status;
+    private ZonedDateTime startTime;
+    private ZonedDateTime endTime;
     public String getId() {
         return id;
     }
@@ -84,13 +86,6 @@ public class ScheduleBak {
     public void setSource(String source) {
         this.source = source;
     }
-    public String getExecuter() {
-        return executer;
-    }
-
-    public void setExecuter(String executer) {
-        this.executer = executer;
-    }
 
     public int getStatus() {
         return status;
@@ -122,6 +117,23 @@ public class ScheduleBak {
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
+
+    public ZonedDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(ZonedDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public ZonedDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(ZonedDateTime endTime) {
+        this.endTime = endTime;
+    }
+
     public static ScheduleBak valueOf(ScheduleDto.Schedule dto){
         ScheduleBak schedule=new ScheduleBak();
         schedule.id=dto.getId();
@@ -132,8 +144,9 @@ public class ScheduleBak {
         schedule.unit=dto.getUnit();
         schedule.param=dto.getParam();
         schedule.source=dto.getSource();
-        schedule.executer=dto.getExecuter();
         schedule.status=dto.getStatus();
+        schedule.startTime= DateUtils.parse(dto.getStartTime());
+        schedule.endTime= DateUtils.parse(dto.getEndTime());
         return schedule;
     }
 }

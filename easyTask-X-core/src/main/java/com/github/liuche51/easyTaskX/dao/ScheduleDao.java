@@ -240,7 +240,6 @@ public class ScheduleDao {
         schedule.setCreateTime(createTime);
         schedule.setModifyTime(modifyTime);
         schedule.setSource(source);
-        schedule.setExecuter(executer);
         schedule.setStatus(status);
         return schedule;
     }
@@ -260,7 +259,6 @@ public class ScheduleDao {
             sql1.append(schedule.getParam()).append("','");
             sql1.append(schedule.getCreateTime()).append("','");
             sql1.append(schedule.getModifyTime()).append("','");
-            sql1.append(schedule.getExecuter()).append("',");
             sql1.append(schedule.getStatus()).append(",'");
             sql1.append(schedule.getSource()).append("')").append(',');
         }

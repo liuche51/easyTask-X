@@ -147,7 +147,6 @@ public class ScheduleBakDao {
         schedulebak.setUnit(unit);
         schedulebak.setParam(param);
         schedulebak.setSource(source);
-        schedulebak.setExecuter(executer);
         schedulebak.setStatus(status);
         schedulebak.setCreateTime(createTime);
         return schedulebak;
@@ -166,7 +165,6 @@ public class ScheduleBakDao {
             sql1.append(scheduleBak.getUnit()).append("','");
             sql1.append(scheduleBak.getParam()).append("','");
             sql1.append(scheduleBak.getSource()).append("','");
-            sql1.append(scheduleBak.getExecuter()).append("',");
             sql1.append(scheduleBak.getStatus()).append(",'");
             sql1.append(scheduleBak.getCreateTime()).append("','");
             sql1.append(scheduleBak.getModifyTime()).append("')").append(',');

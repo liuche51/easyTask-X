@@ -24,8 +24,9 @@ public class ScheduleBakInit {
                     "\"create_time\"  TEXT,\n" +
                     "\"modify_time\"  TEXT,\n" +
                     "\"source\"  TEXT,\n" +
-                    "\"executer\"  TEXT,\n" +
                     "\"status\"  INTEGER,\n" +
+                    "\"startTime\"  TEXT,\n" +
+                    "\"endTime\"  TEXT,\n" +
                     "PRIMARY KEY (\"id\" ASC)\n" +
                     ");";
             SqliteHelper helper = new SqliteHelper(DbTableName.SCHEDULE_BAK);

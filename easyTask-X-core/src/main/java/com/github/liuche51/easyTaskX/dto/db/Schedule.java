@@ -2,6 +2,9 @@ package com.github.liuche51.easyTaskX.dto.db;
 
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
+import com.github.liuche51.easyTaskX.util.DateUtils;
+
+import java.time.ZonedDateTime;
 
 public class Schedule {
     private String id;
@@ -21,14 +24,11 @@ public class Schedule {
     private String modifyTime;
     private String source;
     /**
-     * 当前任务执行的Client
-     */
-    private String executer;
-    /**
      * 任务状态。1正常，0暂时不可用
      */
     private int status;
-
+    private ZonedDateTime startTime;
+    private ZonedDateTime endTime;
     /**
      * 任务提交模式。不保存库中
      * 0（高性能模式，任务提交至等待发送服务端队列成功即算成功）
@@ -117,14 +117,6 @@ public class Schedule {
         this.source = source;
     }
 
-    public String getExecuter() {
-        return executer;
-    }
-
-    public void setExecuter(String executer) {
-        this.executer = executer;
-    }
-
     public int getStatus() {
         return status;
     }
@@ -141,6 +133,22 @@ public class Schedule {
         this.submit_model = submit_model;
     }
 
+    public ZonedDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(ZonedDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public ZonedDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(ZonedDateTime endTime) {
+        this.endTime = endTime;
+    }
+
     public static Schedule valueOf(ScheduleBak bak){
         Schedule schedule=new Schedule();
         schedule.id=bak.getId();
@@ -151,8 +159,9 @@ public class Schedule {
         schedule.unit=bak.getUnit();
         schedule.param=bak.getParam();
         schedule.source=bak.getSource();
-        schedule.executer=bak.getExecuter();
         schedule.status=bak.getStatus();
+        schedule.startTime=bak.getStartTime();
+        schedule.endTime=bak.getEndTime();
         return schedule;
     }
     public static Schedule valueOf(ScheduleDto.Schedule dto){
@@ -165,9 +174,10 @@ public class Schedule {
         schedule.unit=dto.getUnit();
         schedule.param=dto.getParam();
         schedule.source=dto.getSource();
-        schedule.executer=dto.getExecuter();
         schedule.status=dto.getStatus();
-        schedule.setSubmit_model(dto.getSubmitModel());
+        schedule.submit_model=dto.getSubmitModel();
+        schedule.startTime= DateUtils.parse(dto.getStartTime());
+        schedule.endTime= DateUtils.parse(dto.getEndTime());
         return schedule;
     }
 
@@ -180,7 +190,8 @@ public class Schedule {
         builder.setId(this.id).setClassPath(this.classPath).setExecuteTime(this.executeTime)
                 .setTaskType(this.taskType).setPeriod(this.period).setUnit(this.unit)
                 .setParam(this.param).setSource(BrokerService.getConfig().getAddress())
-                .setExecuter(this.executer).setStatus(this.status);
+                .setStatus(this.status).setStartTime(DateUtils.getTimeStamp(this.startTime))
+                .setEndTime(DateUtils.getTimeStamp(this.endTime));
         return builder.build();
     }
 }
