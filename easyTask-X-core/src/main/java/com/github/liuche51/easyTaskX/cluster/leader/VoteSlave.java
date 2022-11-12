@@ -7,8 +7,8 @@ import com.github.liuche51.easyTaskX.dto.RegNode;
 import com.github.liuche51.easyTaskX.enume.DataStatusEnum;
 import com.github.liuche51.easyTaskX.enume.NodeStatusEnum;
 import com.github.liuche51.easyTaskX.util.LogUtil;
-import com.github.liuche51.easyTaskX.util.exception.VotedException;
-import com.github.liuche51.easyTaskX.util.exception.VotingException;
+import com.github.liuche51.easyTaskX.exception.VotedException;
+import com.github.liuche51.easyTaskX.exception.VotingException;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

@@ -7,6 +7,7 @@ import com.github.liuche51.easyTaskX.dto.proto.Dto;
 import com.github.liuche51.easyTaskX.dto.proto.StringListDto;
 import com.github.liuche51.easyTaskX.enume.SubmitTaskResultStatusEnum;
 import com.github.liuche51.easyTaskX.netty.server.handler.BaseHandler;
+import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
 import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.google.protobuf.ByteString;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * slave通知Master，已经同步了还不能使用的任务。
+ * Master响应：slave通知Master，已经同步了还不能使用的任务。
  */
 public class SlaveNotifyMasterHasSyncUnUseTaskHandler extends BaseHandler {
 
@@ -27,6 +28,7 @@ public class SlaveNotifyMasterHasSyncUnUseTaskHandler extends BaseHandler {
         for (String task : tasks) {
             String[] split = task.split(StringConstant.CHAR_SPRIT_COMMA);//任务ID,状态,错误信息
             String taskId = split[0], error = split[2];
+            LogUtil.trace(taskId,"Master收到slave通知的已经同步了还不能使用的任务，"+task);
             int status = Integer.parseInt(split[1]);
             Map<String, Object> map = MasterService.SLAVE_SYNC_TASK_RECORD.get(taskId);
             if (map == null) {//第一个反馈的slave处理就行，后续反馈的就直接抛弃。避免重复处理

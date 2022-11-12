@@ -16,7 +16,7 @@ import com.github.liuche51.easyTaskX.enume.RegNodeTypeEnum;
 import com.github.liuche51.easyTaskX.util.DateUtils;
 import com.github.liuche51.easyTaskX.util.LogUtil;
 import com.github.liuche51.easyTaskX.util.StringConstant;
-import com.github.liuche51.easyTaskX.util.exception.VotingException;
+import com.github.liuche51.easyTaskX.exception.VotingException;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
