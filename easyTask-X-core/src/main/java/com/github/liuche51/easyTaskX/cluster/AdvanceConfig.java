@@ -39,6 +39,10 @@ public class AdvanceConfig {
      */
     private String taskTraceStoreModel=null;
     /**
+     * 任务跟踪日志队列写库频率。毫秒
+     */
+    private int traceLogWriteIntervalTimes = 1000;
+    /**
      * binlog同步一次数据量。
      */
     private int binlogCount = 100;
@@ -169,6 +173,14 @@ public class AdvanceConfig {
 
     public void setTaskTraceStoreModel(String taskTraceStoreModel) {
         this.taskTraceStoreModel = taskTraceStoreModel;
+    }
+
+    public int getTraceLogWriteIntervalTimes() {
+        return traceLogWriteIntervalTimes;
+    }
+
+    public void setTraceLogWriteIntervalTimes(int traceLogWriteIntervalTimes) {
+        this.traceLogWriteIntervalTimes = traceLogWriteIntervalTimes;
     }
 
     public void setBinlogCount(int binlogCount) throws Exception {

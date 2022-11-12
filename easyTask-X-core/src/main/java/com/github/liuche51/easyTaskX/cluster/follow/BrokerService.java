@@ -5,10 +5,7 @@ import com.github.liuche51.easyTaskX.cluster.master.MasterService;
 import com.github.liuche51.easyTaskX.cluster.slave.SlaveService;
 import com.github.liuche51.easyTaskX.cluster.task.OnceTask;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
-import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerNotifyClientSubmitTaskResultTask;
-import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerRequestUpdateRegeditTask;
-import com.github.liuche51.easyTaskX.cluster.task.broker.BrokerUpdateClientsTask;
-import com.github.liuche51.easyTaskX.cluster.task.broker.HeartbeatsTask;
+import com.github.liuche51.easyTaskX.cluster.task.broker.*;
 import com.github.liuche51.easyTaskX.cluster.task.master.AnnularQueueTask;
 import com.github.liuche51.easyTaskX.cluster.task.master.ClearDataTask;
 import com.github.liuche51.easyTaskX.dao.dbinit.DbInit;
@@ -135,6 +132,7 @@ public class BrokerService {
         timerTasks.add(MasterService.startMasterUpdateSubmitTaskStatusTask());
         timerTasks.add(MasterService.startMasterDeleteTaskTask());
         timerTasks.add(MasterService.startMasterUpdateSlaveDataStatusTask());
+        timerTasks.add(startTraceLogTask());
         ZKService.listenLeaderDataNode();
     }
     /**
@@ -198,6 +196,15 @@ public class BrokerService {
      */
     public static TimerTask startBrokerNotifyClientSubmitTaskResultTask() {
         BrokerNotifyClientSubmitTaskResultTask task = new BrokerNotifyClientSubmitTaskResultTask();
+        task.start();
+        return task;
+    }
+
+    /**
+     * 启动任务跟踪日志写库任务
+     */
+    public static TimerTask startTraceLogTask() {
+        TraceLogTask task = new TraceLogTask();
         task.start();
         return task;
     }

@@ -25,7 +25,7 @@ public class TraceLogUtil {
     /**
      * 等待写本地库的跟踪日志
      */
-    private static LinkedBlockingQueue<TraceLog> TASK_TRACE_WAITTO_WRITEDB=new LinkedBlockingQueue<>(5000);
+    public static LinkedBlockingQueue<TraceLog> TASK_TRACE_WAITTO_WRITEDB=new LinkedBlockingQueue<>(BrokerService.getConfig().getAdvanceConfig().getTaskQueueCapacity());
     /**
      * 任务跟踪日志专用
      * @param taskId
