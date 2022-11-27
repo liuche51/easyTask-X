@@ -1,7 +1,5 @@
 package com.github.liuche51.easyTaskX.cluster;
 
-import com.github.liuche51.easyTaskX.ext.TaskTraceExt;
-
 import java.util.concurrent.ExecutorService;
 
 public class AdvanceConfig {
@@ -38,6 +36,10 @@ public class AdvanceConfig {
      * 1、其他还有内存存储（memory），local(本地磁盘db存储)，ext（外部扩展存储，比如接入mq、es、db等）
      */
     private String taskTraceStoreModel=null;
+    /**
+     * 任务跟踪日志外部扩展接受日志的URL
+     */
+    private String taskTraceExtUrl;
     /**
      * 任务跟踪日志队列写库频率。毫秒
      */
@@ -76,11 +78,6 @@ public class AdvanceConfig {
      * 从leader更新Clients列表间隔时间。单位小时。
      */
     private int updateClientsTime = 1;
-    /**
-     * 任务跟踪日志扩展实现类。
-     * 1、用户需要将组件产生的日志接入外部统一数据中心时使用
-     */
-    private TaskTraceExt taskTraceExt;
     /**
      * 环形队列任务调度线程池
      */
@@ -175,6 +172,14 @@ public class AdvanceConfig {
         this.taskTraceStoreModel = taskTraceStoreModel;
     }
 
+    public String getTaskTraceExtUrl() {
+        return taskTraceExtUrl;
+    }
+
+    public void setTaskTraceExtUrl(String taskTraceExtUrl) {
+        this.taskTraceExtUrl = taskTraceExtUrl;
+    }
+
     public int getTraceLogWriteIntervalTimes() {
         return traceLogWriteIntervalTimes;
     }
@@ -267,15 +272,5 @@ public class AdvanceConfig {
     public void setWorkers(ExecutorService workers) {
         this.workers = workers;
     }
-    public TaskTraceExt getTaskTraceExt() {
-        return taskTraceExt;
-    }
 
-    /**
-     * 注册任务跟踪日志扩展实现
-     * @param taskTraceExt
-     */
-    public void registerTaskTraceExt(TaskTraceExt taskTraceExt) {
-        this.taskTraceExt = taskTraceExt;
-    }
 }

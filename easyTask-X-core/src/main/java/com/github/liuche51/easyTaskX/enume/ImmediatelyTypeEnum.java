@@ -3,7 +3,7 @@ package com.github.liuche51.easyTaskX.enume;
 /**
  * 立即执行类型
  */
-public enum ImmediatelyType {
+public enum ImmediatelyTypeEnum {
     /**
      * 不需要立即执行
      */
@@ -19,7 +19,7 @@ public enum ImmediatelyType {
     DISTRIB(2);
     private int value;
 
-    private ImmediatelyType(int value) {
+    private ImmediatelyTypeEnum(int value) {
         this.value = value;
     }
 
@@ -27,14 +27,14 @@ public enum ImmediatelyType {
         return value;
     }
 
-    public static ImmediatelyType getByValue(String value) {
+    public static ImmediatelyTypeEnum getByValue(String value) {
         switch (value) {
             case "0":
-                return ImmediatelyType.NONE;
+                return ImmediatelyTypeEnum.NONE;
             case "1":
-                return ImmediatelyType.LOCAL;
+                return ImmediatelyTypeEnum.LOCAL;
             case "2":
-                return ImmediatelyType.DISTRIB;
+                return ImmediatelyTypeEnum.DISTRIB;
             default:
                 return null;
         }

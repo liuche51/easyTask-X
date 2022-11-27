@@ -1,5 +1,6 @@
 package com.github.liuche51.easyTaskX.cluster;
 
+import com.github.liuche51.easyTaskX.enume.TaskTraceStoreModel;
 import com.github.liuche51.easyTaskX.util.StringUtils;
 import com.github.liuche51.easyTaskX.util.Util;
 import org.slf4j.Logger;
@@ -124,6 +125,8 @@ public class EasyTaskConfig {
             throw new Exception("zkAddress is necessary!");
         if (StringUtils.isNullOrEmpty(config.taskStorePath))
             throw new Exception("taskStorePath is necessary!");
+        if(TaskTraceStoreModel.EXT.equalsIgnoreCase(config.getAdvanceConfig().getTaskTraceStoreModel())&&StringUtils.isNullOrEmpty(config.getAdvanceConfig().getTaskTraceExtUrl()))
+            throw new Exception("taskTraceExtUrl is necessary!");
         if (config.getAdvanceConfig().getClusterPool() == null)
             config.getAdvanceConfig().setClusterPool(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2));
         if (config.getAdvanceConfig().getDispatchs() == null)

@@ -3,7 +3,7 @@ package com.github.liuche51.easyTaskX.dto;
 import com.alibaba.fastjson.JSONObject;
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
 import com.github.liuche51.easyTaskX.dto.proto.ScheduleDto;
-import com.github.liuche51.easyTaskX.enume.ImmediatelyType;
+import com.github.liuche51.easyTaskX.enume.ImmediatelyTypeEnum;
 import com.github.liuche51.easyTaskX.enume.TaskType;
 import com.github.liuche51.easyTaskX.enume.TimeUnit;
 import com.github.liuche51.easyTaskX.util.DateUtils;
@@ -22,7 +22,7 @@ public class InnerTask {
     private TaskType taskType = TaskType.ONECE;
     private long period;
     private TimeUnit unit;
-    private ImmediatelyType immediatelyType = ImmediatelyType.NONE;//立即执行类型
+    private ImmediatelyTypeEnum immediatelyType = ImmediatelyTypeEnum.NONE;//立即执行类型
     private String id;
     private String taskClassPath;
     private String group = "Default";//默认分组
@@ -63,11 +63,11 @@ public class InnerTask {
         this.unit = unit;
     }
 
-    public ImmediatelyType getImmediatelyType() {
+    public ImmediatelyTypeEnum getImmediatelyType() {
         return immediatelyType;
     }
 
-    public void setImmediatelyType(ImmediatelyType immediatelyType) {
+    public void setImmediatelyType(ImmediatelyTypeEnum immediatelyType) {
         this.immediatelyType = immediatelyType;
     }
 
@@ -199,7 +199,7 @@ public class InnerTask {
         task.setParam(JSONObject.parseObject(schedule.getParam(), Map.class));
         task.setPeriod(schedule.getPeriod());
         task.setTaskType(TaskType.getByValue(schedule.getTaskType()));
-        task.setImmediatelyType(ImmediatelyType.getByValue(schedule.getImmediatelyType()));
+        task.setImmediatelyType(ImmediatelyTypeEnum.getByValue(schedule.getImmediatelyType()));
         task.setUnit(TimeUnit.getByValue(schedule.getUnit()));
         task.setTaskClassPath(schedule.getClassPath());
         task.setStartTime(DateUtils.parse(schedule.getStartTime()));

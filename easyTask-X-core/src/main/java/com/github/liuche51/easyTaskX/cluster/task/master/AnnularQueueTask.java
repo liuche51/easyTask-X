@@ -2,11 +2,10 @@ package com.github.liuche51.easyTaskX.cluster.task.master;
 
 
 import com.github.liuche51.easyTaskX.cluster.follow.BrokerService;
-import com.github.liuche51.easyTaskX.cluster.follow.ClientService;
 import com.github.liuche51.easyTaskX.cluster.task.TimerTask;
 import com.github.liuche51.easyTaskX.dto.InnerTask;
 import com.github.liuche51.easyTaskX.dto.Slice;
-import com.github.liuche51.easyTaskX.enume.ImmediatelyType;
+import com.github.liuche51.easyTaskX.enume.ImmediatelyTypeEnum;
 import com.github.liuche51.easyTaskX.enume.TaskType;
 import com.github.liuche51.easyTaskX.util.LogUtil;
 
@@ -143,7 +142,7 @@ public class AnnularQueueTask extends TimerTask {
      */
     public void submitAddSlice(InnerTask innerTask) throws Exception {
         //分布式立即执行的任务，第一次不走时间分片环形队列，直接提交执行。
-        if (innerTask.getImmediatelyType().equals(ImmediatelyType.DISTRIB)) {
+        if (innerTask.getImmediatelyType().equals(ImmediatelyTypeEnum.DISTRIB)) {
             LogUtil.debug("分布式立即执行类工作任务:{}已提交代理执行", innerTask.getId());
             BrokerService.getConfig().getAdvanceConfig().getWorkers().submit(new Runnable() {
                 @Override
